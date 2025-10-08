@@ -1,0 +1,2 @@
+/Users/panuwitchaiton/webuild/ssm_mall/mobile_mart_v3/android/app/.cxx/Debug/3h36p272/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/panuwitchaiton/webuild/ssm_mall/mobile_mart_v3/android/app/.cxx/Debug/3h36p272/armeabi-v7a/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,2 @@
+/Users/ratchanon.k/Desktop/kumall/android/app/.cxx/Debug/s6r3m5p4/x86_64/CMakeFiles/edit_cache.dir
+/Users/ratchanon.k/Desktop/kumall/android/app/.cxx/Debug/s6r3m5p4/x86_64/CMakeFiles/rebuild_cache.dir

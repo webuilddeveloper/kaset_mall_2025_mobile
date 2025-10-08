@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true />
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleLocalizations</key>
+		<array>
+			<string>en</string>
+			<string>th</string>
+		</array>
+		<key>CFBundleName</key>
+		<string>SUKSAPAN Mall</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(MARKETING_VERSION)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>LINELoginAPI</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>line3rdp.$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>FACEBOOKLoginAPI</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>fb844396240125700</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>GOOGLELoginAPI</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>com.googleusercontent.apps.773066081983-eqsp8qc9fridlun1s4k7fdvhmjl6kpvu</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>SspMall</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>sspmall</string>
+				</array>
+			</dict>
+		</array>
+		<key>CFBundleVersion</key>
+		<string>$(CURRENT_PROJECT_VERSION)</string>
+		<key>FacebookAppID</key>
+		<string>844396240125700</string>
+		<key>FacebookClientToken</key>
+		<string>CLIENT-TOKEN</string>
+		<key>FacebookDisplayName</key>
+		<string>SUKSAPAN Mall</string>
+		<key>FirebaseAppDelegateProxyEnabled</key>
+		<false />
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>tel</string>
+			<string>fbapi</string>
+			<string>fb-messenger-share-api</string>
+			<string>fbauth2</string>
+			<string>fbshareextension</string>
+			<string>lineauth2</string>
+			<string>line3rdp.$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<string>googlechromes</string>
+			<string>googlechrome</string>
+			<string>gsaviewcontroller</string>
+		</array>
+		<key>LSRequiresIPhoneOS</key>
+		<true />
+		<key>LineSDKConfig</key>
+		<dict>
+			<key>ChannelID</key>
+			<string>1660657781</string>
+		</dict>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true />
+		</dict>
+		<key>NSAppleMusicUsageDescription</key>
+		<string>SUKSAPAN Mall Music Usage</string>
+		<key>NSBluetoothAlwaysUsageDescription</key>
+		<string>SUKSAPAN Mall Bluetool Usage</string>
+		<key>NSBluetoothPeripheralUsageDescription</key>
+		<string>SUKSAPAN Mall BluetoothPeripheral</string>
+		<key>NSCalendarsUsageDescription</key>
+		<string>SUKSAPAN Mall Calendar Usage</string>
+		<key>NSCameraUsageDescription</key>
+		<string>เพื่อแสดงรูปภาพโปรไฟล์ของคุณ</string>
+		<key>NSContactsUsageDescription</key>
+		<string>SUKSAPAN Mall ต้องการเข้าถึงข้อมูลการติดต่อของคุณ</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>SUKSAPAN Mall FaceID Usage</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>เพื่อแสดงตำแหน่งปัจจุบันของคุณ และแนะนำสถานที่น่าสนใจให้กับคุณ</string>
+		<key>NSLocationUsageDescription</key>
+		<string>เพื่อแสดงตำแหน่งปัจจุบันของคุณ และแนะนำสถานที่น่าสนใจให้กับคุณ</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>เพื่อแสดงตำแหน่งปัจจุบันของคุณ และแนะนำสถานที่น่าสนใจให้กับคุณ</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>SUKSAPAN Mall Microphone Usage</string>
+		<key>NSMotionUsageDescription</key>
+		<string>SUKSAPAN Mall Motion Usage</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>เพื่อแสดงรูปภาพโปรไฟล์ของคุณ</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>เพื่อแสดงรูปภาพโปรไฟล์ของคุณ</string>
+		<key>NSRemindersUsageDescription</key>
+		<string>SUKSAPAN Mall Reminder Usage</string>
+		<key>NSSiriUsageDescription</key>
+		<string>SUKSAPAN Mall Siri Usage</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>SUKSAPAN Mall Speech Recognition Usage</string>
+		<key>NSVideoSubscriberAccountUsageDescription</key>
+		<string>SUKSAPAN Mall Video Subscribe Usage</string>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true />
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>fetch</string>
+			<string>remote-notification</string>
+		</array>
+		<key>NSUserNotificationUsageDescription</key>
+		<string>We use notifications to alert you.</string>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UIRequiresFullScreen</key>
+		<true />
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false />
+		<key>io.flutter.embedded_views_preview</key>
+		<true />
+		<key>kTCCServiceMediaLibrary</key>
+		<string>SUKSAPAN Mall MediaLibrary Usage</string>
+	</dict>
+</plist>

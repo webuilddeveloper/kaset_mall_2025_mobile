@@ -1,0 +1,2 @@
+/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/armeabi-v7a/CMakeFiles/rebuild_cache.dir

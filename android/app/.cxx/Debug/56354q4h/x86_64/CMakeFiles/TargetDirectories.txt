@@ -1,0 +1,2 @@
+/Users/saksitmukdasanit/Sources/ssp/mobile_mart_v3/android/app/.cxx/Debug/56354q4h/x86_64/CMakeFiles/edit_cache.dir
+/Users/saksitmukdasanit/Sources/ssp/mobile_mart_v3/android/app/.cxx/Debug/56354q4h/x86_64/CMakeFiles/rebuild_cache.dir

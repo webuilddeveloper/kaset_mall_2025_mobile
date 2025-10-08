@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/webuild/Development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/webuild/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/webuild/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SUKSAPAN Mall</string>
+    <string name="facebook_app_id">844396240125700</string>
+    <string name="facebook_client_token">577023fb61e45cef0bfb9d88ca5c5c47</string>
+    <string name="fb_login_protocol_scheme">fb844396240125700</string>
+    <string name="line_channel_id">1660657781</string>
+</resources>

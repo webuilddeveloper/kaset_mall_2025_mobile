@@ -1,0 +1,2 @@
+/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/Debug/8366044l/x86/CMakeFiles/edit_cache.dir
+/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/Debug/8366044l/x86/CMakeFiles/rebuild_cache.dir
