@@ -406,55 +406,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     ],
                   ),
                 ),
-                // SizedBox(width: 10),
-                // Expanded(
-                //   child: GestureDetector(
-                //     onTap: () {
-                //       Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //           builder: (_) => SearchPage(),
-                //         ),
-                //       ).then((value) => _getCountItemInCart());
-                //     },
-                //     child: Container(
-                //       height:
-                //           AdaptiveTextSize().getadaptiveTextSize(context, 35),
-                //       padding: EdgeInsets.symmetric(horizontal: 15),
-                //       decoration: BoxDecoration(
-                //         border: Border.all(
-                //           color: Color(0xFF707070),
-                //           width: 1,
-                //         ),
-                //         borderRadius: BorderRadius.circular(40),
-                //       ),
-                //       child: Row(
-                //         crossAxisAlignment: CrossAxisAlignment.center,
-                //         children: [
-                //           Expanded(
-                //             child: Text(
-                //               'ค้นหารายการสินค้า',
-                //               style: TextStyle(
-                //                 fontSize: 13,
-                //                 color: Color(0xFF707070),
-                //               ),
-                //               textScaleFactor:
-                //                   ScaleSize.textScaleFactor(context),
-                //               textAlign: TextAlign.start,
-                //             ),
-                //           ),
-                //           SizedBox(width: 10),
-                //           Icon(
-                //             Icons.search,
-                //             size: AdaptiveTextSize()
-                //                 .getadaptiveTextSize(context, 20),
-                //             color: Color(0xFF000000),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
                 SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
@@ -485,7 +436,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                             AdaptiveTextSize().getadaptiveTextSize(context, 35),
                         padding: EdgeInsets.all(8),
                         child: Image.asset(
-                          'assets/images/ku/basket.png',
+                          'assets/images/kaset/basket.png',
                           color: Color(0xFF000000),
                           scale: AdaptiveTextSize()
                               .getadaptiveTextSize(context, 1),
@@ -585,7 +536,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                         hintText: 'Search',
                         prefixIcon: Icon(Icons.search_rounded),
                         suffixIcon: Image.asset(
-                          'assets/images/ku/filter.png',
+                          'assets/images/kaset/filter.png',
                           scale: AdaptiveTextSize()
                               .getadaptiveTextSize(context, 6),
                         ),
@@ -896,7 +847,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                   Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Image.asset(
-                                  "assets/images/ku/tractor.png",
+                                  "assets/images/kaset/tractor.png",
                                   color: Colors.white,
                                 ),
                               )

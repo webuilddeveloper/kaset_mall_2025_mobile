@@ -124,7 +124,7 @@ flutter:
     - assets/
     - assets/lang/
     - assets/images/central/
-    - assets/images/ku/
+    - assets/images/kaset/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
