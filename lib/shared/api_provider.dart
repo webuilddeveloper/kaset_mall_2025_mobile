@@ -26,7 +26,7 @@ const versionNumber = 162;
 // const server = 'https://private-anon-a0406381df-sspmall.apiary-mock.com/';
 const server = 'https://api.suksapanmall.com/';
 // const server_we_build = 'http://122.155.223.63/td-we-mart-api/';
-const server_we_build = 'https://ssp.we-builds.com/ssp-api/';
+const server_we_build = 'https://gateway.we-builds.com/kaset-mall-api/';
 
 const serverUpload = 'https://ssp.we-builds.com/ssp-document/upload';
 const serverReport = 'http://122.155.223.63/td-we-mart-report/';
@@ -302,10 +302,10 @@ Future<dynamic> getCarts(String url) async {
 Future<dynamic> post(String url, dynamic criteria) async {
   final storage = new FlutterSecureStorage();
   var value = await storage.read(key: 'dataUserLoginDDPM');
-  var dataUser = json.decode(value!);
+  // var dataUser = json.decode(value!);
   List<dynamic> dataOrganization = [];
-  dataOrganization =
-      dataUser['countUnit'] != '' ? json.decode(dataUser['countUnit']) : [];
+  // dataOrganization =
+  //     dataUser['countUnit'] != '' ? json.decode(dataUser['countUnit']) : [];
 
   var body = json.encode({
     "permission": "all",
@@ -329,12 +329,12 @@ Future<dynamic> post(String url, dynamic criteria) async {
     "language": criteria['language'] != null ? criteria['language'] : 'th',
     "organization": dataOrganization != null ? dataOrganization : [],
   });
-
   var response = await http.post(Uri.parse(url), body: body, headers: {
     "Accept": "application/json",
     "Content-Type": "application/json"
   });
   var data = json.decode(response.body);
+  
 
   return Future.value(data['objectData']);
 }
@@ -449,26 +449,14 @@ Future<dynamic> postObjectData(String url, dynamic criteria) async {
   var response = await http.post(Uri.parse(url), body: body, headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
-    "Authorization": "Bearer " + token!
+    // "Authorization": "Bearer " + token!
   });
 
   print('-----statusCode-----${response.statusCode}');
   print("-----Response Body-----${response.body}");
 
   var data = jsonDecode(utf8.decode(response.bodyBytes));
-  if (response.statusCode == 200) {
-    data['data']['status2'] = 'S';
-    return Future.value(data['data']);
-    // var data = json.decode(response.body);
-    // return {
-    //   "status": data['status'],
-    //   "message": data['message'],
-    //   "objectData": data['data']
-    // };
-  } else {
-    data['data']['status2'] = 'F';
-    return Future.value(data);
-  }
+  return Future.value(data);
 }
 
 Future<dynamic> postQuestion(String url, dynamic criteria) async {

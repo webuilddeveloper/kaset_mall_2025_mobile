@@ -12,6 +12,7 @@ import 'package:mobile_mart_v3/component/material/loading_tween.dart';
 import 'package:mobile_mart_v3/component/toast_fail.dart';
 import 'package:mobile_mart_v3/login.dart';
 import 'package:mobile_mart_v3/math_game/math_game_main.dart';
+import 'package:mobile_mart_v3/news_all.dart';
 import 'package:mobile_mart_v3/product_all.dart';
 import 'package:mobile_mart_v3/product_from.dart';
 import 'package:mobile_mart_v3/product_list_by_category.dart';
@@ -629,6 +630,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
+                      code: 'news',
                       title: 'ข่าวสารประชาสัมพันธ์',
                       // color: Color(0xFFF7F7F7),
                       showAll: true,
@@ -783,6 +785,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _buildTitle({
+    String? code,
     String? title,
     bool showAll = false,
     Color color = Colors.white,
@@ -817,13 +820,23 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     MaterialPageRoute(builder: (_) => nextPage),
                   );
                 } else if (showAll) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          ProductAllCentralPage(title: title, mode: showAll),
-                    ),
-                  ).then((value) => _getCountItemInCart());
+                  if (code == 'news') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            NewsAllPage(title: title, mode: showAll),
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ProductAllCentralPage(title: title, mode: showAll),
+                      ),
+                    ).then((value) => _getCountItemInCart());
+                  }
                 }
               },
               child: showAll
