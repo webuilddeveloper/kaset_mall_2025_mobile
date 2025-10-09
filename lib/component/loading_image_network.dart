@@ -51,7 +51,7 @@ Widget loadingImageNetwork(
             width: width ?? 30,
             alignment: Alignment.center,
             child: Image.asset(
-              'assets/icon-ssp3.png',
+              'assets/images/kaset/no-img.png',
             ),
           ),
         );
@@ -75,7 +75,7 @@ Widget loadingImageNetwork(
         borderRadius: BorderRadius.circular(15),
       ),
       child: Image.asset(
-        'assets/images/no_image.png',
+        'assets/images/kaset/no-img.png',
       ),
     ),
   );

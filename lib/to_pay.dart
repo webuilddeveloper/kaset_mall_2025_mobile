@@ -468,7 +468,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                             fit: BoxFit.cover,
                           )
                         : Image.asset(
-                            'assets/images/no_image.png',
+                            'assets/images/kaset/no-img.png',
                             fit: BoxFit.cover,
                             width: 90,
                             height: 90,

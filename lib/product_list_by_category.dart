@@ -1201,7 +1201,7 @@ class _ProductListByCategoryState extends State<ProductListByCategory> {
                               param['media']['data'][0]['url'],
                               fit: BoxFit.cover)
                           : Image.asset(
-                              'assets/images/no_image.png',
+                              'assets/images/kaset/no-img.png',
                               fit: BoxFit.cover,
                               // col
                             ),
@@ -1349,7 +1349,7 @@ class _ProductListByCategoryState extends State<ProductListByCategory> {
                                 fit: BoxFit.cover,
                               )
                             : Image.asset(
-                                'assets/images/no_image.png',
+                                'assets/images/kaset/no-img.png',
                                 fit: BoxFit.cover,
                                 // col
                               ),

@@ -83,15 +83,14 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
                         padding: EdgeInsets.zero,
-                        itemBuilder: (context, index) => 
-                        snapshot
+                        itemBuilder: (context, index) => snapshot
                                     .data[index]['order_details']['data']
                                     .length >
                                 0
-                            ? 
-                        _buildListCategory(
-                          snapshot.data[index],
-                        ) : SizedBox(),
+                            ? _buildListCategory(
+                                snapshot.data[index],
+                              )
+                            : SizedBox(),
                         separatorBuilder: (_, __) => SizedBox(height: 0),
                         itemCount: snapshot.data.length,
                       );
@@ -101,11 +100,11 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                       );
                     }
                   } else if (snapshot.hasError) {
-                    if(snapshot.data == null) {
+                    if (snapshot.data == null) {
                       return Center(
                         child: Text('ไม่มีรายการ'),
                       );
-                    }else {
+                    } else {
                       return DataError();
                     }
                   } else {
@@ -128,20 +127,20 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
       child: InkWell(
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => OrderDetailsPage(
-                  model: param,
-                  statusText: 'ระหว่างขนส่ง',
-                  modePage: "20",
-                ),
+            context,
+            MaterialPageRoute(
+              builder: (_) => OrderDetailsPage(
+                model: param,
+                statusText: 'ระหว่างขนส่ง',
+                modePage: "20",
               ),
-            );
+            ),
+          );
         },
         child: Column(
           children: [
             SizedBox(height: 5),
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -167,22 +166,22 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Color(0xFFFBE3E6),
-                  borderRadius: BorderRadius.circular(
-                    12.5,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFBE3E6),
+                    borderRadius: BorderRadius.circular(
+                      12.5,
+                    ),
+                  ),
+                  child: Text(
+                    'ท่านจะได้รับพัสดุภายในวันที่ ${dateThai(param['destination_shipped_at']).toString()}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFFDF0B24),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                child: Text(
-                  'ท่านจะได้รับพัสดุภายในวันที่ ${dateThai(param['destination_shipped_at']).toString()}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFFDF0B24),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
               ],
             ),
             SizedBox(height: 10),
@@ -258,7 +257,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
               //             fit: BoxFit.cover,
               //           )
               //         : Image.asset(
-              //             'assets/images/no_image.png',
+              //             'assets/images/kaset/no-img.png',
               //             fit: BoxFit.cover,
               //             width: 80,
               //             height: 80,
@@ -273,48 +272,49 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                       // Navigator.pop(context);
                     },
                     child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: param[0]['media']['data']['url'] != null
-                      ? loadingImageNetwork(
-                          param[0]['media']['data']['url'],
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'assets/images/no_image.png',
-                          fit: BoxFit.cover,
-                          width: 90,
-                          height: 90,
-                        ),
-                ),
+                      borderRadius: BorderRadius.circular(5),
+                      child: param[0]['media']['data']['url'] != null
+                          ? loadingImageNetwork(
+                              param[0]['media']['data']['url'],
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              'assets/images/kaset/no-img.png',
+                              fit: BoxFit.cover,
+                              width: 90,
+                              height: 90,
+                            ),
+                    ),
                   ),
-                param.length > 1 ?
-                Positioned(
-                      right: 10,
-                      // top: 0,
-                      bottom: 5,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          // shape: BoxShape.circle,
-                          color: Color(0XFFE3E6FE),
-                          borderRadius: BorderRadius.all(Radius.circular(25))
-                        ),
-                        child: Text(
-                         '${param.length > 99 ? '99+' : param.length.toString()} ชิ้น',
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 12,
-                            color: Color(0xFF0B24FB),
+                  param.length > 1
+                      ? Positioned(
+                          right: 10,
+                          // top: 0,
+                          bottom: 5,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 6),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                // shape: BoxShape.circle,
+                                color: Color(0XFFE3E6FE),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(25))),
+                            child: Text(
+                              '${param.length > 99 ? '99+' : param.length.toString()} ชิ้น',
+                              style: TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 12,
+                                color: Color(0xFF0B24FB),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ) : SizedBox(),
+                        )
+                      : SizedBox(),
                 ],
               ),
-              
+
               SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -353,7 +353,8 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                           ),
                           child: Text(
                             param[0]['product_variant']['data']['name'] ??
-                                param[0]['product_variant']['data']['sku'] ?? '',
+                                param[0]['product_variant']['data']['sku'] ??
+                                '',
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.black,

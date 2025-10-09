@@ -1147,7 +1147,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                               .data['media']['data'].length <=
                                           0
                                       ? Image.asset(
-                                          'assets/images/no_image.png',
+                                          'assets/images/kaset/no-img.png',
                                           // fit: BoxFit.contain,
                                           width: AdaptiveTextSize()
                                               .getadaptiveTextSize(context, 50),
@@ -1159,7 +1159,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                   ['data'][index]) ==
                                               null
                                           ? Image.asset(
-                                              'assets/images/no_image.png',
+                                              'assets/images/kaset/no-img.png',
                                               // fit: BoxFit.contain,
                                               width: AdaptiveTextSize()
                                                   .getadaptiveTextSize(
@@ -1301,7 +1301,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
               maxHeight: AdaptiveTextSize().getadaptiveTextSize(context, 400)),
           child: listImage.length <= 0
               ? Image.asset(
-                  'assets/images/no_image.png',
+                  'assets/images/kaset/no-img.png',
                   fit: BoxFit.contain,
                   height: double.infinity,
                   width: double.infinity,
@@ -1326,8 +1326,8 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                   return ImageViewer(
                                     initialIndex: _currentImage,
                                     imageProviders: listImage
-                                            .map((e) => NetworkImage(e['url']))
-                                            .toList(),
+                                        .map((e) => NetworkImage(e['url']))
+                                        .toList(),
                                   );
                                 },
                               ),
@@ -1622,7 +1622,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                             fit: BoxFit.cover,
                                                           )
                                                         : Image.asset(
-                                                            'assets/images/no_image.png',
+                                                            'assets/images/kaset/no-img.png',
                                                             fit: BoxFit.contain,
                                                           ))
                                                 : Container(
@@ -1645,7 +1645,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                             fit: BoxFit.cover,
                                                           )
                                                         : Image.asset(
-                                                            'assets/images/no_image.png',
+                                                            'assets/images/kaset/no-img.png',
                                                             fit: BoxFit.contain,
                                                           )),
                                             SizedBox(width: 20),
@@ -1788,12 +1788,13 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                               children: [
                                                 InkWell(
                                                   onTap: () => setState(() {
-                                                        if (productQty > 1)
-                                                          {productQty--;};
-                                                        qtyController.text =
-                                                            productQty
-                                                                .toString();
-                                                      }),
+                                                    if (productQty > 1) {
+                                                      productQty--;
+                                                    }
+                                                    ;
+                                                    qtyController.text =
+                                                        productQty.toString();
+                                                  }),
                                                   child: Container(
                                                     height: AdaptiveTextSize()
                                                         .getadaptiveTextSize(
@@ -2468,9 +2469,8 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                   builder: (context) {
                     return ImageViewer(
                       initialIndex: _currentImage,
-                      imageProviders: listImage
-                              .map((e) => NetworkImage(e['url']))
-                              .toList(),
+                      imageProviders:
+                          listImage.map((e) => NetworkImage(e['url'])).toList(),
                     );
                   },
                 );
@@ -2527,7 +2527,10 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   InkWell buildAttribute(StateSetter setState, e) {
     return InkWell(
         onTap: () => {
-              setState(() {selectedInventory = e['id']; selectedInventoryModel = e;}),
+              setState(() {
+                selectedInventory = e['id'];
+                selectedInventoryModel = e;
+              }),
             },
         child: Container(
           // height: e['name'] == null ? 30 : 50,
@@ -2557,7 +2560,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                         fit: BoxFit.cover,
                       )
                     : Image.asset(
-                        'assets/images/no_image.png',
+                        'assets/images/kaset/no-img.png',
                         fit: BoxFit.contain,
                         height:
                             AdaptiveTextSize().getadaptiveTextSize(context, 40),

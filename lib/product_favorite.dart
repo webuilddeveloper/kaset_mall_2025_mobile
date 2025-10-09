@@ -535,7 +535,7 @@ class _ProductFavoriteCentralPageState
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Image.asset(
-                        'assets/images/no_image.png',
+                        'assets/images/kaset/no-img.png',
                         fit: BoxFit.contain,
                         // color: Colors.white,
                       ),
@@ -646,7 +646,7 @@ class _ProductFavoriteCentralPageState
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: Image.asset(
-                              'assets/images/no_image.png',
+                              'assets/images/kaset/no-img.png',
                               fit: BoxFit.contain,
                               // color: Colors.white,
                             ),

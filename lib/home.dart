@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_mart_v3/cart.dart';
-import 'package:mobile_mart_v3/chats_staff.dart';
 import 'package:mobile_mart_v3/component/carousel_banner.dart';
 import 'package:mobile_mart_v3/component/loading_image_network.dart';
 import 'package:mobile_mart_v3/component/material/loading_tween.dart';
@@ -13,26 +12,24 @@ import 'package:mobile_mart_v3/component/toast_fail.dart';
 import 'package:mobile_mart_v3/event_calendar.dart';
 import 'package:mobile_mart_v3/event_calendar_main.dart';
 import 'package:mobile_mart_v3/login.dart';
+<<<<<<< Updated upstream
 import 'package:mobile_mart_v3/math_game/math_game_main.dart';
 import 'package:mobile_mart_v3/news_all.dart';
+=======
+>>>>>>> Stashed changes
 import 'package:mobile_mart_v3/product_all.dart';
 import 'package:mobile_mart_v3/product_from.dart';
 import 'package:mobile_mart_v3/product_list_by_category.dart';
 import 'package:mobile_mart_v3/purchase_menu.dart';
-import 'package:mobile_mart_v3/search.dart';
 import 'package:mobile_mart_v3/shared/api_provider.dart';
 import 'package:mobile_mart_v3/shared/extension.dart';
 import 'package:mobile_mart_v3/shared/notification_service.dart';
 import 'package:mobile_mart_v3/verify_phone.dart';
-import 'package:mobile_mart_v3/widget/videoForm.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../component/link_url_in.dart';
 import '../read_book.dart';
 import '../read_book_list.dart';
-import '../widget/my_video_widget.dart';
-import 'package:video_player/video_player.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 
 class HomeCentralPage extends StatefulWidget {
@@ -60,6 +57,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   int _limit = 30;
   Future<dynamic>? _futureCategory;
   Future<dynamic>? _futureBanner;
+  Future<dynamic>? _futureModelEvent;
   Future<dynamic>? _futureModelNew;
   List<dynamic> _futureModelTrending = [];
   List<dynamic> _futureProductHot = [];
@@ -155,10 +153,15 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _getCategory() async {
-    List<dynamic> model = await getData(server + 'categories');
-    model.sort((a, b) => a['description'].compareTo(b['description']));
+    // List<dynamic> model = await getData(server + 'categories');
+    // model.sort((a, b) => a['description'].compareTo(b['description']));
+    print('-------mockCategories---------');
+    print(mockCategories);
+    print('----------------');
+
     setState(() {
-      _futureCategory = Future.value(model);
+      _futureCategory = Future.value(mockCategories);
+      // _futureCategory = mockCategories as Future?;
       // logWTF(_futureCategory);
     });
   }
@@ -226,7 +229,10 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _callRead() async {
-    _futureBanner = postDio('${mainBannerApi}read', {'limit': 999});
+    // _futureBanner = postDio('${mainBannerApi}read', {'limit': 999})
+    _futureBanner = postDio(
+        'https://gateway.we-builds.com/kaset-mall-api/m/Banner/main/read',
+        {'limit': 999});
 
     List<String> keySearchRandom;
     var element1 = "";
@@ -272,11 +278,21 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       }
     });
 
-    _futureModelForYou = postProductData(
-        server_we_build + 'm/Product/readProduct', {"search": "$element1"});
+    _futureModelNew = postDio(
+        'https://gateway.we-builds.com/kaset-mall-api/m/news/read',
+        {'limit': 999});
 
-    _futureModelNew =
-        postProductHotSale(server_we_build + 'm/Product/readProductHot', {});
+    _futureModelEvent = postDio(
+        'https://gateway.we-builds.com/kaset-mall-api/m/eventCalendar/read',
+        {'limit': 999});
+    _futureModelForYou = postDio(
+        'https://gateway.we-builds.com/kaset-mall-api/m/privilege/read',
+        {'limit': 999});
+
+    // postProductHotSale(server_we_build + 'm/Product/readProductHot', {});
+
+    // _futureModelForYou = postProductData(
+    //     server_we_build + 'm/Product/readProduct', {"search": "$element1"});
 
     profileCode = (await storage.read(key: 'profileCode10')) ?? '';
 
@@ -294,21 +310,21 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     });
   }
 
-  _addLog(param) async {
-    await postObjectData(server_we_build + 'log/logGoods/create', {
-      "username": emailProfile ?? "",
-      "profileCode": profileCode,
-      "platform": Platform.isAndroid
-          ? "android"
-          : Platform.isIOS
-              ? "ios"
-              : "other",
-      "prodjctId": param['id'] ?? "",
-      "title": param['name'] ?? "",
-      "categoryId": param['category']['data']['id'] ?? "",
-      "category": param['category']['data']['name'] ?? "",
-    });
-  }
+  // _addLog(param) async {
+  //   await postObjectData(server_we_build + 'log/logGoods/create', {
+  //     "username": emailProfile ?? "",
+  //     "profileCode": profileCode,
+  //     "platform": Platform.isAndroid
+  //         ? "android"
+  //         : Platform.isIOS
+  //             ? "ios"
+  //             : "other",
+  //     "prodjctId": param['id'] ?? "",
+  //     "title": param['name'] ?? "",
+  //     "categoryId": param['category']['data']['id'] ?? "",
+  //     "category": param['category']['data']['name'] ?? "",
+  //   });
+  // }
 
   _callReadAll() async {
     _callReadBanner();
@@ -316,7 +332,9 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _callReadBanner() {
-    _futureBanner = postDio('${mainBannerApi}read', {'limit': 10});
+    _futureBanner = postDio(
+        'https://gateway.we-builds.com/kaset-mall-api/m/Banner/main/read',
+        {'limit': 10});
   }
 
   _callReadKnowledge() {
@@ -350,7 +368,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                 MediaQuery.of(context).size.width) +
             AdaptiveTextSize().getadaptiveTextSize(context, 60),
         flexibleSpace: Container(
-          color: Colors.transparent,
+          color: Colors.white,
           child: Container(
             margin:
                 EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10),
@@ -366,25 +384,26 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     final String? savedCardId =
                         prefs.getString('saved_card_id');
 
-                    if (savedCardId != null && savedCardId.isNotEmpty) {
-                      // User has logged in before, navigate directly to PurchaseMenuPage
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PurchaseMenuPage(
-                            cardid: savedCardId,
-                          ),
+                    // if (savedCardId != null && savedCardId.isNotEmpty) {
+                    // User has logged in before, navigate directly to PurchaseMenuPage
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PurchaseMenuPage(
+                          cardid: savedCardId,
                         ),
-                      );
-                    } else {
-                      // First time login, go to verification screen
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => IDVerificationScreen(),
-                      //   ),
-                      // );
-                    }
+                      ),
+                    );
+                    // }
+                    // else {
+                    // First time login, go to verification screen
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => IDVerificationScreen(),
+                    //   ),
+                    // );
+                    // }
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,23 +431,23 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                 SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
-                    if (profileCode == '') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => LoginCentralPage(),
-                        ),
-                      );
-                    } else if (verifyPhonePage == 'false') {
-                      _showVerifyCheckDialog();
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => CartCentralPage(),
-                        ),
-                      ).then((value) => _getCountItemInCart());
-                    }
+                    // if (profileCode == '') {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (BuildContext context) => LoginCentralPage(),
+                    //     ),
+                    //   );
+                    // } else if (verifyPhonePage == 'false') {
+                    //   _showVerifyCheckDialog();
+                    // } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CartCentralPage(),
+                      ),
+                    ).then((value) => _getCountItemInCart());
+                    // }
                   },
                   child: Stack(
                     children: [
@@ -491,7 +510,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
             ),
             child: SmartRefresher(
               enablePullDown: true,
-              enablePullUp: true,
+              enablePullUp: false,
               header: WaterDropHeader(
                 complete: Container(
                   child: Text(''),
@@ -568,159 +587,58 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 16),
+
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
                       title: 'หมวดหมู่',
-                      // color: Color(0xFFF7F7F7),
                       showAll: true,
                     ),
                   ),
                   SizedBox(height: 10),
                   _buildCategory(),
-                  SizedBox(height: 10),
+
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
                       code: 'news',
                       title: 'ข่าวสารประชาสัมพันธ์',
-                      // color: Color(0xFFF7F7F7),
                       showAll: true,
                     ),
                   ),
                   _buildNew(),
-                  SizedBox(height: 10),
+
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
                       code: 'event',
                       title: 'ปฏิทินกิจกรรมที่น่าสนใจ',
-                      // color: Color(0xFFF7F7F7),
                       showAll: true,
                     ),
                   ),
-                  _buildNew(),
-                  SizedBox(height: 10),
+                  _buildEvent(),
+
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
                       title: 'สิทธิประโยชน์',
-                      // color: Color(0xFFF7F7F7),
                       showAll: true,
                     ),
                   ),
                   _buildForYou(),
 
-                  // SizedBox(height: 10),
-                  // GestureDetector(
-                  //   onTap: () => launchInWebViewWithJavaScript(
-                  //       'https://teaching.suksapanpanit.com/th'),
-                  //   child: Image.asset(
-                  //     'assets/ssp-teching-banner.jpg',
-                  //     fit: BoxFit.contain,
-                  //   ),
-                  // ),
-                  // SizedBox(height: 15),
-                  // _buildVideoShort(),
-                  SizedBox(height: 15),
-                  _buildTitle(title: 'สินค้าศึกษาภัณฑ์มอลล์', showAll: true),
+                  _buildTitle(title: 'สินค้า', showAll: true),
                   SizedBox(height: 5),
                   _buildTrending(),
                 ],
               ),
             ),
-          ),
-          // // เนื้อหาอื่นใน Stack ของคุณ
-          // if (_isVisible)
-          //   StatefulBuilder(
-          //     builder: (context, setStateFloating) {
-          //       return Positioned(
-          //         top: _offset.dy,
-          //         left: _offset.dx,
-          //         child: Draggable(
-          //           feedback: _buildFloatingButton(),
-          //           childWhenDragging: Container(),
-          //           child: _buildFloatingButton(),
-          //           onDragEnd: (details) {
-          //             setStateFloating(() {
-          //               _offset = details.offset;
-          //             });
-          //           },
-          //         ),
-          //       );
-          //     },
-          //   ),
+          )
         ],
       ),
     );
   }
-
-  // Widget _buildFloatingButton() {
-  //   return Stack(
-  //     alignment: Alignment.topRight,
-  //     children: [
-  //       Container(
-  //         width: 90.0,
-  //         height: 90.0,
-  //         decoration: BoxDecoration(
-  //           color: Colors.transparent,
-  //           shape: BoxShape.circle,
-  //           boxShadow: [
-  //             BoxShadow(
-  //               color: Colors.pinkAccent
-  //                   .withOpacity(0.4), // สีของเงา ปรับความเข้มขึ้น
-  //               spreadRadius: 10, // การกระจายเงา
-  //               blurRadius: 20, // ความเบลอของเงา
-  //               offset: Offset(0, 12), // ตำแหน่งของเงา (แนวนอน, แนวตั้ง)
-  //             ),
-  //           ],
-  //         ),
-  //         child: FloatingActionButton(
-  //           onPressed: () {
-  //             Navigator.push(
-  //               context,
-  //               MaterialPageRoute(
-  //                 builder: (_) => MathGameMain(),
-  //               ),
-  //             );
-  //           },
-  //           backgroundColor: Colors.transparent,
-  //           elevation: 0,
-  //           child: Image.asset(
-  //             'assets/images/Icon-quickMath.png',
-  //             fit: BoxFit.cover,
-  //           ),
-  //           tooltip: 'คณิตคิดไว',
-  //         ),
-  //       ),
-  //       Positioned(
-  //         top: 0,
-  //         right: 0,
-  //         child: GestureDetector(
-  //           onTap: () {
-  //             setState(() {
-  //               _isVisible = false; // ซ่อนปุ่มเมื่อกด "X"
-  //             });
-  //           },
-  //           child: Container(
-  //             width: 25,
-  //             height: 25,
-  //             decoration: BoxDecoration(
-  //               color: Colors.red,
-  //               shape: BoxShape.circle,
-  //             ),
-  //             child: Icon(
-  //               Icons.close,
-  //               color: Colors.white,
-  //               size: 16,
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Future<bool> confirmExit() {
     DateTime now = DateTime.now();
@@ -747,7 +665,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }) {
     return Container(
       color: color,
-      // padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       padding: EdgeInsets.only(
         left: 15,
         top: 10,
@@ -833,80 +750,56 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     return FutureBuilder(
       future: _futureCategory,
       builder: (context, snapshot) {
-        return SizedBox(
-          height: AdaptiveTextSize().getadaptiveTextSize(context, 105),
-          width: double.infinity,
-          child: ListView(
-            padding: EdgeInsets.only(left: 14),
-            scrollDirection: Axis.horizontal,
-            children: <Widget>[
-              if (snapshot.hasData)
-                for (var i = 0; i < snapshot.data.length; i++)
-                  SizedBox(
-                    width: AdaptiveTextSize().getadaptiveTextSize(context, 70),
-                    child: GestureDetector(
-                      onTap: () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductListByCategory(
-                                code: snapshot.data[i]['id']),
-                          ),
-                        ).then((value) => _getCountItemInCart()),
-                      },
-                      child: Column(
-                        children: [
-                          Container(
-                              // constraints: BoxConstraints(),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: Color(0xFF09665a),
+        if (!snapshot.hasData) {
+          return const Center(
+            child: Text(
+              'ไม่มีหมวดหมู่',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          );
+        }
+
+        final categories = snapshot.data;
+
+        return Container(
+            height: 100,
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 16,
+              runSpacing: 12,
+              children: List.generate(categories.length, (i) {
+                final item = categories[i];
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      radius: 35,
+                      backgroundColor: const Color(0xFF09665a),
+                      child: item['img'] == null
+                          ? Image.asset("assets/images/kaset/no-img.png")
+                          : Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Image.asset(
+                                item['img'],
+                                color: Colors.white,
                               ),
-                              height: AdaptiveTextSize()
-                                  .getadaptiveTextSize(context, 60),
-                              width: AdaptiveTextSize()
-                                  .getadaptiveTextSize(context, 60),
-                              child:
-                                  //snapshot.data[i]['thumbnail_url'] == null
-                                  // ?
-                                  Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Image.asset(
-                                  "assets/images/kaset/tractor.png",
-                                  color: Colors.white,
-                                ),
-                              )
-                              // : Image.network(
-                              //     snapshot.data[i]['thumbnail_url'],
-                              //   ),
-                              ),
-                          SizedBox(height: 5),
-                          Expanded(
-                            child: Text(
-                              snapshot.data[i]['name'],
-                              style: TextStyle(fontSize: 13),
-                              textAlign: TextAlign.center,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              textScaleFactor:
-                                  ScaleSize.textScaleFactor(context),
                             ),
-                          ),
-                          SizedBox(height: 5),
-                        ],
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: 75,
+                      child: Text(
+                        item['name'],
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  )
-              else
-                Text(
-                  'ไม่มีหมวดหมู่',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-            ],
-          ),
-        );
+                  ],
+                );
+              }),
+            ));
       },
     );
   }
@@ -929,27 +822,17 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   return ListView.separated(
                     padding: EdgeInsets.symmetric(horizontal: 15),
                     scrollDirection: Axis.horizontal,
-                    itemCount: 10,
+                    itemCount:
+                        snapshot.data.length > 10 ? 10 : snapshot.data.length,
                     separatorBuilder: (_, __) => SizedBox(width: 14),
                     itemBuilder: (context, index) => GestureDetector(
-                      onTap: () {
-                        //newdetail
-                      },
+                      onTap: () {},
                       child: Stack(
                         children: [
                           Container(
                             width: 145,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                              // color: Colors.red,
-                              // boxShadow: [
-                              //   BoxShadow(
-                              //     color: Colors.grey.withOpacity(0.3),
-                              //     spreadRadius: 2,
-                              //     blurRadius: 5,
-                              //     offset: Offset(0, 3),
-                              //   ),
-                              // ],
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -962,27 +845,24 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                         topLeft: Radius.circular(16),
                                         topRight: Radius.circular(16)),
                                   ),
-                                  child: snapshot.data[index]['media']['data']
-                                              .length >
+                                  child: snapshot
+                                              .data[index]['imageUrl'].length >
                                           0
                                       ? ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(16),
                                           child: loadingImageNetwork(
-                                            // snapshot.data[index]['imageUrl'],
-                                            snapshot.data[index]['media']
-                                                ['data'][0]['thumbnail'],
+                                            snapshot.data[index]['imageUrl'],
                                             fit: BoxFit.contain,
                                           ),
                                         )
                                       : Container(
                                           decoration: BoxDecoration(
-                                            // color: Color(0XFF0B24FB),
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                           ),
                                           child: Image.asset(
-                                            'assets/images/no_image.png',
+                                            'assets/images/kaset/no-img.png',
                                             fit: BoxFit.contain,
                                             // color: Colors.white,
                                           ),
@@ -990,7 +870,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                 ),
                                 SizedBox(height: 8),
                                 Text(
-                                  snapshot.data[index]['name'] ?? '',
+                                  snapshot.data[index]['title'] ?? '',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
@@ -1016,161 +896,98 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     );
   }
 
-  // _buildVideoShortOld() {
-  //   return Container(
-  //     color: Color(0xFFF7F7F7),
-  //     padding: const EdgeInsets.only(
-  //       top: 10,
-  //       bottom: 10,
-  //     ),
-  //     child: Column(
-  //       children: [
-  //         GestureDetector(
-  //           onTap: () {
-  //           },
-  //           child: _buildTitle(
-  //             title: 'SSP Video',
-  //             color: Color(0xFFF7F7F7),
-  //             showAll: false,
-  //           ),
-  //         ),
-  //         SizedBox(
-  //           height: 180,
-  //           child: ListView.separated(
-  //             padding: EdgeInsets.symmetric(horizontal: 8),
-  //             scrollDirection: Axis.horizontal,
-  //             separatorBuilder: (context, index) => SizedBox(width: 8),
-  //             shrinkWrap: false,
-  //             itemCount:
-  //                 _futureListVideo.length > 7 ? 7 : _futureListVideo.length,
-  //             itemBuilder: (context, index) {
-  //               VideoPlayerController controller = VideoPlayerController
-  //                   .network(_futureListVideo[index]['videoUrl'])
-  //                 ..initialize().then((_) {});
-  //               controller.setLooping(true);
-  //               controller.setVolume(0.0);
-  //               controller.seekTo(Duration(
-  //                   seconds: controller.value.position.inSeconds + 10));
-  //               return GestureDetector(
-  //                 onTap: () {
-  //                   Navigator.push(
-  //                     context,
-  //                     MaterialPageRoute(
-  //                       builder: (_) =>
-  //                           VideoApp(model: _futureListVideo[index]),
-  //                     ),
-  //                   );
-  //                 },
-  //                 child: Stack(
-  //                   alignment: Alignment.center,
-  //                   children: <Widget>[
-  //                     FittedBox(
-  //                       fit: BoxFit.cover,
-  //                       child: SizedBox(
-  //                         width: 160,
-  //                         height: 260,
-  //                         child: ClipRRect(
-  //                           borderRadius: BorderRadius.circular(9),
-  //                           child: AspectRatio(
-  //                             aspectRatio: controller.value.aspectRatio,
-  //                             child: VideoPlayer(controller),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                     Positioned.fill(
-  //                       bottom: 0,
-  //                       left: 0,
-  //                       child: Container(
-  //                         padding: EdgeInsets.all(10),
-  //                         decoration: BoxDecoration(
-  //                             ),
-  //                         alignment: Alignment.bottomLeft,
-  //                         child: Text(
-  //                           (_futureListVideo[index]['title'] ?? ''),
-  //                           style: TextStyle(
-  //                             color: Colors.white,
-  //                             fontSize: 13.0,
-  //                             fontFamily: 'Kanit',
-  //                           ),
-  //                           maxLines: 2,
-  //                           overflow: TextOverflow.ellipsis,
-  //                         ),
-  //                       ),
-  //                     ),
-  //                     Positioned.fill(
-  //                       top: 0,
-  //                       left: 0,
-  //                       child: Container(
-  //                         padding: EdgeInsets.all(3),
-  //                         decoration: BoxDecoration(
-  //                             ),
-  //                         alignment: Alignment.topLeft,
-  //                         child: Row(
-  //                           children: [
-  //                             Icon(
-  //                               Icons.play_arrow_outlined,
-  //                               size: 25,
-  //                               color: Colors.white,
-  //                             ),
-  //                             Text(
-  //                               _futureListVideo[index]['viewTotal'].toString(),
-  //                               style: TextStyle(
-  //                                 color: Colors.white,
-  //                                 fontSize: 13.0,
-  //                                 fontFamily: 'Kanit',
-  //                               ),
-  //                               maxLines: 3,
-  //                               overflow: TextOverflow.ellipsis,
-  //                             ),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               );
-  //             },
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // _buildVideoShort() {
-  //   return Container(
-  //     color: Color(0xFFF7F7F7),
-  //     padding: const EdgeInsets.only(top: 10, bottom: 10),
-  //     child: Column(
-  //       children: [
-  //         GestureDetector(
-  //           onTap: () {},
-  //           child: _buildTitle(
-  //               title: 'SSP Video', color: Color(0xFFF7F7F7), showAll: false),
-  //         ),
-  //         SizedBox(
-  //           height: 180,
-  //           child: ListView.separated(
-  //             padding: EdgeInsets.symmetric(horizontal: 8),
-  //             scrollDirection: Axis.horizontal,
-  //             separatorBuilder: (context, index) => SizedBox(width: 8),
-  //             shrinkWrap: false,
-  //             itemCount:
-  //                 _futureListVideo.length > 7 ? 7 : _futureListVideo.length,
-  //             itemBuilder: (context, index) {
-  //               return MyVideoWidget(
-  //                 videoUrl: _futureListVideo[index]['videoUrl'],
-  //                 title: _futureListVideo[index]['title'], // เพิ่ม title
-  //                 model: _futureListVideo[index],
-  //               );
-  //             },
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  _buildEvent() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.only(
+        top: 10,
+        bottom: 10,
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 215,
+            child: FutureBuilder<dynamic>(
+              future: _futureModelEvent,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.separated(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    scrollDirection: Axis.horizontal,
+                    itemCount:
+                        snapshot.data.length > 10 ? 10 : snapshot.data.length,
+                    separatorBuilder: (_, __) => SizedBox(width: 14),
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () {},
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 145,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 145,
+                                  width: 145,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(16),
+                                        topRight: Radius.circular(16)),
+                                  ),
+                                  child: snapshot
+                                              .data[index]['imageUrl'].length >
+                                          0
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          child: loadingImageNetwork(
+                                            snapshot.data[index]['imageUrl'],
+                                            fit: BoxFit.contain,
+                                          ),
+                                        )
+                                      : Container(
+                                          decoration: BoxDecoration(
+                                            // color: Color(0XFF0B24FB),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                          child: Image.asset(
+                                            'assets/images/kaset/no-img.png',
+                                            fit: BoxFit.contain,
+                                            // color: Colors.white,
+                                          ),
+                                        ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  snapshot.data[index]['title'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  return _buildWaitingCard(scrollDirection: Axis.horizontal);
+                }
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
 
   _buildForYou() {
     return Container(
@@ -1184,17 +1001,18 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           SizedBox(
             height: 215,
             child: FutureBuilder<dynamic>(
-              future: _futureModelNew,
+              future: _futureModelForYou,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return ListView.separated(
                     padding: EdgeInsets.symmetric(horizontal: 15),
                     scrollDirection: Axis.horizontal,
-                    itemCount: 10,
+                    itemCount:
+                        snapshot.data.length > 10 ? 10 : snapshot.data.length,
                     separatorBuilder: (_, __) => SizedBox(width: 14),
                     itemBuilder: (context, index) => GestureDetector(
                       onTap: () {
-                        //newdetail
+                        // Foryou
                       },
                       child: Stack(
                         children: [
@@ -1202,15 +1020,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                             width: 145,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                              // color: Colors.red,
-                              // boxShadow: [
-                              //   BoxShadow(
-                              //     color: Colors.grey.withOpacity(0.3),
-                              //     spreadRadius: 2,
-                              //     blurRadius: 5,
-                              //     offset: Offset(0, 3),
-                              //   ),
-                              // ],
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1223,16 +1032,16 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                         topLeft: Radius.circular(16),
                                         topRight: Radius.circular(16)),
                                   ),
-                                  child: snapshot.data[index]['media']['data']
-                                              .length >
+                                  child: snapshot
+                                              .data[index]['imageUrl'].length >
                                           0
                                       ? ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(16),
                                           child: loadingImageNetwork(
-                                            // snapshot.data[index]['imageUrl'],
-                                            snapshot.data[index]['media']
-                                                ['data'][0]['thumbnail'],
+                                            snapshot.data[index]['imageUrl'],
+                                            // snapshot.data[index]['media']
+                                            //     ['data'][0]['thumbnail'],
                                             fit: BoxFit.contain,
                                           ),
                                         )
@@ -1243,7 +1052,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                                 BorderRadius.circular(5),
                                           ),
                                           child: Image.asset(
-                                            'assets/images/no_image.png',
+                                            'assets/images/kaset/no-img.png',
                                             fit: BoxFit.contain,
                                             // color: Colors.white,
                                           ),
@@ -1251,7 +1060,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                 ),
                                 SizedBox(height: 8),
                                 Text(
-                                  snapshot.data[index]['name'] ?? '',
+                                  snapshot.data[index]['title'] ?? '',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
@@ -1277,280 +1086,32 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     );
   }
 
-  _buildDealOfTheDay() {
-    return Container(
-      color: Color(0xFFF7F7F7),
-      height: 215,
-      child: FutureBuilder<dynamic>(
-          future: _futureModelForYou,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                scrollDirection: Axis.horizontal,
-                itemCount: snapshot.data.length,
-                separatorBuilder: (_, __) => SizedBox(width: 14),
-                itemBuilder: (context, index) => GestureDetector(
-                  onTap: () {
-                    _addLog(snapshot.data[index]);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ProductFormCentralPage(
-                          model: snapshot.data[index],
-                        ),
-                      ),
-                    ).then((value) => _getCountItemInCart());
-                  },
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                        width: 150,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 145,
-                              width: 145,
-                              // padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(9),
-                                color: Color(0xFFF7F7F7),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(9),
-                                child: snapshot.data[index]['media']['data']
-                                            .length >
-                                        0
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(9),
-                                        child: loadingImageNetwork(
-                                          // snapshot.data[index]['imageUrl'],
-                                          snapshot.data[index]['media']['data']
-                                              [0]['thumbnail'],
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : Container(
-                                        decoration: BoxDecoration(
-                                          // color: Color(0XFF0B24FB),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/no_image.png',
-                                          fit: BoxFit.contain,
-                                          // color: Colors.white,
-                                        ),
-                                      ),
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              '1x' + snapshot.data[index]['name'] ?? '',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              // textScaleFactor: ScaleSize.textScaleFactor(context),
-                            ),
-                            // Text(
-                            //   parseHtmlString(
-                            //       snapshot.data[index]['description'] ?? ''),
-                            //   maxLines: 2,
-                            //   overflow: TextOverflow.ellipsis,
-                            // ),
-                            // Expanded(child: SizedBox()),
-                            snapshot.data[index]['product_variants']['data'][0]
-                                    ['promotion_active']
-                                ? Text(
-                                    (moneyFormat(snapshot.data[index]
-                                                ['product_variants']['data'][0]
-                                                ['price']
-                                            .toString()) +
-                                        " บาท"),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFFED168B),
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.lineThrough,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    // textScaleFactor: ScaleSize.textScaleFactor(context),
-                                  )
-                                : Expanded(child: Container()),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                snapshot.data[index]['product_variants']['data']
-                                            .length >
-                                        0
-                                    ? snapshot.data[index]['product_variants']
-                                                    ['data'][0]
-                                                ['discount_percent'] >
-                                            0
-
-                                        // i.product_variants.data[0]?.discount_percent > 0
-                                        ? Text(
-                                            (moneyFormat(snapshot.data[index]
-                                                        ['product_variants']
-                                                        ['data'][0]
-                                                        ['promotion_price']
-                                                    .toString()) +
-                                                " บาท"),
-                                            style: TextStyle(
-                                              fontSize: 17,
-                                              color: Color(0xFFED168B),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            // textScaleFactor: ScaleSize.textScaleFactor(context),
-                                          )
-                                        : Text(
-                                            (moneyFormat(snapshot.data[index]
-                                                        ['product_variants']
-                                                        ['data'][0]['price']
-                                                    .toString()) +
-                                                " บาท"),
-                                            style: TextStyle(
-                                              fontSize: 17,
-                                              color: Color(0xFFED168B),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            // textScaleFactor: ScaleSize.textScaleFactor(context),
-                                          )
-                                    : Text(
-                                        'สินค้าหมด',
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                          color: Color(0xFFED168B),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        // textScaleFactor: ScaleSize.textScaleFactor(context),
-                                      ),
-                                snapshot.data[index]['product_variants']['data']
-                                            .length >
-                                        0
-                                    ? Text(
-                                        (_callSumStock(snapshot.data[index]
-                                                        ['product_variants']
-                                                    ['data']) ==
-                                                0
-                                            ? 'สินค้าหมด'
-                                            : _callSumStock(snapshot.data[index]
-                                                            ['product_variants']
-                                                        ['data'])
-                                                    .toString() +
-                                                " ชิ้น"),
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: _callSumStock(snapshot
-                                                              .data[index]
-                                                          ['product_variants']
-                                                      ['data']) ==
-                                                  0
-                                              ? Color(0xFFED168B)
-                                              : Colors.black,
-                                          // fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        // textScaleFactor: ScaleSize.textScaleFactor(context),
-                                      )
-                                    : Text(
-                                        'สินค้าหมด',
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                          color: Color(0xFFED168B),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        // textScaleFactor: ScaleSize.textScaleFactor(context),
-                                      ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                      snapshot.data[index]['product_variants']['data'][0]
-                              ['promotion_active']
-                          ? Positioned(
-                              // left: 15,
-                              top: 5,
-                              right: 0,
-                              // top: MediaQuery.of(context).padding.top + 5,
-                              child: Container(
-                                // height: AdaptiveTextSize()
-                                //     .getadaptiveTextSize(context, 42),
-                                // width: AdaptiveTextSize()
-                                //     .getadaptiveTextSize(context, 20),
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.horizontal(
-                                      left: Radius.circular(40),
-                                    ),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xFFFFD45A),
-                                        Color(0xFFFFD45A),
-                                      ],
-                                    )),
-                                child: Text(
-                                  'โปรโมชั่น',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0XFFee4d2d),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textScaleFactor:
-                                      ScaleSize.textScaleFactor(context),
-                                ),
-                              ),
-                            )
-                          : Container(
-                              color: Color(0xFFF7F7F7),
-                            ),
-                    ],
-                  ),
-                ),
-              );
-            } else {
-              return _buildWaitingCard(scrollDirection: Axis.horizontal);
-            }
-          }),
-    );
-  }
-
   late bool isBestSeller;
-  String _filterSelected = 'ทั้งหมด';
+  String _filterSelected = '0';
+
   _buildTrending() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
-          // Filter Tabs
-          Row(
-            children: [
-              _buildFilterTab('ทั้งหมด'),
-              SizedBox(width: 20),
-              _buildFilterTab('ขายดี'),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _buildFilterTab('0'),
+                SizedBox(width: 12),
+                _buildFilterTab('1'),
+                SizedBox(width: 12),
+                _buildFilterTab('2'),
+                SizedBox(width: 12),
+                _buildFilterTab('3'),
+                SizedBox(width: 12),
+                _buildFilterTab('4'),
+              ],
+            ),
           ),
           SizedBox(height: 12),
-
-          // Product Grid
           _buildProductGrid(),
         ],
       ),
@@ -1558,30 +1119,60 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
 // แยก Widget สำหรับ Filter Tab
-  Widget _buildFilterTab(String label) {
-    final isSelected = _filterSelected == label;
+  Widget _buildFilterTab(String type) {
+    final isSelected = _filterSelected == type;
     return GestureDetector(
-      onTap: () {
-        setState(() => _filterSelected = label);
-        if (label == 'ทั้งหมด') {
-          onRefresh();
-        }
-      },
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Color(0xFF0B24FB) : Colors.black,
-        ),
-      ),
-    );
+        onTap: () {
+          setState(() {
+            _filterSelected = type;
+            if (type == '0') {
+              onRefresh();
+            } else if (type == '1') {
+              onRefresh(); // พรรณพืช
+            } else if (type == '2') {
+              onRefresh(); // เคมีภัณฑ์
+            } else if (type == '2') {
+              onRefresh(); // เคมีภัณฑ์
+            } else if (type == '3') {
+              onRefresh(); // อาหารสัตว์
+            } else if (type == '4') {
+              onRefresh(); // เครื่องมือ
+            }
+          });
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+          decoration: BoxDecoration(
+            color: isSelected ? Color(0xFF09665a) : Colors.grey[100],
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            type == '0'
+                ? 'ทั้งหมด'
+                : type == '1'
+                    ? 'พรรณพืช'
+                    : type == '2'
+                        ? 'เครื่องมือ'
+                        : type == '3'
+                            ? 'อาหารสัตว์'
+                            : 'เคมีภัณฑ์',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? Colors.white : Colors.black,
+            ),
+          ),
+        ));
   }
 
 // แยก Widget สำหรับ Product Grid
   Widget _buildProductGrid() {
-    final products =
-        _filterSelected == 'ทั้งหมด' ? _futureModelTrending : _futureProductHot;
+    final products = _filterSelected == '0'
+        ? mockProductList
+        : mockProductList
+            .where((item) => item['type'] == _filterSelected)
+            .toList();
+    ;
 
     if (products.isEmpty) {
       return Center(
@@ -1595,29 +1186,25 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     return GridView.builder(
       shrinkWrap: true,
       physics: ClampingScrollPhysics(),
-      padding: EdgeInsets.zero, // ✅ เปลี่ยนจาก horizontal: 15
+      padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 200,
-        childAspectRatio: 0.7, // ✅ ใช้ค่าคงที่แทนการคำนวณซับซ้อน
+        childAspectRatio: 0.7,
         crossAxisSpacing: 15,
         mainAxisSpacing: 15,
       ),
-      itemCount: products.length,
+      itemCount: products.length > 10 ? 10 : products.length,
       itemBuilder: (context, index) =>
           _buildProductCard(products[index], index),
     );
   }
 
-// แยก Widget สำหรับ Product Card
   Widget _buildProductCard(dynamic product, int index) {
-    final hasVariants = product['product_variants']['data'].isNotEmpty;
-    final hasMedia = product['media']['data'].isNotEmpty;
-    final isPromotion = hasVariants &&
-        product['product_variants']['data'][0]['promotion_active'];
+    final hasMedia = product['image'].isNotEmpty;
 
     return GestureDetector(
       onTap: () {
-        _addLog(product);
+        // _addLog(product);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -1625,40 +1212,30 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           ),
         ).then((_) => _getCountItemInCart());
       },
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Product Image
-              _buildProductImage(hasMedia, product),
-              SizedBox(height: 5),
-
-              // Product Name
-              Text(
-                product['name'] ?? '',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-
-              // Original Price (if promotion)
-              if (isPromotion) _buildOriginalPrice(product),
-
-              // Current Price & Stock
-              _buildPriceAndStock(product, hasVariants),
-            ],
+          _buildProductImage(hasMedia, product),
+          SizedBox(height: 5),
+          Text(
+            product['name'] ?? '',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-
-          // Hot Sale Badge (only for "ทั้งหมด" tab)
-          if (_filterSelected == 'ทั้งหมด' && index % 36 < 6)
-            _buildHotSaleBadge(),
-
-          // Promotion Badge
-          if (isPromotion) _buildPromotionBadge(),
+          Text(
+            product['description'] ?? '',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+              fontWeight: FontWeight.w400,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -1668,7 +1245,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   Widget _buildProductImage(bool hasMedia, dynamic product) {
     return Container(
       width: double.infinity,
-      height: 150, // ✅ กำหนดความสูงชัดเจน
+      height: 150,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(9),
         color: Colors.white,
@@ -1677,920 +1254,16 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         borderRadius: BorderRadius.circular(9),
         child: hasMedia
             ? loadingImageNetwork(
-                product['media']['data'][0]['thumbnail'],
+                product['image'],
                 fit: BoxFit.cover,
               )
             : Image.asset(
-                'assets/images/no_image.png',
+                'assets/images/kaset/no-img.png',
                 fit: BoxFit.contain,
               ),
       ),
     );
   }
-
-// แยก Widget สำหรับราคาเดิม (ขีดฆ่า)
-  Widget _buildOriginalPrice(dynamic product) {
-    return Text(
-      "${moneyFormat(product['product_variants']['data'][0]['price'].toString())} บาท",
-      style: TextStyle(
-        fontSize: 12,
-        color: Color(0xFFED168B),
-        fontWeight: FontWeight.bold,
-        decoration: TextDecoration.lineThrough,
-      ),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
-// แยก Widget สำหรับราคาและสต็อก
-  Widget _buildPriceAndStock(dynamic product, bool hasVariants) {
-    if (!hasVariants) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildOutOfStockText(),
-          _buildOutOfStockText(),
-        ],
-      );
-    }
-
-    final variant = product['product_variants']['data'][0];
-    final isPromotion = variant['promotion_active'];
-    final price = isPromotion ? variant['promotion_price'] : variant['price'];
-    final stock = _callSumStock(product['product_variants']['data']);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Price
-        Flexible(
-          // ✅ เพิ่ม Flexible เพื่อป้องกัน overflow
-          child: Text(
-            "${moneyFormat(price.toString())} บาท",
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFFED168B),
-              fontWeight: FontWeight.bold,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        SizedBox(width: 8), // ✅ เพิ่มระยะห่าง
-        // Stock
-        Text(
-          stock == 0 ? 'สินค้าหมด' : '$stock ชิ้น',
-          style: TextStyle(
-            fontSize: 14,
-            color: stock == 0 ? Color(0xFFED168B) : Colors.black,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOutOfStockText() {
-    return Text(
-      'สินค้าหมด',
-      style: TextStyle(
-        fontSize: 16,
-        color: Color(0xFFED168B),
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-
-// Badge สำหรับสินค้าขายดี
-  Widget _buildHotSaleBadge() {
-    return Positioned(
-      top: 5,
-      left: 0,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.red.shade900,
-              Colors.redAccent.shade400,
-              Colors.orangeAccent.shade200,
-            ],
-            stops: [0.2, 0.7, 1.0],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: Offset(2, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ShaderMask(
-              shaderCallback: (bounds) => LinearGradient(
-                colors: [Colors.red, Colors.orange, Colors.yellow],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: Icon(
-                Icons.local_fire_department,
-                size: 12,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(width: 3),
-            Text(
-              'ขายดี',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 3,
-                    offset: Offset(1, 1),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-// Badge สำหรับโปรโมชั่น
-  Widget _buildPromotionBadge() {
-    return Positioned(
-      top: 5,
-      right: 0,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.horizontal(left: Radius.circular(40)),
-          gradient: LinearGradient(
-            colors: [Color(0xFFFFD45A), Color(0xFFFFD45A)],
-          ),
-        ),
-        child: Text(
-          'โปรโมชั่น',
-          style: TextStyle(
-            fontSize: 11,
-            color: Color(0XFFee4d2d),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-  // _buildTrending() {
-  //   return Padding(
-  //     padding: EdgeInsets.symmetric(
-  //       horizontal: 15,
-  //     ),
-  //     child: Column(
-  //       children: [
-  //         Row(
-  //           children: [
-  //             GestureDetector(
-  //               onTap: () => {
-  //                 setState(() => _filterSelected = 'ทั้งหมด'),
-  //                 onRefresh(),
-  //               },
-  //               child: Text(
-  //                 'ทั้งหมด',
-  //                 style: TextStyle(
-  //                   fontSize: 13,
-  //                   fontWeight: _filterSelected == 'ทั้งหมด'
-  //                       ? FontWeight.bold
-  //                       : FontWeight.normal,
-  //                   color: _filterSelected == 'ทั้งหมด'
-  //                       ? Color(0xFF0B24FB)
-  //                       : Colors.black,
-  //                 ),
-  //               ),
-  //             ),
-  //             SizedBox(width: 20),
-  //             GestureDetector(
-  //               onTap: () => {
-  //                 setState(
-  //                   () => _filterSelected = 'ขายดี',
-  //                 ),
-  //                 // _hotSale(),
-  //               },
-  //               child: Text(
-  //                 'ขายดี',
-  //                 style: TextStyle(
-  //                   fontSize: 13,
-  //                   fontWeight: _filterSelected == 'ขายดี'
-  //                       ? FontWeight.bold
-  //                       : FontWeight.normal,
-  //                   color: _filterSelected == 'ขายดี'
-  //                       ? Color(0xFF0B24FB)
-  //                       : Colors.black,
-  //                 ),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         SizedBox(height: 12),
-  //         _filterSelected == 'ทั้งหมด'
-  //             ? _futureModelTrending.isNotEmpty ?? false
-  //                 ? GridView.builder(
-  //                     shrinkWrap: true,
-  //                     physics: ClampingScrollPhysics(),
-  //                     padding: EdgeInsets.symmetric(horizontal: 15),
-  //                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-  //                         maxCrossAxisExtent: 200,
-  //                         childAspectRatio:
-  //                             ((MediaQuery.of(context).size.height - (140)) /
-  //                                     1.2) /
-  //                                 (MediaQuery.of(context).size.height),
-  //                         crossAxisSpacing: 15,
-  //                         mainAxisSpacing: 15),
-  //                     itemCount: _futureModelTrending.length,
-  //                     itemBuilder: (context, index) => GestureDetector(
-  //                       onTap: () {
-  //                         _addLog(_futureModelTrending[index]);
-  //                         Navigator.push(
-  //                           context,
-  //                           MaterialPageRoute(
-  //                             builder: (_) => ProductFormCentralPage(
-  //                               model: _futureModelTrending[index],
-  //                             ),
-  //                           ),
-  //                         ).then((value) => _getCountItemInCart());
-  //                       },
-  //                       child: Stack(
-  //                         children: [
-  //                           Center(
-  //                             child: SizedBox(
-  //                               // width: 165,
-  //                               child: Column(
-  //                                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                                 children: [
-  //                                   Container(
-  //                                     // height: 200,
-  //                                     width: MediaQuery.of(context).size.width,
-  //                                     // padding: EdgeInsets.all(5),
-  //                                     decoration: BoxDecoration(
-  //                                       borderRadius: BorderRadius.circular(9),
-  //                                       color: Colors.white,
-  //                                     ),
-  //                                     // alignment: Alignment.center,
-  //                                     child: ClipRRect(
-  //                                       borderRadius: BorderRadius.circular(9),
-  //                                       child: _futureModelTrending[index]
-  //                                                       ['media']['data']
-  //                                                   .length >
-  //                                               0
-  //                                           ? ClipRRect(
-  //                                               borderRadius:
-  //                                                   BorderRadius.circular(9),
-  //                                               child: loadingImageNetwork(
-  //                                                 // snapshot.data[index]['imageUrl'],
-  //                                                 _futureModelTrending[index]
-  //                                                         ['media']['data'][0]
-  //                                                     ['thumbnail'],
-  //                                                 fit: BoxFit.cover,
-  //                                               ),
-  //                                             )
-  //                                           : Container(
-  //                                               decoration: BoxDecoration(
-  //                                                 // color: Color(0XFF0B24FB),
-  //                                                 borderRadius:
-  //                                                     BorderRadius.circular(5),
-  //                                               ),
-  //                                               child: Image.asset(
-  //                                                 'assets/images/no_image.png',
-  //                                                 fit: BoxFit.contain,
-  //                                                 // color: Colors.white,
-  //                                               ),
-  //                                             ),
-  //                                     ),
-  //                                   ),
-  //                                   SizedBox(height: 5),
-  //                                   Text(
-  //                                     // _futureModelTrending[index]['media']['data'].toString(),
-  //                                     _futureModelTrending[index]['name'] ?? '',
-  //                                     style: TextStyle(
-  //                                       fontSize: 15,
-  //                                       fontWeight: FontWeight.bold,
-  //                                     ),
-  //                                     maxLines: 1,
-  //                                     overflow: TextOverflow.ellipsis,
-  //                                     // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                   ),
-  //                                   // Text(
-  //                                   //   parseHtmlString(
-  //                                   //       snapshot.data[index]['description'] ?? ''),
-  //                                   //   maxLines: 2,
-  //                                   //   overflow: TextOverflow.ellipsis,
-  //                                   // ),
-  //                                   // // SizedBox(height: 2),
-  //                                   // Expanded(
-  //                                   //   child: SizedBox(),
-  //                                   // ),
-  //                                   _futureModelTrending[index]
-  //                                               ['product_variants']['data'][0]
-  //                                           ['promotion_active']
-  //                                       ? Text(
-  //                                           (moneyFormat(_futureModelTrending[
-  //                                                               index]
-  //                                                           ['product_variants']
-  //                                                       ['data'][0]['price']
-  //                                                   .toString()) +
-  //                                               " บาท"),
-  //                                           style: TextStyle(
-  //                                             fontSize: 12,
-  //                                             color: Color(0xFFED168B),
-  //                                             fontWeight: FontWeight.bold,
-  //                                             decoration:
-  //                                                 TextDecoration.lineThrough,
-  //                                           ),
-  //                                           maxLines: 1,
-  //                                           overflow: TextOverflow.ellipsis,
-  //                                           // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                         )
-  //                                       : Expanded(child: Container()),
-  //                                   Row(
-  //                                     mainAxisAlignment:
-  //                                         MainAxisAlignment.spaceBetween,
-  //                                     children: [
-  //                                       _futureModelTrending[index]
-  //                                                           ['product_variants']
-  //                                                       ['data']
-  //                                                   .length >
-  //                                               0
-  //                                           ? _futureModelTrending[index]
-  //                                                           ['product_variants']
-  //                                                       ['data'][0]
-  //                                                   ['promotion_active']
-  //                                               ? Text(
-  //                                                   (moneyFormat(_futureModelTrending[
-  //                                                                           index]
-  //                                                                       [
-  //                                                                       'product_variants']
-  //                                                                   ['data'][0][
-  //                                                               'promotion_price']
-  //                                                           .toString()) +
-  //                                                       " บาท"),
-  //                                                   style: TextStyle(
-  //                                                     fontSize: 16,
-  //                                                     color: Color(0xFFED168B),
-  //                                                     fontWeight:
-  //                                                         FontWeight.bold,
-  //                                                   ),
-  //                                                   maxLines: 1,
-  //                                                   overflow:
-  //                                                       TextOverflow.ellipsis,
-  //                                                   // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                                 )
-  //                                               : Text(
-  //                                                   (moneyFormat(_futureModelTrending[
-  //                                                                       index][
-  //                                                                   'product_variants']
-  //                                                               [
-  //                                                               'data'][0]['price']
-  //                                                           .toString()) +
-  //                                                       " บาท"),
-  //                                                   style: TextStyle(
-  //                                                     fontSize: 16,
-  //                                                     color: Color(0xFFED168B),
-  //                                                     fontWeight:
-  //                                                         FontWeight.bold,
-  //                                                   ),
-  //                                                   maxLines: 1,
-  //                                                   overflow:
-  //                                                       TextOverflow.ellipsis,
-  //                                                   // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                                 )
-  //                                           : Text(
-  //                                               'สินค้าหมด',
-  //                                               style: TextStyle(
-  //                                                 fontSize: 16,
-  //                                                 color: Color(0xFFED168B),
-  //                                                 fontWeight: FontWeight.bold,
-  //                                               ),
-  //                                               maxLines: 1,
-  //                                               overflow: TextOverflow.ellipsis,
-  //                                               // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                             ),
-  //                                       _futureModelTrending[index]
-  //                                                           ['product_variants']
-  //                                                       ['data']
-  //                                                   .length >
-  //                                               0
-  //                                           ? Text(
-  //                                               (_callSumStock(_futureModelTrending[
-  //                                                                   index][
-  //                                                               'product_variants']
-  //                                                           ['data']) ==
-  //                                                       0
-  //                                                   ? 'สินค้าหมด'
-  //                                                   : _callSumStock(_futureModelTrending[
-  //                                                                       index][
-  //                                                                   'product_variants']
-  //                                                               ['data'])
-  //                                                           .toString() +
-  //                                                       " ชิ้น"),
-  //                                               style: TextStyle(
-  //                                                 fontSize: 14,
-  //                                                 color: _callSumStock(
-  //                                                             _futureModelTrending[
-  //                                                                         index]
-  //                                                                     [
-  //                                                                     'product_variants']
-  //                                                                 ['data']) ==
-  //                                                         0
-  //                                                     ? Color(0xFFED168B)
-  //                                                     : Colors.black,
-  //                                                 // fontWeight: FontWeight.bold,
-  //                                               ),
-  //                                               maxLines: 1,
-  //                                               overflow: TextOverflow.ellipsis,
-  //                                               // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                             )
-  //                                           : Text(
-  //                                               'สินค้าหมด',
-  //                                               style: TextStyle(
-  //                                                 fontSize: 17,
-  //                                                 color: Color(0xFFED168B),
-  //                                                 fontWeight: FontWeight.bold,
-  //                                               ),
-  //                                               maxLines: 1,
-  //                                               overflow: TextOverflow.ellipsis,
-  //                                               // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                             )
-  //                                     ],
-  //                                   )
-  //                                 ],
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           if (index % 36 < 6)
-  //                             Positioned(
-  //                               top: 5,
-  //                               left: 0,
-  //                               child: Container(
-  //                                 padding: EdgeInsets.symmetric(
-  //                                     horizontal: 10, vertical: 3),
-  //                                 alignment: Alignment.center,
-  //                                 decoration: BoxDecoration(
-  //                                   borderRadius: BorderRadius.horizontal(
-  //                                     right: Radius.circular(30),
-  //                                   ),
-  //                                   gradient: LinearGradient(
-  //                                     begin: Alignment.topLeft,
-  //                                     end: Alignment.bottomRight,
-  //                                     colors: [
-  //                                       Colors.red.shade900, // เฉดสีแดงเข้ม
-  //                                       Colors
-  //                                           .redAccent.shade400, // เฉดสีแดงกลาง
-  //                                       Colors.orangeAccent
-  //                                           .shade200, // เพิ่มสีส้มทองเพื่อมิติ
-  //                                     ],
-  //                                     stops: [0.2, 0.7, 1.0], // ตำแหน่งการไล่สี
-  //                                   ),
-  //                                   boxShadow: [
-  //                                     BoxShadow(
-  //                                       color: Colors.black.withOpacity(0.2),
-  //                                       blurRadius: 8,
-  //                                       offset: Offset(2, 3),
-  //                                     ),
-  //                                   ],
-  //                                 ),
-  //                                 child: Row(
-  //                                   mainAxisSize: MainAxisSize.min,
-  //                                   children: [
-  //                                     ShaderMask(
-  //                                       shaderCallback: (bounds) =>
-  //                                           LinearGradient(
-  //                                         colors: [
-  //                                           Colors.red,
-  //                                           Colors.orange,
-  //                                           Colors.yellow
-  //                                         ],
-  //                                         begin: Alignment.topLeft,
-  //                                         end: Alignment.bottomRight,
-  //                                       ).createShader(bounds),
-  //                                       child: Icon(
-  //                                         Icons.local_fire_department,
-  //                                         size: 12,
-  //                                         color: Colors
-  //                                             .white, // Use white to let the gradient colors show
-  //                                       ),
-  //                                     ),
-  //                                     SizedBox(width: 3),
-  //                                     Text(
-  //                                       'ขายดี',
-  //                                       style: TextStyle(
-  //                                         fontSize: 12,
-  //                                         color: Colors.white,
-  //                                         fontWeight: FontWeight.bold,
-  //                                         shadows: [
-  //                                           Shadow(
-  //                                             color: Colors.black.withOpacity(
-  //                                                 0.3), // เงาที่ข้อความ
-  //                                             blurRadius: 3,
-  //                                             offset: Offset(1, 1),
-  //                                           ),
-  //                                         ],
-  //                                       ),
-  //                                     ),
-  //                                   ],
-  //                                 ),
-  //                               ),
-  //                             ),
-  //                           _futureModelTrending[index]['product_variants']
-  //                                   ['data'][0]['promotion_active']
-  //                               ? Positioned(
-  //                                   // left: 15,
-  //                                   top: 5,
-  //                                   right: 0,
-  //                                   // top: MediaQuery.of(context).padding.top + 5,
-  //                                   child: Container(
-  //                                     // height: AdaptiveTextSize()
-  //                                     //     .getadaptiveTextSize(context, 42),
-  //                                     // width: AdaptiveTextSize()
-  //                                     //     .getadaptiveTextSize(context, 20),
-  //                                     padding:
-  //                                         EdgeInsets.symmetric(horizontal: 10),
-  //                                     alignment: Alignment.center,
-  //                                     decoration: BoxDecoration(
-  //                                         borderRadius: BorderRadius.horizontal(
-  //                                           left: Radius.circular(40),
-  //                                         ),
-  //                                         gradient: LinearGradient(
-  //                                           begin: Alignment.topLeft,
-  //                                           end: Alignment.bottomRight,
-  //                                           colors: [
-  //                                             Color(0xFFFFD45A),
-  //                                             Color(0xFFFFD45A),
-  //                                           ],
-  //                                         )),
-  //                                     child: Text(
-  //                                       'โปรโมชั่น',
-  //                                       style: TextStyle(
-  //                                         fontSize: 11,
-  //                                         color: Color(0XFFee4d2d),
-  //                                         fontWeight: FontWeight.bold,
-  //                                       ),
-  //                                       textScaleFactor:
-  //                                           ScaleSize.textScaleFactor(context),
-  //                                     ),
-  //                                   ),
-  //                                   // child: _futureModelTrending[index]['product_variants']
-  //                                   //                 ['data'][0]['promotions']['data']
-  //                                   //             .length >
-  //                                   //         0
-  //                                   //     ? Container(
-  //                                   //         // height: AdaptiveTextSize()
-  //                                   //         //     .getadaptiveTextSize(context, 42),
-  //                                   //         // width: AdaptiveTextSize()
-  //                                   //         //     .getadaptiveTextSize(context, 20),
-  //                                   //         padding: EdgeInsets.symmetric(horizontal: 10),
-  //                                   //         alignment: Alignment.center,
-  //                                   //         decoration: BoxDecoration(
-  //                                   //             borderRadius: BorderRadius.horizontal(
-  //                                   //               left: Radius.circular(40),
-  //                                   //             ),
-  //                                   //             gradient: LinearGradient(
-  //                                   //               begin: Alignment.topLeft,
-  //                                   //               end: Alignment.bottomRight,
-  //                                   //               colors: [
-  //                                   //                 Color(0xFFFFD45A),
-  //                                   //                 Color(0xFFFFD45A),
-  //                                   //               ],
-  //                                   //             )),
-  //                                   //         child: Text(
-  //                                   //           'โปรโมชั่น',
-  //                                   //           style: TextStyle(
-  //                                   //             fontSize: 11,
-  //                                   //             color: Color(0XFFee4d2d),
-  //                                   //             fontWeight: FontWeight.bold,
-  //                                   //           ),
-  //                                   //           textScaleFactor:
-  //                                   //               ScaleSize.textScaleFactor(context),
-  //                                   //         ),
-  //                                   //       )
-  //                                   //     : Container(),
-  //                                 )
-  //                               : Container(),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                   )
-  //                 : Container()
-  //             // : Text('${_futureProductHot.length}')
-  //             : _futureProductHot.isNotEmpty ?? false
-  //                 ? GridView.builder(
-  //                     shrinkWrap: true,
-  //                     physics: ClampingScrollPhysics(),
-  //                     padding: EdgeInsets.symmetric(horizontal: 15),
-  //                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-  //                         maxCrossAxisExtent: 200,
-  //                         childAspectRatio:
-  //                             ((MediaQuery.of(context).size.height - (140)) /
-  //                                     1.2) /
-  //                                 (MediaQuery.of(context).size.height),
-  //                         crossAxisSpacing: 15,
-  //                         mainAxisSpacing: 15),
-  //                     itemCount: _futureProductHot.length,
-  //                     itemBuilder: (context, index) => GestureDetector(
-  //                       onTap: () {
-  //                         _addLog(_futureProductHot[index]);
-  //                         Navigator.push(
-  //                           context,
-  //                           MaterialPageRoute(
-  //                             builder: (_) => ProductFormCentralPage(
-  //                               model: _futureProductHot[index],
-  //                             ),
-  //                           ),
-  //                         ).then((value) => _getCountItemInCart());
-  //                       },
-  //                       child: Stack(
-  //                         children: [
-  //                           Center(
-  //                             child: SizedBox(
-  //                               // width: 165,
-  //                               child: Column(
-  //                                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                                 children: [
-  //                                   Container(
-  //                                     // height: 200,
-  //                                     width: MediaQuery.of(context).size.width,
-  //                                     // padding: EdgeInsets.all(5),
-  //                                     decoration: BoxDecoration(
-  //                                       borderRadius: BorderRadius.circular(9),
-  //                                       color: Colors.white,
-  //                                     ),
-  //                                     // alignment: Alignment.center,
-  //                                     child: ClipRRect(
-  //                                       borderRadius: BorderRadius.circular(9),
-  //                                       child: _futureProductHot[index]['media']
-  //                                                       ['data']
-  //                                                   .length >
-  //                                               0
-  //                                           ? ClipRRect(
-  //                                               borderRadius:
-  //                                                   BorderRadius.circular(9),
-  //                                               child: loadingImageNetwork(
-  //                                                 // snapshot.data[index]['imageUrl'],
-  //                                                 _futureProductHot[index]
-  //                                                         ['media']['data'][0]
-  //                                                     ['thumbnail'],
-  //                                                 fit: BoxFit.cover,
-  //                                               ),
-  //                                             )
-  //                                           : Container(
-  //                                               decoration: BoxDecoration(
-  //                                                 // color: Color(0XFF0B24FB),
-  //                                                 borderRadius:
-  //                                                     BorderRadius.circular(5),
-  //                                               ),
-  //                                               child: Image.asset(
-  //                                                 'assets/images/no_image.png',
-  //                                                 fit: BoxFit.contain,
-  //                                                 // color: Colors.white,
-  //                                               ),
-  //                                             ),
-  //                                     ),
-  //                                   ),
-  //                                   SizedBox(height: 5),
-  //                                   Text(
-  //                                     _futureProductHot[index]['name'] ?? '',
-  //                                     style: TextStyle(
-  //                                       fontSize: 15,
-  //                                       fontWeight: FontWeight.bold,
-  //                                     ),
-  //                                     maxLines: 1,
-  //                                     overflow: TextOverflow.ellipsis,
-  //                                   ),
-  //                                   _futureProductHot[index]['product_variants']
-  //                                           ['data'][0]['promotion_active']
-  //                                       ? Text(
-  //                                           (moneyFormat(_futureProductHot[
-  //                                                               index]
-  //                                                           ['product_variants']
-  //                                                       ['data'][0]['price']
-  //                                                   .toString()) +
-  //                                               " บาท"),
-  //                                           style: TextStyle(
-  //                                             fontSize: 12,
-  //                                             color: Color(0xFFED168B),
-  //                                             fontWeight: FontWeight.bold,
-  //                                             decoration:
-  //                                                 TextDecoration.lineThrough,
-  //                                           ),
-  //                                           maxLines: 1,
-  //                                           overflow: TextOverflow.ellipsis,
-  //                                           // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                         )
-  //                                       : Expanded(child: Container()),
-  //                                   Row(
-  //                                     mainAxisAlignment:
-  //                                         MainAxisAlignment.spaceBetween,
-  //                                     children: [
-  //                                       _futureProductHot[index]
-  //                                                           ['product_variants']
-  //                                                       ['data']
-  //                                                   .length >
-  //                                               0
-  //                                           ? _futureProductHot[index]
-  //                                                           ['product_variants']
-  //                                                       ['data'][0]
-  //                                                   ['promotion_active']
-  //                                               ? Text(
-  //                                                   (moneyFormat(_futureProductHot[
-  //                                                                           index]
-  //                                                                       [
-  //                                                                       'product_variants']
-  //                                                                   ['data'][0][
-  //                                                               'promotion_price']
-  //                                                           .toString()) +
-  //                                                       " บาท"),
-  //                                                   style: TextStyle(
-  //                                                     fontSize: 16,
-  //                                                     color: Color(0xFFED168B),
-  //                                                     fontWeight:
-  //                                                         FontWeight.bold,
-  //                                                   ),
-  //                                                   maxLines: 1,
-  //                                                   overflow:
-  //                                                       TextOverflow.ellipsis,
-  //                                                   // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                                 )
-  //                                               : Text(
-  //                                                   (moneyFormat(_futureProductHot[
-  //                                                                       index][
-  //                                                                   'product_variants']
-  //                                                               [
-  //                                                               'data'][0]['price']
-  //                                                           .toString()) +
-  //                                                       " บาท"),
-  //                                                   style: TextStyle(
-  //                                                     fontSize: 16,
-  //                                                     color: Color(0xFFED168B),
-  //                                                     fontWeight:
-  //                                                         FontWeight.bold,
-  //                                                   ),
-  //                                                   maxLines: 1,
-  //                                                   overflow:
-  //                                                       TextOverflow.ellipsis,
-  //                                                   // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                                 )
-  //                                           : Text(
-  //                                               'สินค้าหมด',
-  //                                               style: TextStyle(
-  //                                                 fontSize: 16,
-  //                                                 color: Color(0xFFED168B),
-  //                                                 fontWeight: FontWeight.bold,
-  //                                               ),
-  //                                               maxLines: 1,
-  //                                               overflow: TextOverflow.ellipsis,
-  //                                             ),
-  //                                       _futureProductHot[index]
-  //                                                           ['product_variants']
-  //                                                       ['data']
-  //                                                   .length >
-  //                                               0
-  //                                           ? Text(
-  //                                               (_callSumStock(_futureProductHot[
-  //                                                                   index][
-  //                                                               'product_variants']
-  //                                                           ['data']) ==
-  //                                                       0
-  //                                                   ? 'สินค้าหมด'
-  //                                                   : _callSumStock(_futureProductHot[
-  //                                                                       index][
-  //                                                                   'product_variants']
-  //                                                               ['data'])
-  //                                                           .toString() +
-  //                                                       " ชิ้น"),
-  //                                               style: TextStyle(
-  //                                                 fontSize: 14,
-  //                                                 color: _callSumStock(
-  //                                                             _futureProductHot[
-  //                                                                         index]
-  //                                                                     [
-  //                                                                     'product_variants']
-  //                                                                 ['data']) ==
-  //                                                         0
-  //                                                     ? Color(0xFFED168B)
-  //                                                     : Colors.black,
-  //                                                 // fontWeight: FontWeight.bold,
-  //                                               ),
-  //                                               maxLines: 1,
-  //                                               overflow: TextOverflow.ellipsis,
-  //                                               // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                             )
-  //                                           : Text(
-  //                                               'สินค้าหมด',
-  //                                               style: TextStyle(
-  //                                                 fontSize: 17,
-  //                                                 color: Color(0xFFED168B),
-  //                                                 fontWeight: FontWeight.bold,
-  //                                               ),
-  //                                               maxLines: 1,
-  //                                               overflow: TextOverflow.ellipsis,
-  //                                               // textScaleFactor: ScaleSize.textScaleFactor(context),
-  //                                             )
-  //                                     ],
-  //                                   )
-  //                                 ],
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           Positioned(
-  //                             top: 5,
-  //                             left: 0,
-  //                             child: Container(
-  //                               padding: EdgeInsets.symmetric(
-  //                                   horizontal: 10, vertical: 3),
-  //                               alignment: Alignment.center,
-  //                               decoration: BoxDecoration(
-  //                                 borderRadius: BorderRadius.horizontal(
-  //                                   right: Radius.circular(30),
-  //                                 ),
-  //                                 gradient: LinearGradient(
-  //                                   begin: Alignment.topLeft,
-  //                                   end: Alignment.bottomRight,
-  //                                   colors: [
-  //                                     Colors.red.shade900, // เฉดสีแดงเข้ม
-  //                                     Colors.redAccent.shade400, // เฉดสีแดงกลาง
-  //                                     Colors.orangeAccent
-  //                                         .shade200, // เพิ่มสีส้มทองเพื่อมิติ
-  //                                   ],
-  //                                   stops: [0.2, 0.7, 1.0], // ตำแหน่งการไล่สี
-  //                                 ),
-  //                                 boxShadow: [
-  //                                   BoxShadow(
-  //                                     color: Colors.black.withOpacity(0.2),
-  //                                     blurRadius: 8,
-  //                                     offset: Offset(2, 3),
-  //                                   ),
-  //                                 ],
-  //                               ),
-  //                               child: Row(
-  //                                 mainAxisSize: MainAxisSize.min,
-  //                                 children: [
-  //                                   ShaderMask(
-  //                                     shaderCallback: (bounds) =>
-  //                                         LinearGradient(
-  //                                       colors: [
-  //                                         Colors.red,
-  //                                         Colors.orange,
-  //                                         Colors.yellow
-  //                                       ],
-  //                                       begin: Alignment.topLeft,
-  //                                       end: Alignment.bottomRight,
-  //                                     ).createShader(bounds),
-  //                                     child: Icon(
-  //                                       Icons.local_fire_department,
-  //                                       size: 12,
-  //                                       color: Colors
-  //                                           .white, // Use white to let the gradient colors show
-  //                                     ),
-  //                                   ),
-  //                                   SizedBox(width: 3),
-  //                                   Text(
-  //                                     'ขายดี',
-  //                                     style: TextStyle(
-  //                                       fontSize: 12,
-  //                                       color: Colors.white,
-  //                                       fontWeight: FontWeight.bold,
-  //                                       shadows: [
-  //                                         Shadow(
-  //                                           color: Colors.black.withOpacity(
-  //                                               0.3), // เงาที่ข้อความ
-  //                                           blurRadius: 3,
-  //                                           offset: Offset(1, 1),
-  //                                         ),
-  //                                       ],
-  //                                     ),
-  //                                   ),
-  //                                 ],
-  //                               ),
-  //                             ),
-  //                           )
-  //                         ],
-  //                       ),
-  //                     ),
-  //                   )
-  //                 : Container()
-  //       ],
-  //     ),
-  //   );
-  // }
 
   _buildWaitingCard({Axis scrollDirection = Axis.vertical}) {
     return ListView.separated(
@@ -2741,7 +1414,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                               fit: BoxFit.cover,
                                             )
                                           : Image.asset(
-                                              'assets/images/no_image.png',
+                                              'assets/images/kaset/no-img.png',
                                               fit: BoxFit.cover,
                                             ),
                                     ),
@@ -2868,7 +1541,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       fit: BoxFit.cover,
                     )
                   : Image.asset(
-                      'assets/images/no_image.png',
+                      'assets/images/kaset/no-img.png',
                       fit: BoxFit.cover,
                       // col
                     ),
@@ -2940,7 +1613,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                             fit: BoxFit.cover,
                           )
                         : Image.asset(
-                            'assets/images/no_image.png',
+                            'assets/images/kaset/no-img.png',
                             fit: BoxFit.cover,
                             // col
                           ),
@@ -2986,4 +1659,71 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     // print(qty);
     return qty;
   }
+
+  final List<Map<String, dynamic>> mockCategories = [
+    {'id': '1', 'name': 'พรรณพืช', 'img': "assets/images/kaset/pngegg.png"},
+    {'id': '2', 'name': 'เครื่องมือ', 'img': "assets/images/kaset/tractor.png"},
+    {
+      'id': '3',
+      'name': 'อาหารสัตว์',
+      'img': "assets/images/kaset/pet-bowl.png"
+    },
+    {
+      'id': '4',
+      'name': 'เคมีภัณฑ์',
+      'img': "assets/images/kaset/fertilizer.png"
+    },
+  ];
+  final List<Map<String, dynamic>> mockProductList = [
+    {
+      'id': 1,
+      'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
+      'type': '1', // พรรณพืช
+      'price': 120.0,
+      'description':
+          'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
+      'image':
+          'https://www.doae.go.th/wp-content/uploads/2021/03/rice-seed.jpg',
+    },
+    {
+      'id': 2,
+      'name': 'เครื่องพ่นยาแบตเตอรี่ 20 ลิตร',
+      'type': '2', // เครื่องมือ
+      'price': 890.0,
+      'description':
+          'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
+      'image':
+          'https://www.sprayerthai.com/wp-content/uploads/2021/07/sprayer-20L.jpg',
+    },
+    {
+      'id': 3,
+      'name': 'อาหารไก่เนื้อเบอร์ 910',
+      'type': '3', // อาหารสัตว์
+      'price': 250.0,
+      'description':
+          'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
+      'image':
+          'https://www.cpffeed.com/wp-content/uploads/2019/12/910-181x300.png',
+    },
+    {
+      'id': 4,
+      'name': 'ปุ๋ยเคมีสูตร 15-15-15',
+      'type': '4', // เคมีภัณฑ์
+      'price': 450.0,
+      'description':
+          'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
+      'image':
+          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+    },
+    {
+      'id': 5,
+      'name': 'ยาฆ่าแมลงตราช้างแดง',
+      'type': '4', // เคมีภัณฑ์
+      'price': 195.0,
+      'description':
+          'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
+      'image':
+          'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
+    },
+  ];
 }

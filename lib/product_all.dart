@@ -14,7 +14,6 @@ import 'package:mobile_mart_v3/shared/extension.dart';
 import 'package:mobile_mart_v3/verify_phone.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-
 import 'login.dart';
 
 class ProductAllCentralPage extends StatefulWidget {
@@ -86,12 +85,12 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       // emailProfile = dataValue['email'].toString() ?? "";
       // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
       if (widget.mode) {
-        _futureModel =
-            postProductHotSale(server_we_build + 'm/Product/readProductHot',
-                // {"per_page": "${_limit.toString()}"}
-                {});
+        _futureModel = postProductHotSale(
+            server_we_build + 'm/Product/readProductHot',
+            // {"per_page": "${_limit.toString()}"}
+            {});
         _futureModel!.then((value) async => {
-               setState(() {
+              setState(() {
                 // total_page = value[0]['total_pages'];
                 _listModelMore = [...value];
                 _listModelMore.length == 0 ? loadProduct = false : true;
@@ -101,7 +100,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
         _futureModel =
             postProductData(server_we_build + 'm/Product/readProduct', {});
         _futureModel!.then((value) async => {
-               setState(() {
+              setState(() {
                 total_page = value[0]['total_pages'];
                 _listModelMore = [...value];
                 _listModelMore.length == 0 ? loadProduct = false : true;
@@ -143,7 +142,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
           {});
 
       _futureModel!.then((value) async => {
-             setState(() {
+            setState(() {
               // total_page = value[0]['total_pages'];
               _listModelMore = [...value];
               _listModelMore.shuffle();
@@ -218,7 +217,6 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
         //         _listModelMore.length == 0 ? loadProduct = false : true;
         //       })
         //     });
-
       } else {
         // if (_listModelMore.length < 20) {
         if (page < total_page) {
@@ -256,7 +254,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
           );
 
           _futureModel!.then((value) async => {
-                 setState(() {
+                setState(() {
                   total_page = value[0]['total_pages'];
                   _listModelMore = [..._listModelMore, ...value];
                   // _listModelMore = [...value];
@@ -1224,7 +1222,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: Image.asset(
-                            'assets/images/no_image.png',
+                            'assets/images/kaset/no-img.png',
                             fit: BoxFit.contain,
                             // color: Colors.white,
                           ),
@@ -1474,7 +1472,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Image.asset(
-                                  'assets/images/no_image.png',
+                                  'assets/images/kaset/no-img.png',
                                   fit: BoxFit.contain,
                                   // color: Colors.white,
                                 ),
