@@ -12,11 +12,8 @@ import 'package:mobile_mart_v3/component/toast_fail.dart';
 import 'package:mobile_mart_v3/event_calendar.dart';
 import 'package:mobile_mart_v3/event_calendar_main.dart';
 import 'package:mobile_mart_v3/login.dart';
-<<<<<<< Updated upstream
 import 'package:mobile_mart_v3/math_game/math_game_main.dart';
 import 'package:mobile_mart_v3/news_all.dart';
-=======
->>>>>>> Stashed changes
 import 'package:mobile_mart_v3/product_all.dart';
 import 'package:mobile_mart_v3/product_from.dart';
 import 'package:mobile_mart_v3/product_list_by_category.dart';
