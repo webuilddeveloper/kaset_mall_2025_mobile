@@ -97,11 +97,11 @@ class _ToShipCentralPageState extends State<ToShipCentralPage> {
                       );
                     }
                   } else if (snapshot.hasError) {
-                    if(snapshot.data == null) {
+                    if (snapshot.data == null) {
                       return Center(
                         child: Text('ไม่มีรายการ'),
                       );
-                    }else {
+                    } else {
                       return DataError();
                     }
                     // return DataError();
@@ -253,18 +253,18 @@ class _ToShipCentralPageState extends State<ToShipCentralPage> {
                       // Navigator.pop(context);
                     },
                     child: param[0]['media']['data']['url'] != null
-                      ? loadingImageNetwork(
-                          param[0]['media']['data']['url'],
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'assets/images/no_image.png',
-                          fit: BoxFit.cover,
-                          width: 90,
-                          height: 90,
-                        ),
+                        ? loadingImageNetwork(
+                            param[0]['media']['data']['url'],
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset(
+                            'assets/images/kaset/no-img.png',
+                            fit: BoxFit.cover,
+                            width: 90,
+                            height: 90,
+                          ),
                   ),
                   param.length > 1
                       ? Positioned(

@@ -65,27 +65,32 @@ class _CarouselBanner extends State<CarouselBanner>
   Widget build(BuildContext context) {
     super.build(context);
     return FutureBuilder<dynamic>(
-      future: widget.model, // function where you call your api
+      future: widget.model,
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data.length > 0) {
-            return Stack(
-              alignment: Alignment.bottomCenter,
+            return Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                // 🔹 Carousel ส่วนรูป
                 InkWell(
                   onTap: () {
                     List<String> linkSplit =
                         snapshot.data[_current]['linkUrl'].split('/');
                     if (snapshot.data[_current]['isChkLogin']) {
-                      if (userProfileCode != null && userProfileCode.isNotEmpty && userProfileCode.length != 0) {
+                      if (userProfileCode != null &&
+                          userProfileCode.isNotEmpty &&
+                          userProfileCode.length != 0) {
                         if (snapshot.data[_current]['action'] == 'out') {
                           if (linkSplit[0] == '') {
-                            if (linkSplit[1] == 'exercise') ;
-                            {
+                            if (linkSplit[1] == 'exercise') {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ExerciseMain(coverImg: snapshot.data[_current]['imageUrl']),
+                                  builder: (context) => ExerciseMain(
+                                    coverImg: snapshot.data[_current]
+                                        ['imageUrl'],
+                                  ),
                                 ),
                               );
                             }
@@ -103,11 +108,11 @@ class _CarouselBanner extends State<CarouselBanner>
                                     code.replaceAll('-', '');
                                 launchInWebViewWithJavaScript(
                                     '$path$codeReplae');
-                                // launchURL(path);
                               }
-                            } else
+                            } else {
                               launchInWebViewWithJavaScript(
                                   snapshot.data[_current]['linkUrl']);
+                            }
                           }
                         } else if (snapshot.data[_current]['action'] == 'in') {
                           Navigator.push(
@@ -133,8 +138,7 @@ class _CarouselBanner extends State<CarouselBanner>
                     } else {
                       if (snapshot.data[_current]['action'] == 'out') {
                         if (linkSplit[0] == '') {
-                          if (linkSplit[1] == 'exercise') ;
-                          {
+                          if (linkSplit[1] == 'exercise') {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -155,11 +159,11 @@ class _CarouselBanner extends State<CarouselBanner>
                                   profileCode.replaceAll('-', '') +
                                   code.replaceAll('-', '');
                               launchInWebViewWithJavaScript('$path$codeReplae');
-                              // launchURL(path);
                             }
-                          } else
+                          } else {
                             launchInWebViewWithJavaScript(
                                 snapshot.data[_current]['linkUrl']);
+                          }
                         }
                       } else if (snapshot.data[_current]['action'] == 'in') {
                         Navigator.push(
@@ -189,53 +193,50 @@ class _CarouselBanner extends State<CarouselBanner>
                         });
                       },
                     ),
-                    items: snapshot.data.map<Widget>(
-                      (document) {
-                        return new Container(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: loadingImageNetwork(
-                              document['imageUrl'],
-                              fit: BoxFit.fill,
-                              height: double.infinity,
-                              width: double.infinity,
-                            ),
+                    items: snapshot.data.map<Widget>((document) {
+                      return Container(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: loadingImageNetwork(
+                            document['imageUrl'],
+                            fit: BoxFit.fill,
+                            height: double.infinity,
+                            width: double.infinity,
                           ),
-                        );
-                      },
-                    ).toList(),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                Positioned(
-                  bottom: 5,
-                  child: Container(
-                    width: 100,
-                    alignment: Alignment.centerLeft,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        width: 1,
-                        color: Colors.white,
-                      ),
+
+                const SizedBox(height: 10), // เว้นระยะห่างเล็กน้อย
+
+                // 🔹 แถบ AnimatedContainer ที่อยู่ข้างล่างสุด
+                Container(
+                  width: 100,
+                  alignment: Alignment.centerLeft,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.grey.shade300),
+                  ),
+                  child: AnimatedContainer(
+                    margin: EdgeInsets.only(
+                      left: ((100 / snapshot.data.length) * (_current))
+                          .toDouble(),
                     ),
-                    child: AnimatedContainer(
-                      margin: EdgeInsets.only(
-                          left: ((100 / snapshot.data.length) * (_current))
-                              .toDouble()),
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.fastOutSlowIn,
-                      child: Container(
-                        width: (100 / snapshot.data.length) -
-                            ((snapshot.data.length / 3)),
-                        height: 7,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.white,
-                        ),
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.fastOutSlowIn,
+                    child: Container(
+                      width: (100 / snapshot.data.length) -
+                          ((snapshot.data.length / 3)),
+                      height: 7,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Color(0xFF09665a),
                       ),
                     ),
                   ),
-                )
+                ),
               ],
             );
           } else {

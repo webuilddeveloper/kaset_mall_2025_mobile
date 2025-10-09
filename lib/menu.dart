@@ -159,7 +159,19 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
           children: _widgetOptions,
         ),
         bottomNavigationBar: Container(
-            // color: Colors.white.withOpacity(0.6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 2,
+                ),
+              ],
+            ),
             height: AdaptiveTextSize().getadaptiveTextSize(
                 context, 35 + MediaQuery.of(context).padding.top),
             width: double.infinity,
@@ -180,20 +192,23 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buttonBottomBar(
-                            'assets/images/central/home.png', 'หน้าหลัก', 0),
+                            'assets/images/kaset/home-menu.png', '', 0),
+
+                        // _buttonBottomBar('assets/images/central/organize.png',
+                        //     'องค์การค้า', 2),
+                        // _buttonBottomBar(
+                        //     'assets/images/central/game.png', 'เกมส์', 3),
+                        // _buttonBottomBar(
+                        //     'assets/images/central/coupon.png', 'คูปอง', 4),
                         _buttonBottomBar(
-                            'assets/images/central/bell.png', 'แจ้งเตือน', 1),
-                        _buttonBottomBar('assets/images/central/organize.png',
-                            'องค์การค้า', 2),
+                            'assets/images/kaset/basket.png', '', 1),
                         _buttonBottomBar(
-                            'assets/images/central/game.png', 'เกมส์', 3),
-                        _buttonBottomBar(
-                            'assets/images/central/coupon.png', 'คูปอง', 4),
+                            'assets/images/kaset/notification.png', '', 2),
                         _buttonBottomBar(
                             (profile['imageUrl'] ?? "") == ''
-                                ? 'assets/images/central/profile.png'
+                                ? 'assets/images/kaset/user.png'
                                 : profile['imageUrl'],
-                            'ฉัน',
+                            '',
                             5,
                             network: (profile['imageUrl'] ?? "") == ''
                                 ? false
@@ -252,15 +267,15 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
               if (!network)
                 Image.asset(
                   image,
-                  height: AdaptiveTextSize().getadaptiveTextSize(context, 20),
-                  width: AdaptiveTextSize().getadaptiveTextSize(context, 20),
-                  color: hasSelected ? Color(0xFF0B24FB) : Colors.black,
+                  height: AdaptiveTextSize().getadaptiveTextSize(context, 30),
+                  width: AdaptiveTextSize().getadaptiveTextSize(context, 30),
+                  color: hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
                 ),
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 11,
-                  color: hasSelected ? Color(0xFF0B24FB) : Colors.black,
+                  color: hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
                   fontWeight: hasSelected ? FontWeight.bold : FontWeight.normal,
                 ),
                 textScaleFactor: ScaleSize.textScaleFactor(context),

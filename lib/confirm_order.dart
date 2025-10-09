@@ -187,8 +187,9 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
           print('----- _callCarts ' + e['promotion_price'].toString());
           print('----- _callCarts ' + e['price'].toString());
 
-          e['url'] =
-              (e['url'] ?? '') != '' ? e['url'] : 'assets/images/no_image.png';
+          e['url'] = (e['url'] ?? '') != ''
+              ? e['url']
+              : 'assets/images/kaset/no-img.png';
           price +=
               ((e['promotion_price'] != 0 ? e['promotion_price'] : e['price']) *
                   e['quantity']) as int;
@@ -2181,7 +2182,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Image.asset(
-                    'assets/images/no_image.png',
+                    'assets/images/kaset/no-img.png',
                     fit: BoxFit.contain,
                     // color: Colors.white,
                   ),
