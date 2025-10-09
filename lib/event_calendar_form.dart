@@ -7,8 +7,8 @@ import '../../component/button_close_back.dart';
 import '../../shared/api_provider.dart';
 
 // ignore: must_be_immutable
-class NewsForm extends StatefulWidget {
-  NewsForm({
+class EventCalendarFormPage extends StatefulWidget {
+  EventCalendarFormPage({
     super.key,
     this.url,
     this.code,
@@ -24,10 +24,10 @@ class NewsForm extends StatefulWidget {
   final String? urlGallery;
 
   @override
-  _NewsForm createState() => _NewsForm();
+  _EventCalendarFormPage createState() => _EventCalendarFormPage();
 }
 
-class _NewsForm extends State<NewsForm> {
+class _EventCalendarFormPage extends State<EventCalendarFormPage> {
   Comment? comment;
   int? _limit;
 
@@ -40,8 +40,8 @@ class _NewsForm extends State<NewsForm> {
 
       comment = Comment(
         code: widget.code,
-        url: newsCommentApi,
-        model: post('${newsCommentApi}read',
+        url: eventCalendarCommentApi,
+        model: post('${eventCalendarCommentApi}read',
             {'skip': 0, 'limit': _limit, 'code': widget.code}),
         limit: _limit,
       );
@@ -94,12 +94,12 @@ class _NewsForm extends State<NewsForm> {
               onLoading: _onLoading,
               child: ListView(
                 physics: ClampingScrollPhysics(),
-                padding: EdgeInsets.zero,
+                padding: EdgeInsets.only(bottom: 16),
                 children: [
                   Content(
-                    pathShare: 'content/news/',
+                    pathShare: 'content/event/',
                     code: widget.model['code'],
-                    url: '${newsApi}/read',
+                    url: '${eventCalendarApi}/read',
                     model: widget.model,
                     urlGallery: widget.urlGallery,
                   ),

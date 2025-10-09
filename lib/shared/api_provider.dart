@@ -36,7 +36,7 @@ const server_gateway =
     'https://gateway.we-builds.com/sspmall-py-extended/phonics/';
 
 const registerApi = server + 'm/register/';
-const newsApi = server + 'm/news/';
+const newsApi = server_we_build + 'm/news/';
 const partnerApi = server + 'm/partner/';
 const partnerCategoryApi = server + 'm/partner/category/';
 const newsGalleryApi = server + 'm/news/gallery/read';
@@ -48,16 +48,14 @@ const knowledgeApi = server + 'm/knowledge/';
 const cooperativeApi = server + 'm/cooperativeForm/';
 const contactApi = server + 'm/contact/';
 const bannerApi = server + 'm/banner/';
-const bannerGalleryApi = server + 'm/banner/gallery/read';
+const bannerGalleryApi = server_we_build + 'm/banner/gallery/read';
 const privilegeApi = server + "m/privilege/";
 const menuApi = server + "m/menu/";
 const aboutUsApi = server + "m/aboutus/";
 const welfareApi = server + 'm/welfare/';
 const welfareGalleryApi = server + 'm/welfare/gallery/read';
-const eventCalendarApi = server + 'm/eventCalendar/';
-const eventCalendarCategoryApi = server + 'm/eventCalendar/category/';
-const eventCalendarCommentApi = server + 'm/eventCalendar/comment/';
-const eventCalendarGalleryApi = server + 'm/eventCalendar/gallery/read';
+const eventCalendarApi = server_we_build + 'm/eventCalendar/';
+const eventCalendarGalleryApi = server_we_build + 'm/eventCalendar/gallery/read';
 const pollGalleryApi = server + 'm/poll/gallery/read';
 const reporterApi = server + 'm/v2/reporter/';
 const reporterGalleryApi = server + 'm/Reporter/gallery/';
@@ -105,7 +103,8 @@ const forceAdsApi = server + 'm/ForceAds/';
 const couponCategoryApi = server + 'm/coupon/category/';
 
 // comment
-const newsCommentApi = server + 'm/news/comment/';
+const newsCommentApi = server_we_build + 'm/news/comment/';
+const eventCalendarCommentApi = server_we_build + 'm/eventCalendar/comment/';
 const welfareCommentApi = server + 'm/welfare/comment/';
 const poiCommentApi = server + 'm/poi/comment/';
 const fundCommentApi = server + 'm/fund/comment/';
@@ -114,7 +113,8 @@ const warningCommentApi = server + 'm/warning/comment/';
 //category
 const knowledgeCategoryApi = server_we_build + 'm/knowledge/category/';
 const cooperativeCategoryApi = server + 'm/cooperativeForm/category/';
-const newsCategoryApi = server + 'm/news/category/';
+const newsCategoryApi = server_we_build + 'm/news/category/';
+const eventCalendarCategoryApi = server_we_build + 'm/eventCalendar/category/';
 const privilegeCategoryApi = server + 'm/privilege/category/';
 const contactCategoryApi = server + 'm/contact/category/';
 const welfareCategoryApi = server + 'm/welfare/category/';
@@ -134,11 +134,11 @@ const privilegeSpecialCategoryReadApi =
 
 Future<dynamic> postCategory(String url, dynamic criteria) async {
   final storage = new FlutterSecureStorage();
-  var value = await storage.read(key: 'dataUserLoginDDPM');
-  var dataUser = json.decode(value!);
+  // var value = await storage.read(key: 'dataUserLoginDDPM');
+  // var dataUser = json.decode(value!);
   List<dynamic> dataOrganization = [];
-  dataOrganization =
-      dataUser['countUnit'] != '' ? json.decode(dataUser['countUnit']) : [];
+  // dataOrganization =
+  //     dataUser['countUnit'] != '' ? json.decode(dataUser['countUnit']) : [];
 
   var body = json.encode({
     "permission": "all",
@@ -167,8 +167,7 @@ Future<dynamic> postCategory(String url, dynamic criteria) async {
   List<dynamic> list = [
     {'code': "", 'title': 'ทั้งหมด'}
   ];
-  list = [...list, ...data['objectData']];
-
+  list = [...list, ...data['objectData'] ?? []];
   return Future.value(list);
 }
 

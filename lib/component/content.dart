@@ -39,11 +39,11 @@ class ContentState extends State<Content> {
   @override
   void initState() {
     super.initState();
-    sharedApi();
-    _futureModel =
-        post(widget.url!, {'skip': 0, 'limit': 1, 'code': widget.code});
+    // sharedApi();
+    print('>>>>>> code: ${widget.code}');
+    _futureModel = postObjectData(widget.url!, {'skip': 0, 'limit': 1, 'code': widget.code});
 
-    readGallery();
+    // readGallery();
   }
 
   Future<dynamic> readGallery() async {
@@ -85,16 +85,20 @@ class ContentState extends State<Content> {
 
   @override
   Widget build(BuildContext context) {
+    // return myContent(
+    //         widget.model,
+    //       ); //   re
     return FutureBuilder<dynamic>(
       future: _futureModel, // function where you call your api
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         // AsyncSnapshot<Your object type>
         if (snapshot.hasData) {
+         
           // setState(() {
           //   urlImage = [snapshot.data[0].imageUrl];
           // });
           return myContent(
-            snapshot.data[0],
+            snapshot.data['objectData'][0],
           ); //   return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           return myContent(
@@ -107,6 +111,7 @@ class ContentState extends State<Content> {
   }
 
   myContent(dynamic model) {
+    print('>>>>>>>>> ${model['code']}');
     List image = ['${model['imageUrl']}'];
     List<ImageProvider> imagePro = [
       model['imageUrl'] != null
@@ -296,6 +301,7 @@ class ContentState extends State<Content> {
         model['fileUrl'] != '' ? fileUrl(model) : Container(),
       ],
     );
+  
   }
 
   linkButton(dynamic model) {

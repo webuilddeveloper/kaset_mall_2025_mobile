@@ -298,7 +298,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             locale: context.locale,
             navigatorKey: navigatorKey,
             theme: ThemeData(
-              primaryColor: Color(0xFFEC008C),
+              primaryColor: const Color(0XFF1b5738),
+              primaryColorLight: const Color(0xFF528c6e),
+              primaryColorDark: const Color(0xFF9C0000),
               colorScheme: ColorScheme.light(
                 primary: Color(0xFFEC008C),
                 secondary: Color(0xFFFC6767), // ใช้แทน accentColor

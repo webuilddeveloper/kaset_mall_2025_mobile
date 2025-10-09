@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile_mart_v3/component/key_search.dart';
 import 'package:mobile_mart_v3/component/loading_image_network.dart';
+import 'package:mobile_mart_v3/component/material/loading_tween.dart';
 import 'package:mobile_mart_v3/news_form.dart';
 import 'package:mobile_mart_v3/product_from.dart';
 import 'package:mobile_mart_v3/shared/api_provider.dart';
@@ -46,6 +48,11 @@ class _NewsAllPageState extends State<NewsAllPage> {
   int total_page = 0;
   bool loadProduct = true;
   String? emailProfile;
+  bool isMain = true;
+  String categorySelected = '';
+  String keySearch = '';
+  bool isHighlight = false;
+  bool hideSearch = true;
 
   @override
   void initState() {
@@ -68,7 +75,8 @@ class _NewsAllPageState extends State<NewsAllPage> {
   _callRead() async {
     setState(() {
       loadProduct = true;
-      _futureModel = postObjectData(server_we_build + 'm/news/read', {});
+      _futureModel = postObjectData(
+          server_we_build + 'm/news/read', {"keySearch": keySearch, "category": categorySelected});
 
       // Timer(
       //   Duration(seconds: 1),
@@ -192,18 +200,6 @@ class _NewsAllPageState extends State<NewsAllPage> {
               server_we_build + 'm/news/read',
               {},
             );
-
-            _futureModel!.then((value) async => {
-                  setState(() {
-                    // total_page = value[0]['total_pages'];
-                    // _listModelMore = [..._listModelMore, ...value];
-                    // // _listModelMore = [...value];
-                    // // _filterSelected == 'เกี่ยวข้อง' ? null : _listModelMore.shuffle();
-                    // _listModelMore.length == 0 ? loadProduct = false : true;
-                    print('total_page ========== ${value}');
-                  })
-                });
-
             changOrderKey = false;
             _refreshController?.loadComplete();
           } else {
@@ -283,117 +279,22 @@ class _NewsAllPageState extends State<NewsAllPage> {
         ),
         body: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => {
-                          setState(() => {_filterSelected = 'เกี่ยวข้อง'}),
-                          _onRefresh(),
-                        },
-                        child: Text(
-                          'เกี่ยวข้อง',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: _filterSelected == 'เกี่ยวข้อง'
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: _filterSelected == 'เกี่ยวข้อง'
-                                ? Color(0xFF0B24FB)
-                                : Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () => {
-                          setState(() => {
-                                _filterSelected = 'ขายดี',
-                                orderBy = '',
-                                loadProduct = true,
-                                changOrderKey = true,
-                                page = 0,
-                              }),
-                          _hotSale(),
-                        },
-                        child: Text(
-                          'ขายดี',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: _filterSelected == 'ขายดี'
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: _filterSelected == 'ขายดี'
-                                ? Color(0xFF0B24FB)
-                                : Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () => {
-                          setState(
-                            () => {
-                              _filterSelected = 'ราคา',
-                              orderKey = 'min_price',
-                              filterType = 'minPrice',
-                              orderBy = '',
-                              loadProduct = true,
-                              changOrderKey = true,
-                              page = 0,
-                            },
-                          ),
-                          _onLoading(),
-                        },
-                        child: Text(
-                          'ราคา',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: _filterSelected == 'ราคา'
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: _filterSelected == 'ราคา'
-                                ? Color(0xFF0B24FB)
-                                : Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: SizedBox(),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _key.currentState!.openEndDrawer();
-                        },
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/filter.png',
-                              height: 15,
-                              width: 15,
-                            ),
-                            SizedBox(width: 5),
-                            Text(
-                              'ขั้นสูง',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 5),
+                tabCategory(),
+                SizedBox(height: 5),
+                KeySearch(
+                  show: hideSearch,
+                  onKeySearchChange: (String val) {
+                    setState(() {
+                      keySearch = val;
+                      _callRead();
+                    });
+                  },
+                ),
+              ],
             ),
             Expanded(
               child: _buildMain(),
@@ -458,112 +359,10 @@ class _NewsAllPageState extends State<NewsAllPage> {
                 );
               }
             } else {
-              return Container(
-                height: 165,
-                child: Center(
-                  child: Text('ไม่มีข่าวประชาสัมพันธ์'),
-                ),
-              );
-              // return loadProduct == true
-              //     ? GridView.builder(
-              //         shrinkWrap: true,
-              //         physics: ClampingScrollPhysics(),
-              //         gridDelegate:
-              //             const SliverGridDelegateWithMaxCrossAxisExtent(
-              //                 maxCrossAxisExtent: 300,
-              //                 childAspectRatio: 9 / 14,
-              //                 crossAxisSpacing: 15,
-              //                 mainAxisSpacing: 20),
-              //         itemCount: 6,
-              //         itemBuilder: (context, index) => Column(
-              //           children: [
-              //             SizedBox(height: 10),
-              //             LoadingTween(
-              //               height: 165,
-              //             ),
-              //             SizedBox(height: 5),
-              //             LoadingTween(
-              //               height: 40,
-              //             ),
-              //             SizedBox(height: 5),
-              //             LoadingTween(
-              //               height: 17,
-              //             ),
-              //           ],
-              //         ),
-              //       )
-              //     :
+              return _buildLoading();
             }
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildGridView(param) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      padding: EdgeInsets.all(12),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // จำนวนคอลัมน์
-        crossAxisSpacing: 10, // ระยะห่างแนวนอน
-        mainAxisSpacing: 10, // ระยะห่างแนวตั้ง
-      ),
-      itemCount: param.length,
-      itemBuilder: (context, index) => _buildCardGrid(param[index]),
-    );
-  }
-
-  _buildCardGrid(dynamic param) {
-    return GestureDetector(
-      onTap: () {
-        _addLog(param);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductFormCentralPage(model: param),
-          ),
-        );
-      },
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                // height: 200,
-                width: MediaQuery.of(context).size.width,
-                // padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(9),
-                  color: Colors.white,
-                ),
-                // alignment: Alignment.center,
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(9),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(9),
-                      child: loadingImageNetwork(
-                        // snapshot.data[index]['imageUrl'],
-                        param['imageUrl'],
-                        fit: BoxFit.cover,
-                      ),
-                    )),
-              ),
-              SizedBox(height: 5),
-              Text(
-                param['title'],
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -654,79 +453,168 @@ class _NewsAllPageState extends State<NewsAllPage> {
     );
   }
 
-  _showVerifyCheckDialog() {
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () {
-              return Future.value(false);
-            },
-            child: CupertinoAlertDialog(
-              title: new Text(
-                'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Kanit',
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              content: Text(" "),
-              actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: new Text(
-                    "ตกลง",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
-                      fontWeight: FontWeight.normal,
+  tabCategory() {
+    return FutureBuilder<dynamic>(
+      future: postCategory(
+        '${newsCategoryApi}read',
+        {'skip': 0, 'limit': 100},
+      ),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData) {
+          return Container(
+            height: 40.0,
+            padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+            margin: EdgeInsets.symmetric(horizontal: 10.0),
+            decoration: new BoxDecoration(
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: Colors.grey.withOpacity(0.5),
+              //     spreadRadius: 0,
+              //     blurRadius: 7,
+              //     offset: Offset(0, 3), // changes position of shadow
+              //   ),
+              // ],
+              borderRadius: new BorderRadius.circular(6.0),
+              color: Colors.white,
+            ),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: snapshot.data.length,
+              separatorBuilder: (context, index) {
+                return SizedBox(
+                  width: 10,
+                );
+              },
+              itemBuilder: (BuildContext context, int index) {
+                return GestureDetector(
+                  onTap: () {
+                    if (snapshot.data[index]['code'] != '') {
+                      setState(() {
+                        keySearch = '';
+                        isMain = false;
+                        isHighlight = false;
+                        categorySelected = snapshot.data[index]['code'];
+                      });
+                    } else {
+                      setState(() {
+                        isHighlight = true;
+                        categorySelected = '';
+                        isMain = true;
+                      });
+                    }
+                    setState(() {
+                      categorySelected = snapshot.data[index]['code'];
+                      _callRead();
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: categorySelected == snapshot.data[index]['code']
+                          ? Theme.of(context).primaryColor
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          width: 1, color: Theme.of(context).primaryColor),
                     ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => VerifyPhonePage(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 5.0,
+                    ),
+                    child: Text(
+                      snapshot.data[index]['title'],
+                      style: TextStyle(
+                        color: categorySelected == snapshot.data[index]['code']
+                            ? Colors.white
+                            : Theme.of(context).primaryColor,
+                        // decoration: index == selectedIndex
+                        //     ? TextDecoration.underline
+                        //     : null,
+                        fontSize: 15,
+                        fontWeight:
+                            categorySelected == snapshot.data[index]['code']
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                        // letterSpacing: 1.2,
+                        fontFamily: 'Kanit',
                       ),
-                    );
-                  },
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: false,
-                  child: new Text(
-                    "ไม่ใช่ตอนนี้",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
-                      fontWeight: FontWeight.normal,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-                ),
-              ],
+                );
+              },
             ),
           );
-        });
+        } else {
+          return Container(
+            height: 45.0,
+            padding: EdgeInsets.only(left: 5.0, right: 5.0),
+            margin: EdgeInsets.symmetric(horizontal: 30.0),
+            decoration: new BoxDecoration(
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: Colors.grey.withOpacity(0.5),
+              //     spreadRadius: 0,
+              //     blurRadius: 7,
+              //     offset: Offset(0, 3), // changes position of shadow
+              //   ),
+              // ],
+              borderRadius: new BorderRadius.circular(6.0),
+              color: Colors.white,
+            ),
+          );
+        }
+      },
+    );
   }
 
-  _callSumStock(param) {
-    // print(param.toString());
-    int qty = 0;
-    for (var item in param) {
-      // print("stock ${item['stock'].toString()}");
-      qty += int.parse(item['stock'].toString());
-    }
-
-    // print(qty);
-    return qty;
+  Widget _buildLoading() {
+    return ListView.separated(
+      padding: EdgeInsets.only(top: 16),
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      itemCount: 4,
+      separatorBuilder: (context, index) => SizedBox(
+        height: 16,
+      ),
+      itemBuilder: (context, index) => IntrinsicHeight(
+          // height: 165,
+          child: Container(
+        padding: EdgeInsets.only(
+          left: 15,
+          // top: 15,
+          right: 15,
+          // bottom: 15,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            LoadingTween(
+              height: 165,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LoadingTween(
+                    height: 40,
+                  ),
+                  Expanded(child: SizedBox()),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      children: [
+                        LoadingTween(
+                          height: 17,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      )),
+    );
   }
 }

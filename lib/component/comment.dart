@@ -165,15 +165,14 @@ class _Comment extends State<Comment> {
             //   ),
             // ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-                overlayColor: Theme.of(context).primaryColor
-            ),
+                backgroundColor: Theme.of(context).primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                overlayColor: Theme.of(context).primaryColor),
             // splashColor: Colors.transparent,
             // highlightColor: Colors.transparent,
-            
+
             child: const Text(
               'ส่ง',
               style: TextStyle(
@@ -186,6 +185,20 @@ class _Comment extends State<Comment> {
             onPressed: () {
               sendComment();
             },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Row(
+            children: [
+              Text(
+                'ความคิดเห็น',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600
+                ),
+              ),
+            ],
           ),
         ),
         FutureBuilder<dynamic>(
@@ -218,11 +231,13 @@ class _Comment extends State<Comment> {
 
   myComment(dynamic model) {
     return Container(
-      child: ListView.builder(
+      child: ListView.separated(
+        padding: EdgeInsets.zero,
         shrinkWrap: true, // 1st add
         physics: ClampingScrollPhysics(), // 2nd
         // scrollDirection: Axis.horizontal,
         itemCount: model.length,
+        separatorBuilder: (context, index) => SizedBox(height: 20,),
         itemBuilder: (context, index) {
           return ListTile(
             leading: Container(
@@ -253,7 +268,7 @@ class _Comment extends State<Comment> {
                       padding: EdgeInsets.only(
                           top: 5, bottom: 5, left: 15, right: 15),
                       margin: EdgeInsets.only(
-                          left: 1, right: 15, top: 5, bottom: 1),
+                          left: 1, right: 15, top: 0, bottom: 1),
                       decoration: BoxDecoration(
                           color: Colors.black.withAlpha(10),
                           borderRadius: BorderRadius.circular(20),
@@ -285,7 +300,8 @@ class _Comment extends State<Comment> {
                 Container(
                   padding: EdgeInsets.only(left: 20),
                   child: Text(
-                    dateStringToDateStringFormat(model[index]['createDate'], type: '-'),
+                    dateStringToDateStringFormat(model[index]['createDate'],
+                        type: '-'),
                     style: TextStyle(
                       // fontWeight: FontWeight.bold,
                       fontSize: 12,
@@ -310,6 +326,7 @@ class _Comment extends State<Comment> {
         'reference': widget.code,
         'description': txtDescription.text
       }).then((response) {
+        print('--------123-------- ${response}');
         if (response == 'S') {
           txtDescription.text = '';
 

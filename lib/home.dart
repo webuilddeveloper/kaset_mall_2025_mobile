@@ -10,6 +10,8 @@ import 'package:mobile_mart_v3/component/carousel_banner.dart';
 import 'package:mobile_mart_v3/component/loading_image_network.dart';
 import 'package:mobile_mart_v3/component/material/loading_tween.dart';
 import 'package:mobile_mart_v3/component/toast_fail.dart';
+import 'package:mobile_mart_v3/event_calendar.dart';
+import 'package:mobile_mart_v3/event_calendar_main.dart';
 import 'package:mobile_mart_v3/login.dart';
 import 'package:mobile_mart_v3/math_game/math_game_main.dart';
 import 'package:mobile_mart_v3/news_all.dart';
@@ -592,6 +594,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
+                      code: 'event',
                       title: 'ปฏิทินกิจกรรมที่น่าสนใจ',
                       // color: Color(0xFFF7F7F7),
                       showAll: true,
@@ -771,7 +774,16 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     MaterialPageRoute(builder: (_) => nextPage),
                   );
                 } else if (showAll) {
-                  if (code == 'news') {
+                  // EventCalendarPage
+                  if (code == 'event') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            EventCalendarMain(title: title),
+                      ),
+                    );
+                  } else if (code == 'news') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
