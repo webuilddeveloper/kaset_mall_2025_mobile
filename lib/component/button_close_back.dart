@@ -12,7 +12,7 @@ buttonCloseBack(BuildContext context) {
           onPressed: () {
             Navigator.pop(context);
           },
-          color: Color(0xFFE84C10),
+          color: Theme.of(context).primaryColor,
           textColor: Colors.white,
           child: Icon(
             Icons.close,

@@ -66,12 +66,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   void initState() {
     setState(() {
       modelProduct = widget.model;
-      modelProduct['order_details']['data'].forEach((element) => {
-            qty += ((element['quantity'] ?? 0) as num).toInt(),
-          });
-      modelProduct['qty'] = qty;
-      readAddress();
-      _callReadProfileCode();
+      // modelProduct['order_details']['data'].forEach((element) => {
+      //       qty += ((element['quantity'] ?? 0) as num).toInt(),
+      //     });
+      // modelProduct['qty'] = qty;
+      // readAddress();
+      // _callReadProfileCode();
       Timer(
         Duration(seconds: 1),
         () => {
@@ -171,21 +171,19 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       //   toolbarHeight: 10,
       // ),
       body: ScrollConfiguration(
-        behavior: CsBehavior(),
-        child: modePage == '0'
-            ? mode0()
-            : modePage == '10'
-                ? mode10()
-                : modePage == '20'
-                    ? mode20()
-                    : mode30(),
-        // loading == true
-        //     ? Center(
-        //         child: CircularProgressIndicator(
-        //         strokeWidth: 2,
-        //       ))
-        //     :
-      ),
+          behavior: CsBehavior(),
+          child: loading == true
+              ? Center(
+                  child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ))
+              : modePage == '0'
+                  ? mode0()
+                  : modePage == '10'
+                      ? mode10()
+                      : modePage == '20'
+                          ? mode20()
+                          : mode30()),
     );
   }
 
@@ -264,7 +262,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Flexible(
                       child: ElevatedButton(
                         onPressed: () {
-                          toPay(modelProduct['id']);
+                          toPay(modelProduct['code']);
                         },
                         style: ElevatedButton.styleFrom(
                           // primary: Color.fromARGB(255, 208, 141, 147),
@@ -311,7 +309,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Flexible(
                       child: Container(
                         child: Text(
-                          dateTimeThai(modelProduct['ordered_at']),
+                          // dateTimeThai(modelProduct['ordered_at']),
+                          modelProduct['purchaseDate'] ?? '',
                           style: TextStyle(
                             fontSize: 13,
                             // fontWeight: FontWeight.bold,
@@ -341,8 +340,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Flexible(
                       child: Container(
                         child: Text(
-                          (modelProduct['tax_identification_number'] ?? '-')
-                              .toString(),
+                          (modelProduct['taxId'] ?? '-'),
                           style: TextStyle(
                             fontSize: 13,
                             // fontWeight: FontWeight.bold,
@@ -399,15 +397,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               Container(
                 child: Text(
-                  (modelProduct['address'] ?? '') +
+                  (modelProduct['address']['no'] ?? '') +
                       ' ' +
-                      (modelProduct['tambon'] ?? '') +
+                      (modelProduct['address']['subDistrict'] ?? '') +
                       ' ' +
-                      (modelProduct['amphoe'] ?? '') +
+                      (modelProduct['address']['district'] ?? '') +
                       ' ' +
-                      (modelProduct['province'] ?? '') +
+                      (modelProduct['address']['province'] ?? '') +
                       ' ' +
-                      (modelProduct['zip'] ?? ''),
+                      (modelProduct['address']['postNo'] ?? ''),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w300,
@@ -431,16 +429,19 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 height: 5,
               ),
               Container(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) => _buildListProduct(
-                    modelProduct['order_details']['data'][index],
-                  ),
-                  separatorBuilder: (_, __) => SizedBox(height: 10),
-                  itemCount: modelProduct['order_details']['data'].length,
+                child: _buildListProduct(
+                  modelProduct,
                 ),
+                // ListView.separated(
+                //   shrinkWrap: true,
+                //   physics: ClampingScrollPhysics(),
+                //   padding: EdgeInsets.zero,
+                //   itemBuilder: (context, index) => _buildListProduct(
+                //     modelProduct['order_details']['data'][index],
+                //   ),
+                //   separatorBuilder: (_, __) => SizedBox(height: 10),
+                //   itemCount: modelProduct['order_details']['data'].length,
+                // ),
               ),
             ],
           ),
@@ -502,31 +503,31 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               SizedBox(
                 height: 5,
               ),
-              for (var i = 0;
-                  i < modelProduct['order_details']['data'].length;
-                  i++)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      child: Text(
-                        'ยอดสินค้า ชิ้นที่ ${(i + 1).toString()}',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        '${moneyFormat(modelProduct['order_details']['data'][i]['total'].toString())} บาท',
-                        style: TextStyle(
-                          fontSize: 14,
+              // for (var i = 0;
+              //     i < modelProduct['order_details']['data'].length;
+              //     i++)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    child: Text(
+                      'ยอดสินค้า',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
                           // fontWeight: FontWeight.bold,
-                        ),
+                          ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      '${moneyFormat(modelProduct['price'].toString())} บาท',
+                      style: TextStyle(
+                        fontSize: 14,
+                        // fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: 5,
               ),
@@ -594,7 +595,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                   Container(
                     child: Text(
-                      '${moneyFormat(modelProduct['total'].toString())} บาท',
+                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -663,7 +664,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           borderRadius: BorderRadius.all(Radius.circular(25)),
                         ),
                         child: Text(
-                          'พัสดุจะถูกส่งมอบให้บริษัทขนส่งภายในวันที่ ${dateThai(modelProduct['shipped_at']).toString()}',
+                          // 'พัสดุจะถูกส่งมอบให้บริษัทขนส่งภายในวันที่ ${dateThai(modelProduct['shipped_at']).toString()}',
+                          'พัสดุจะถูกส่งมอบให้บริษัทขนส่งภายในวันที่ ${modelProduct['shipped_at']}',
                           style: TextStyle(
                               fontSize: 13,
                               // fontWeight: FontWeight.bold,
@@ -696,12 +698,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           Flexible(
                             child: ElevatedButton(
                               onPressed: () {
-                                modelProduct['receipt'] != null
-                                    ? launchUrl(
-                                        Uri.parse(modelProduct['receipt']
-                                            ['data']['url']),
-                                        mode: LaunchMode.inAppWebView)
-                                    : null;
+                                // modelProduct['receipt'] != null
+                                //     ? launchUrl(
+                                //         Uri.parse(modelProduct['receipt']
+                                //             ['data']['url']),
+                                //         mode: LaunchMode.inAppWebView)
+                                //     : null;
                               },
                               style: ElevatedButton.styleFrom(
                                 // primary: Color.fromARGB(255, 208, 141, 147),
@@ -749,13 +751,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           Flexible(
                             child: ElevatedButton(
                               onPressed: () {
-                                modelProduct['receipt_shipping'] != null
-                                    ? launchUrl(
-                                        Uri.parse(
-                                            modelProduct['receipt_shipping']
-                                                ['data']['url']),
-                                        mode: LaunchMode.inAppWebView)
-                                    : null;
+                                // modelProduct['receipt_shipping'] != null
+                                //     ? launchUrl(
+                                //         Uri.parse(
+                                //             modelProduct['receipt_shipping']
+                                //                 ['data']['url']),
+                                //         mode: LaunchMode.inAppWebView)
+                                //     : null;
                               },
                               style: ElevatedButton.styleFrom(
                                 // primary: Color.fromARGB(255, 208, 141, 147),
@@ -804,7 +806,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Flexible(
                       child: Container(
                         child: Text(
-                          dateTimeThai(modelProduct['ordered_at']),
+                          // dateTimeThai(modelProduct['purchaseDate']),
+                          modelProduct['purchaseDate'],
                           style: TextStyle(
                             fontSize: 13,
                             // fontWeight: FontWeight.bold,
@@ -834,7 +837,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Flexible(
                       child: Container(
                         child: Text(
-                          dateTimeThai(modelProduct['paid_at']),
+                          // dateTimeThai(modelProduct['paidDate']),
+                          modelProduct['paidDate'],
                           style: TextStyle(
                             fontSize: 13,
                             // fontWeight: FontWeight.bold,
@@ -864,7 +868,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Flexible(
                       child: Container(
                         child: Text(
-                          (modelProduct['tax_identification_number'] ?? '-')
+                          (modelProduct['taxId'] ?? '-')
                               .toString(),
                           style: TextStyle(
                             fontSize: 13,
@@ -875,6 +879,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ],
                 ),
+              
               ]),
         ),
         Container(
@@ -922,15 +927,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               Container(
                 child: Text(
-                  (modelProduct['address'] ?? '') +
+                  (modelProduct['address']['no'] ?? '') +
                       ' ' +
-                      (modelProduct['tambon'] ?? '') +
+                      (modelProduct['address']['subDistrict'] ?? '') +
                       ' ' +
-                      (modelProduct['amphoe'] ?? '') +
+                      (modelProduct['address']['district'] ?? '') +
                       ' ' +
-                      (modelProduct['province'] ?? '') +
+                      (modelProduct['address']['province'] ?? '') +
                       ' ' +
-                      (modelProduct['zip'] ?? ''),
+                      (modelProduct['address']['postNo'] ?? ''),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w300,
@@ -954,16 +959,19 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 height: 5,
               ),
               Container(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) => _buildListProduct(
-                    modelProduct['order_details']['data'][index],
+                child: _buildListProduct(
+                    modelProduct,
                   ),
-                  separatorBuilder: (_, __) => SizedBox(height: 10),
-                  itemCount: modelProduct['order_details']['data'].length,
-                ),
+                // ListView.separated(
+                //   shrinkWrap: true,
+                //   physics: ClampingScrollPhysics(),
+                //   padding: EdgeInsets.zero,
+                //   itemBuilder: (context, index) => _buildListProduct(
+                //     modelProduct['order_details']['data'][index],
+                //   ),
+                //   separatorBuilder: (_, __) => SizedBox(height: 10),
+                //   itemCount: modelProduct['order_details']['data'].length,
+                // ),
               ),
             ],
           ),
@@ -1017,15 +1025,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               SizedBox(
                 height: 5,
               ),
-              for (var i = 0;
-                  i < modelProduct['order_details']['data'].length;
-                  i++)
+              // for (var i = 0;
+              //     i < modelProduct['order_details']['data'].length;
+              //     i++)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       child: Text(
-                        'ยอดสินค้า ชิ้นที่ ${(i + 1).toString()}',
+                        'ยอดสินค้า',
                         style: TextStyle(fontSize: 14, color: Color(0xFF707070)
                             // fontWeight: FontWeight.bold,
                             ),
@@ -1033,7 +1041,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                     Container(
                       child: Text(
-                        '${moneyFormat(modelProduct['order_details']['data'][i]['total'].toString())} บาท',
+                        '${moneyFormat(modelProduct['price'].toString())} บาท',
                         style: TextStyle(
                           fontSize: 14,
                           // fontWeight: FontWeight.bold,
@@ -1109,7 +1117,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                   Container(
                     child: Text(
-                      '${moneyFormat(modelProduct['total'].toString())} บาท',
+                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -1163,7 +1171,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       borderRadius: BorderRadius.all(Radius.circular(25)),
                     ),
                     child: Text(
-                      'ท่านจะได้รับพัสดุภายในวันที่ ${dateThai(modelProduct['destination_shipped_at']).toString()}',
+                      'ท่านจะได้รับพัสดุภายในวันที่ ${modelProduct['destination_shipped_at']}',
                       style: TextStyle(
                           fontSize: 13,
                           // fontWeight: FontWeight.bold,
@@ -1202,10 +1210,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Flexible(
                           child: ElevatedButton(
                             onPressed: () {
-                              modelProduct['tracking_code'] != null
-                                  ? launchInWebViewWithJavaScript(
-                                      'https://ems.thaiware.com/${modelProduct['tracking_code']}')
-                                  : null;
+                              // modelProduct['tracking_code'] != null
+                              //     ? launchInWebViewWithJavaScript(
+                              //         'https://ems.thaiware.com/${modelProduct['tracking_code']}')
+                              //     : null;
                             },
                             style: ElevatedButton.styleFrom(
                               // primary: Color.fromARGB(255, 208, 141, 147),
@@ -1261,12 +1269,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       children: [
                         Flexible(
                             child: GestureDetector(
-                          onTap: () async => await FlutterClipboard.copy(
-                                  modelProduct['tracking_code'] ?? "")
-                              .then(
-                            (value) =>
-                                toastFail(context, text: '✓  คัดลอกสำเร็จ'),
-                          ),
+                          // onTap: () async => await FlutterClipboard.copy(
+                          //         modelProduct['tracking_code'] ?? "")
+                          //     .then(
+                          //   (value) =>
+                          //       toastFail(context, text: '✓  คัดลอกสำเร็จ'),
+                          // ),
                           child: Image.asset(
                             'assets/images/central/copy_clipboard.png',
                             height: 25,
@@ -1279,7 +1287,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Flexible(
                           child: Container(
                             child: Text(
-                              modelProduct['tracking_code'] ?? "",
+                              modelProduct['trackingCode'] ?? "",
                               style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
@@ -1311,7 +1319,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        dateTimeThai(modelProduct['ordered_at']),
+                        modelProduct['purchaseDate'],
                         style: TextStyle(
                           fontSize: 13,
                           // fontWeight: FontWeight.bold,
@@ -1340,7 +1348,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        dateTimeThai(modelProduct['paid_at']),
+                        modelProduct['paidDate'],
                         style: TextStyle(
                           fontSize: 13,
                           // fontWeight: FontWeight.bold,
@@ -1369,7 +1377,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        (modelProduct['tax_identification_number'] ?? '-')
+                        (modelProduct['taxId'] ?? '-')
                             .toString(),
                         style: TextStyle(
                           fontSize: 13,
@@ -1399,12 +1407,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Flexible(
                           child: ElevatedButton(
                             onPressed: () {
-                              modelProduct['receipt'] != null
-                                  ? launchUrl(
-                                      Uri.parse(modelProduct['receipt']['data']
-                                          ['url']),
-                                      mode: LaunchMode.inAppWebView)
-                                  : null;
+                              // modelProduct['receipt'] != null
+                              //     ? launchUrl(
+                              //         Uri.parse(modelProduct['receipt']['data']
+                              //             ['url']),
+                              //         mode: LaunchMode.inAppWebView)
+                              //     : null;
                             },
                             style: ElevatedButton.styleFrom(
                               // primary: Color.fromARGB(255, 208, 141, 147),
@@ -1433,7 +1441,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       ],
                     )
                   : SizedBox(),
-              modelProduct['receipt_shipping'] != null
+              modelProduct['receiptShipping'] != null
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1452,12 +1460,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Flexible(
                           child: ElevatedButton(
                             onPressed: () {
-                              modelProduct['receipt_shipping'] != null
-                                  ? launchUrl(
-                                      Uri.parse(modelProduct['receipt_shipping']
-                                          ['data']['url']),
-                                      mode: LaunchMode.inAppWebView)
-                                  : null;
+                              // modelProduct['receipt_shipping'] != null
+                              //     ? launchUrl(
+                              //         Uri.parse(modelProduct['receipt_shipping']
+                              //             ['data']['url']),
+                              //         mode: LaunchMode.inAppWebView)
+                              //     : null;
                             },
                             style: ElevatedButton.styleFrom(
                               // primary: Color.fromARGB(255, 208, 141, 147),
@@ -1534,15 +1542,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               Container(
                 child: Text(
-                  (modelProduct['address'] ?? '') +
+                  (modelProduct['address']['no'] ?? '') +
                       ' ' +
-                      (modelProduct['tambon'] ?? '') +
+                      (modelProduct['address']['subDistrict'] ?? '') +
                       ' ' +
-                      (modelProduct['amphoe'] ?? '') +
+                      (modelProduct['address']['district'] ?? '') +
                       ' ' +
-                      (modelProduct['province'] ?? '') +
+                      (modelProduct['address']['province'] ?? '') +
                       ' ' +
-                      (modelProduct['zip'] ?? ''),
+                      (modelProduct['address']['postNo'] ?? ''),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w300,
@@ -1565,18 +1573,21 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               SizedBox(
                 height: 5,
               ),
-              Container(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) => _buildListProduct(
-                    modelProduct['order_details']['data'][index],
+              _buildListProduct(
+                    modelProduct,
                   ),
-                  separatorBuilder: (_, __) => SizedBox(height: 10),
-                  itemCount: modelProduct['order_details']['data'].length,
-                ),
-              ),
+              // Container(
+              //   child: ListView.separated(
+              //     shrinkWrap: true,
+              //     physics: ClampingScrollPhysics(),
+              //     padding: EdgeInsets.zero,
+              //     itemBuilder: (context, index) => _buildListProduct(
+              //       modelProduct['order_details']['data'][index],
+              //     ),
+              //     separatorBuilder: (_, __) => SizedBox(height: 10),
+              //     itemCount: modelProduct['order_details']['data'].length,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -1629,15 +1640,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               SizedBox(
                 height: 5,
               ),
-              for (var i = 0;
-                  i < modelProduct['order_details']['data'].length;
-                  i++)
+              // for (var i = 0;
+              //     i < modelProduct['order_details']['data'].length;
+              //     i++)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       child: Text(
-                        'ยอดสินค้า ชิ้นที่ ${(i + 1).toString()}',
+                        'ยอดสินค้า',
                         style: TextStyle(fontSize: 14, color: Color(0xFF707070)
                             // fontWeight: FontWeight.bold,
                             ),
@@ -1645,7 +1656,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                     Container(
                       child: Text(
-                        '${moneyFormat(modelProduct['order_details']['data'][i]['total'].toString())} บาท',
+                        '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
                         style: TextStyle(
                           fontSize: 14,
                           // fontWeight: FontWeight.bold,
@@ -1721,7 +1732,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                   Container(
                     child: Text(
-                      '${moneyFormat(modelProduct['total'].toString())} บาท',
+                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -1746,13 +1757,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       ),
       children: [
         Container(
-          height: 200,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/bg_order_details.png"),
-              fit: BoxFit.fitWidth,
-            ),
-          ),
+          // height: 200,
+          // decoration: BoxDecoration(
+          //   image: DecorationImage(
+          //     image: AssetImage("assets/bg_order_details.png"),
+          //     fit: BoxFit.fitWidth,
+          //   ),
+          // ),
           // margin: const EdgeInsets.only(top: 15),
           padding:
               const EdgeInsets.only(top: 15, right: 15, left: 15, bottom: 15),
@@ -1875,12 +1886,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       children: [
                         Flexible(
                             child: GestureDetector(
-                          onTap: () async => await FlutterClipboard.copy(
-                                  modelProduct['tracking_code'] ?? "")
-                              .then(
-                            (value) =>
-                                toastFail(context, text: '✓  คัดลอกสำเร็จ'),
-                          ),
+                          // onTap: () async => await FlutterClipboard.copy(
+                          //         modelProduct['tracking_code'] ?? "")
+                          //     .then(
+                          //   (value) =>
+                          //       toastFail(context, text: '✓  คัดลอกสำเร็จ'),
+                          // ),
                           child: Image.asset(
                             'assets/images/central/copy_clipboard.png',
                             height: 25,
@@ -1893,7 +1904,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Flexible(
                           child: Container(
                             child: Text(
-                              modelProduct['tracking_code'] ?? "",
+                              modelProduct['trackingCode'] ?? "",
                               style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.w500,
@@ -1925,7 +1936,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        dateTimeThai(modelProduct['ordered_at']),
+                        // dateTimeThai(modelProduct['ordered_at']),
+                        modelProduct['purchaseDate'],
                         style: TextStyle(
                           fontSize: 13,
                           // fontWeight: FontWeight.bold,
@@ -1954,7 +1966,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        dateTimeThai(modelProduct['paid_at']),
+                        // dateTimeThai(modelProduct['paid_at']),
+                        modelProduct['paidDate'],
                         style: TextStyle(
                           fontSize: 13,
                           // fontWeight: FontWeight.bold,
@@ -1983,7 +1996,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        (modelProduct['tax_identification_number'] ?? '-')
+                        (modelProduct['taxId'] ?? '-')
                             .toString(),
                         style: TextStyle(
                           fontSize: 13,
@@ -2013,12 +2026,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Flexible(
                           child: ElevatedButton(
                             onPressed: () {
-                              modelProduct['receipt'] != null
-                                  ? launchUrl(
-                                      Uri.parse(modelProduct['receipt']['data']
-                                          ['url']),
-                                      mode: LaunchMode.inAppWebView)
-                                  : null;
+                              // modelProduct['receipt'] != null
+                              //     ? launchUrl(
+                              //         Uri.parse(modelProduct['receipt']['data']
+                              //             ['url']),
+                              //         mode: LaunchMode.inAppWebView)
+                              //     : null;
                             },
                             style: ElevatedButton.styleFrom(
                               // primary: Color.fromARGB(255, 208, 141, 147),
@@ -2047,7 +2060,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       ],
                     )
                   : SizedBox(),
-              modelProduct['receipt_shipping'] != null
+              modelProduct['receiptShipping'] != null
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -2066,12 +2079,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Flexible(
                           child: ElevatedButton(
                             onPressed: () {
-                              modelProduct['receipt_shipping'] != null
-                                  ? launchUrl(
-                                      Uri.parse(modelProduct['receipt_shipping']
-                                          ['data']['url']),
-                                      mode: LaunchMode.inAppWebView)
-                                  : null;
+                              // modelProduct['receipt_shipping'] != null
+                              //     ? launchUrl(
+                              //         Uri.parse(modelProduct['receipt_shipping']
+                              //             ['data']['url']),
+                              //         mode: LaunchMode.inAppWebView)
+                              //     : null;
                             },
                             style: ElevatedButton.styleFrom(
                               // primary: Color.fromARGB(255, 208, 141, 147),
@@ -2148,15 +2161,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               Container(
                 child: Text(
-                  (modelProduct['address'] ?? '') +
+                  (modelProduct['no'] ?? '') +
                       ' ' +
-                      (modelProduct['tambon'] ?? '') +
+                      (modelProduct['address']['subDistrict'] ?? '') +
                       ' ' +
-                      (modelProduct['amphoe'] ?? '') +
+                      (modelProduct['address']['district'] ?? '') +
                       ' ' +
-                      (modelProduct['province'] ?? '') +
+                      (modelProduct['address']['province'] ?? '') +
                       ' ' +
-                      (modelProduct['zip'] ?? ''),
+                      (modelProduct['address']['postNo'] ?? ''),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w300,
@@ -2180,16 +2193,19 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 height: 5,
               ),
               Container(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) => _buildListProduct(
-                    modelProduct['order_details']['data'][index],
-                  ),
-                  separatorBuilder: (_, __) => SizedBox(height: 10),
-                  itemCount: modelProduct['order_details']['data'].length,
+                child: _buildListProduct(
+                  modelProduct,
                 ),
+                // ListView.separated(
+                //   shrinkWrap: true,
+                //   physics: ClampingScrollPhysics(),
+                //   padding: EdgeInsets.zero,
+                //   itemBuilder: (context, index) => _buildListProduct(
+                //     modelProduct['order_details']['data'][index],
+                //   ),
+                //   separatorBuilder: (_, __) => SizedBox(height: 10),
+                //   itemCount: modelProduct['order_details']['data'].length,
+                // ),
               ),
             ],
           ),
@@ -2243,31 +2259,29 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               SizedBox(
                 height: 5,
               ),
-              for (var i = 0;
-                  i < modelProduct['order_details']['data'].length;
-                  i++)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      child: Text(
-                        'ยอดสินค้า ชิ้นที่ ${(i + 1).toString()}',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        '${moneyFormat(modelProduct['order_details']['data'][i]['total'].toString())} บาท',
-                        style: TextStyle(
-                          fontSize: 14,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    child: Text(
+                      // 'ยอดสินค้า ชิ้นที่ ${(i + 1).toString()}',
+                      'ยอดสินค้า',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
                           // fontWeight: FontWeight.bold,
-                        ),
+                          ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      '${moneyFormat(modelProduct['price'].toString())} บาท',
+                      style: TextStyle(
+                        fontSize: 14,
+                        // fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: 5,
               ),
@@ -2335,7 +2349,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                   Container(
                     child: Text(
-                      '${moneyFormat(modelProduct['total'].toString())} บาท',
+                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -2388,6 +2402,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   }
 
   _buildListProduct(param) {
+    print(param);
     return Column(
       children: [
         GestureDetector(
@@ -2397,17 +2412,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             // models['product_variant']['data'] = param['product_variant']['data'];
             // models['media']['data'] = param['media']['data'];
 
-            var productModel =
-                await readProduct(param['product']['data']['id']);
-            await _addLog(productModel);
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ProductFormCentralPage(
-                  model: productModel,
-                ),
-              ),
-            );
+            // var productModel =
+            //     await readProduct(param['product']['data']['id']);
+            // await _addLog(productModel);
+            // await Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (_) => ProductFormCentralPage(
+            //       model: productModel,
+            //     ),
+            //   ),
+            // );
           },
           child: Container(
             // padding: EdgeInsets.only(top: 10, bottom: 5),
@@ -2428,14 +2443,20 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 //   },
                 //   child:
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: loadingImageNetwork(
-                    param['media']['data']['url'],
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                    borderRadius: BorderRadius.circular(5),
+                    child: Image.asset(
+                      param['imageUrl'],
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    )
+                    // loadingImageNetwork(
+                    //   param['imageUrl'],
+                    //   width: 80,
+                    //   height: 80,
+                    //   fit: BoxFit.cover,
+                    // ),
+                    ),
                 // ),
                 SizedBox(width: 10),
                 Expanded(
@@ -2449,7 +2470,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              param['product']['data']['name'],
+                              param['title'],
                               style: TextStyle(
                                 fontSize: 13,
                                 overflow: TextOverflow.ellipsis,
@@ -2467,7 +2488,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           children: [
                             Expanded(
                               child: Text(
-                                '${moneyFormat(param['product_variant']['data']['price'].toString())} บาท',
+                                '${moneyFormat(param['price'].toString())} บาท',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w400,
@@ -2475,7 +2496,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               ),
                             ),
                             Text(
-                              'จำนวน ' + param['quantity'].toString(),
+                              'จำนวน ' + param['qty'].toString(),
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400,

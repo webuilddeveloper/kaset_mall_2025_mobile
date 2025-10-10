@@ -20,12 +20,42 @@ class ToSuccessPage extends StatefulWidget {
 class _ToSuccessPageState extends State<ToSuccessPage> {
   late Future<dynamic> _futureModel;
   bool loading = false;
-  List<dynamic> orderModel = [];
+
+  List<dynamic> orderModel = [
+    {
+      "code": "1",
+      "title": "ปุ๋ยเคมี",
+      "price": 99000,
+      "qty": "2",
+      "discount": 0,
+      "priceTotal": 203000,
+      "shipping": 5000,
+      "imageUrl": "assets/images/mock_pro_1.png",
+      "purchaseDate": "10/10/2568 10:30:00",
+      "paidDate": "10/10/2568 10:35:00",
+      "destination_shipped_at": "15/10/2568",
+      "trackingCode": "ES83990293818",
+      "receiptShipping": "receiptShipping.pdf",
+      "receipt": "receipt.pdf",
+      "taxId": "1004293962218",
+      "phone": "0999999999",
+      "name": "สมศักดิ์ ศักดิ์สม",
+      "shipped_at": "15/10/2568",
+      "address": {
+        "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
+        "subDistrict": "จอมพล",
+        "district": "จตุจักร",
+        "province": "กรุงเทพมหานครฯ",
+        "postNo": "10900"
+      },
+      "status": "30"
+    }
+  ];
 
   @override
   void initState() {
     // _futureModel = Future.value(order); // mock
-    _callRead();
+    // _callRead();
     super.initState();
   }
 
@@ -74,43 +104,53 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
           child: ShowLoadingWidget(
             loading: loading,
             children: [
-              FutureBuilder(
-                future: _futureModel,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    loading = false;
-                    if (snapshot.data.length > 0) {
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (context, index) => snapshot
-                                    .data[index]['order_details']['data']
-                                    .length >
-                                0
-                            ? _buildListCategory(snapshot.data[index])
-                            : SizedBox(),
-                        separatorBuilder: (_, __) => SizedBox(height: 0),
-                        itemCount: snapshot.data.length,
-                      );
-                    } else {
-                      return Center(
-                        child: Text('ไม่มีรายการ'),
-                      );
-                    }
-                  } else if (snapshot.hasError) {
-                    if (snapshot.data == null) {
-                      return Center(
-                        child: Text('ไม่มีรายการ'),
-                      );
-                    } else {
-                      return DataError();
-                    }
-                  } else {
-                    return Container();
-                  }
-                },
-              )
+              ListView.separated(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, index) => orderModel.length > 0
+                    ? _buildListCategory(orderModel[index])
+                    : SizedBox(),
+                separatorBuilder: (_, __) => SizedBox(height: 0),
+                itemCount: orderModel.length,
+              ),
+              // FutureBuilder(
+              //   future: _futureModel,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       loading = false;
+              //       if (snapshot.data.length > 0) {
+              //         return ListView.separated(
+              //           shrinkWrap: true,
+              //           physics: ClampingScrollPhysics(),
+              //           padding: EdgeInsets.zero,
+              //           itemBuilder: (context, index) => snapshot
+              //                       .data[index]['order_details']['data']
+              //                       .length >
+              //                   0
+              //               ? _buildListCategory(snapshot.data[index])
+              //               : SizedBox(),
+              //           separatorBuilder: (_, __) => SizedBox(height: 0),
+              //           itemCount: snapshot.data.length,
+              //         );
+              //       } else {
+              //         return Center(
+              //           child: Text('ไม่มีรายการ'),
+              //         );
+              //       }
+              //     } else if (snapshot.hasError) {
+              //       if (snapshot.data == null) {
+              //         return Center(
+              //           child: Text('ไม่มีรายการ'),
+              //         );
+              //       } else {
+              //         return DataError();
+              //       }
+              //     } else {
+              //       return Container();
+              //     }
+              //   },
+              // )
             ],
           ),
         ));
@@ -173,7 +213,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
               //   itemCount: param['order_details']['data'].length,
               // ),
 
-              _buildListProductInOrder(param['order_details']['data'] ?? ''),
+              _buildListProductInOrder(param ?? ''),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -194,7 +234,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                     // padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
                       // _calculatePrice(param['total']),
-                      moneyFormat(param['total'].toString()) + ' บาท',
+                      moneyFormat(param['priceTotal'].toString()) + ' บาท',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
@@ -211,7 +251,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                         Flexible(
                           child: ElevatedButton(
                             onPressed: () {
-                              _acceptProduct(param['id']);
+                              // _acceptProduct(param['code']);
                             },
                             style: ElevatedButton.styleFrom(
                               // primary: Color.fromARGB(255, 208, 141, 147),
@@ -312,13 +352,13 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
             children: [
               InkWell(
                 onTap: () {
-                  _getProductById(param[0]['product']['data']['id']);
+                  _getProductById(param['code']);
                   // Navigator.pop(context);
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),
-                  child: loadingImageNetwork(
-                    param[0]['media']['data']['url'],
+                  child: Image.asset(
+                    param['imageUrl'],
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
@@ -337,7 +377,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            param[0]['product']['data']['name'],
+                            param['title'],
                             style: TextStyle(
                               fontSize: 13,
                               overflow: TextOverflow.ellipsis,
@@ -355,7 +395,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              '${moneyFormat(param[0]['product_variant']['data']['price'].toString())} บาท',
+                              '${moneyFormat(param['price'].toString())} บาท',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -363,7 +403,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                             ),
                           ),
                           Text(
-                            'จำนวน ' + param[0]['quantity'].toString(),
+                            'จำนวน ' + param['qty'].toString(),
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,

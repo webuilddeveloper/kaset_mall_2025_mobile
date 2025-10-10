@@ -243,8 +243,8 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: loadingImageNetwork(
-                widget.modelMediaData['url'],
+              child: Image.asset(
+                widget.modelMediaData['imageUrl'],
                 height: 80,
                 width: 80,
                 fit: BoxFit.cover,
@@ -257,7 +257,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      widget.modelProductData['name'],
+                      widget.modelProductData['title'],
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 13,
@@ -316,10 +316,19 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
               color: Color(0xFFDF0B24),
               child: MaterialButton(
                 onPressed: () async {
-                  final form = _formKey.currentState;
-                  if (form!.validate()) {
-                    save();
-                  } else {}
+                  // final form = _formKey.currentState;
+                  // if (form!.validate()) {
+                  //   save();
+                  // } else {}
+                  _showDialog('ขอคุณสำหรับการรีวิวสินค้า').then((value) {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ToRateCentralPage(),
+                      ),
+                    );
+                  });
                 },
                 child: new Text(
                   'บันทึก',
@@ -482,7 +491,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
       'comment': commentController.text,
       // 'photos': [await futureMultipartFile0, await futureMultipartFile1],
     });
-    
+
     var c = 0;
     for (var i in imageList) {
       mapData.files.addAll([
@@ -578,7 +587,6 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
     //   });
     // }
 
-    
     var result = await postFormData(server + 'reviews', mapData);
     var message = '';
     // var product_idErrors = '';
@@ -666,7 +674,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
                 CupertinoDialogAction(
                   isDefaultAction: true,
                   child: new Text(
-                    "Agree",
+                    "กลับหน้าหลัก",
                     style: TextStyle(
                       fontSize: 13,
                       fontFamily: 'Kanit',

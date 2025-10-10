@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_mart_v3/menu.dart';
+import 'package:mobile_mart_v3/register_shop.dart';
 import 'package:mobile_mart_v3/shared/api_provider.dart';
 import 'package:mobile_mart_v3/verify_phone.dart';
 import 'package:mobile_mart_v3/widget/header.dart';
@@ -380,10 +381,12 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
               // SizedBox(height: 25),
               GestureDetector(
                 onTap: () {
-                  final form = _formKey.currentState;
-                  if (form!.validate()) {
-                    submitRegister();
-                  }
+                  // final form = _formKey.currentState;
+                  // if (form!.validate()) {
+                  //   submitRegister();
+                  // }
+
+                  _buildDialogSuccess();
                 },
                 child: Container(
                   height: 50,
@@ -652,6 +655,74 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
       (token) {
         postDio(server_we_build + 'notificationV2/m/updateTokenDevice',
             {"token": token, "profileCode": profileCode});
+      },
+    );
+  }
+
+  _buildDialogSuccess() {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {
+            return Future.value(false);
+          },
+          child: CupertinoAlertDialog(
+            title: new Text(
+              'ลงทะเบียนเรียบร้อยแล้ว\nท่านสนใจเข้าร่วมเป็นร้านค้ากับเราหรือไม่',
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: 'Kanit',
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+            content: Text(" "),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: new Text(
+                  "ตกลง",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'Kanit',
+                    color: Color(0xFFFF7514),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RegisterShopPage(
+                      ),
+                    ),
+                  );
+                },
+              ),
+              CupertinoDialogAction(
+                isDefaultAction: false,
+                child: new Text(
+                  "ไม่ใช่ตอนนี้",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'Kanit',
+                    color: Color(0xFFFF7514),
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MenuCentralPage()),
+                      (route) => false);
+                },
+              ),
+            ],
+          ),
+        );
       },
     );
   }

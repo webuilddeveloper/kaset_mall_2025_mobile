@@ -8,24 +8,23 @@ import 'package:mobile_mart_v3/component/key_search.dart';
 import 'package:mobile_mart_v3/component/loading_image_network.dart';
 import 'package:mobile_mart_v3/component/material/loading_tween.dart';
 import 'package:mobile_mart_v3/news_form.dart';
-import 'package:mobile_mart_v3/product_from.dart';
+import 'package:mobile_mart_v3/privilege_form.dart';
 import 'package:mobile_mart_v3/shared/api_provider.dart';
 import 'package:mobile_mart_v3/shared/extension.dart';
-import 'package:mobile_mart_v3/verify_phone.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 // ignore: must_be_immutable
-class NewsAllPage extends StatefulWidget {
-  NewsAllPage({Key? key, @required this.title, required this.mode})
+class PrivilegeAllPage extends StatefulWidget {
+  PrivilegeAllPage({Key? key, @required this.title, required this.mode})
       : super(key: key);
   final String? title;
   late bool mode;
 
   @override
-  State<NewsAllPage> createState() => _NewsAllPageState();
+  State<PrivilegeAllPage> createState() => _PrivilegeAllPageState();
 }
 
-class _NewsAllPageState extends State<NewsAllPage> {
+class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   final storage = new FlutterSecureStorage();
   Future<dynamic>? _futureModel;
@@ -76,7 +75,7 @@ class _NewsAllPageState extends State<NewsAllPage> {
     setState(() {
       loadProduct = true;
       _futureModel = postObjectData(
-          newsApi + '/read', {"keySearch": keySearch, "category": categorySelected});
+          privilegeApi + '/read', {"keySearch": keySearch, "category": categorySelected});
 
       // Timer(
       //   Duration(seconds: 1),
@@ -88,56 +87,6 @@ class _NewsAllPageState extends State<NewsAllPage> {
       //     ),
       //   },
       // );
-    });
-  }
-
-  // _hotSale() {
-  //   setState(() {
-  //     loadProduct = true;
-  //     _limit = 20;
-  //     orderKey = '';
-  //     orderBy = '';
-  //     txtPriceMin.text = '';
-  //     txtPriceMax.text = '';
-  //     loadProduct = true;
-  //     _listModelMore = [];
-  //     _futureModel = null;
-
-  //     // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
-  //     _futureModel = postProductHotSale(
-  //         // server_we_build + 'm/Product/readProduct',
-  //         server_we_build + 'm/Product/readProductHot',
-  //         // {"per_page": "${_limit.toString()}"}
-  //         {});
-
-  //     _futureModel!.then((value) async => {
-  //           setState(() {
-  //             // total_page = value[0]['total_pages'];
-  //             _listModelMore = [...value];
-  //             _listModelMore.shuffle();
-  //             _listModelMore.length == 0 ? loadProduct = false : true;
-  //           })
-  //         });
-  //     // Timer(
-  //     //   Duration(seconds: 1),
-  //     //   () => {
-  //     //     setState(
-  //     //       () {
-  //     //         _listModelMore.length == 0 ? loadProduct = false : true;
-  //     //       },
-  //     //     ),
-  //     //   },
-  //     // );
-  //   });
-  // }
-
-  _getCountItemInCart() async {
-    //get amount item in cart.
-    await get(server + 'carts').then((value) async {
-      if (value != null)
-        setState(() {
-          amountItemInCart = value.length;
-        });
     });
   }
 
@@ -153,9 +102,7 @@ class _NewsAllPageState extends State<NewsAllPage> {
       _listModelMore = [];
       _futureModel = null;
     });
-    // _filterSelected == 'เกี่ยวข้อง' ? _callRead() : _hotSale;
     _callRead();
-    // _getCountItemInCart();
     _refreshController?.refreshCompleted();
   }
 
@@ -198,7 +145,7 @@ class _NewsAllPageState extends State<NewsAllPage> {
               // itemProductCount = 0;
             }
             _futureModel = post(
-              server_we_build + 'm/news/read',
+              privilegeApi + '/read',
               {},
             );
             changOrderKey = false;
@@ -386,7 +333,7 @@ class _NewsAllPageState extends State<NewsAllPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => NewsForm(model: param),
+            builder: (_) => PrivilegeForm(model: param),
           ),
         );
       },
@@ -457,7 +404,7 @@ class _NewsAllPageState extends State<NewsAllPage> {
   tabCategory() {
     return FutureBuilder<dynamic>(
       future: postCategory(
-        '${newsCategoryApi}read',
+        '${privilegeCategoryApi}read',
         {'skip': 0, 'limit': 100},
       ),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {

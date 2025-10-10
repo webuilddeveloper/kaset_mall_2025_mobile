@@ -3,14 +3,12 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_mart_v3/forgot_password.dart';
 import 'package:mobile_mart_v3/menu.dart';
 import 'package:mobile_mart_v3/register.dart';
 import 'package:mobile_mart_v3/shared/api_provider.dart';
 import 'package:mobile_mart_v3/shared/apple.dart';
-import 'package:mobile_mart_v3/shared/facebook.dart';
 import 'package:mobile_mart_v3/shared/facebook_firebase.dart';
 import 'package:mobile_mart_v3/shared/google.dart';
 import 'package:mobile_mart_v3/shared/line.dart';
@@ -89,10 +87,11 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
         },
         child: Container(
             decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/bg_login.png"),
-                fit: BoxFit.cover,
-              ),
+              // image: DecorationImage(
+              //   image: AssetImage("assets/bg_login.png"),
+              //   fit: BoxFit.cover,
+              // ),
+              // color: Colors.white
             ),
             child: SafeArea(
               child: Center(
@@ -106,10 +105,10 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                   children: [
                     Center(
                       child: Image.asset(
-                        "assets/logo/logo_ssp.png",
+                        "assets/logo.png",
                         // fit: BoxFit.contain,
                         // height: 150,
-                        width: 200,
+                        width: 150,
                       ),
                     ),
                     Container(
@@ -119,7 +118,8 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                       // constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width + 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(19),
-                        color: Colors.white.withOpacity(0.63),
+                        // color: Colors.white.withOpacity(0.63),
+                        color: Theme.of(context).primaryColorLight.withOpacity(0.3),
                         // border: Border.all(
                         //   // width: 1,
                         //   // color: Theme.of(context).accentColor,
@@ -135,7 +135,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                                 fontSize: 27,
                                 fontFamily: 'Kanit',
                                 fontWeight: FontWeight.bold,
-                                color: Color(0XFF0B24FB)),
+                                color: Theme.of(context).primaryColor,),
                           ),
                           SizedBox(height: 10.0),
                           labelTextField(
@@ -181,7 +181,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                             padding: const EdgeInsets.only(top: 20),
                             child: _rowLongLine(
                               '  หรือท่านอาจจะ  ',
-                              Color(0XFF929dfc),
+                              Theme.of(context).primaryColor,
                             ),
                           ),
                           Padding(
@@ -189,40 +189,39 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ForgotPasswordCentralPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15.0,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      border: Border.all(
-                                        color: Color(0xFFC0BFBF),
-                                      ),
-                                      color: Colors.white,
-                                    ),
-                                    child: Text(
-                                      "ลืมรหัสผ่าน",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Kanit',
-                                        color: Color(0xFFC0BFBF),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                InkWell(
+                                // InkWell(
+                                //   onTap: () {
+                                //     Navigator.push(
+                                //       context,
+                                //       MaterialPageRoute(
+                                //         builder: (context) =>
+                                //             ForgotPasswordCentralPage(),
+                                //       ),
+                                //     );
+                                //   },
+                                //   child: Container(
+                                //     padding: const EdgeInsets.symmetric(
+                                //       horizontal: 15.0,
+                                //       vertical: 3,
+                                //     ),
+                                //     decoration: BoxDecoration(
+                                //       borderRadius: BorderRadius.circular(30.0),
+                                //       border: Border.all(
+                                //         color: Color(0xFFC0BFBF),
+                                //       ),
+                                //       color: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       "ลืมรหัสผ่าน",
+                                //       style: TextStyle(
+                                //         fontSize: 15,
+                                //         fontFamily: 'Kanit',
+                                //         color: Color(0xFFC0BFBF),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                                GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -240,16 +239,49 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(30.0),
                                       border: Border.all(
-                                        color: Color(0xFF929dfc),
+                                        color: Theme.of(context).primaryColor,
                                       ),
-                                      color: Color(0xFF929dfc),
+                                      color: Theme.of(context).primaryColor,
                                     ),
                                     child: Text(
-                                      "สมัครเป็นสมาชิก",
+                                      "สมัครสมาชิก",
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontFamily: 'Kanit',
                                         color: Color(0xFFFFFFFF),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            RegisterCentralPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 25.0,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      border: Border.all(
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      color: Colors.white,
+                                    ),
+                                    child: Text(
+                                      "เข้าร่วมเป็นร้านค้า",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'Kanit',
+                                        color: Theme.of(context).primaryColor,
                                       ),
                                     ),
                                   ),
@@ -264,7 +296,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                       padding: EdgeInsets.only(top: 20, left: 20, right: 20),
                       child: _rowLongLine(
                         '  เข้าสู่ระบบผ่าน  ',
-                        Color(0xFF0B24FB),
+                        Theme.of(context).primaryColor,
                       ),
                     ),
                     Row(
@@ -484,19 +516,28 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
     return Material(
       // elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
-      color: Color(0XFFE00923),
+      color: Theme.of(context).primaryColor,
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         height: 40,
-        onPressed: () {
-          loginWithGuest();
+        onPressed: () async {
+          // loginWithGuest();
+          await new FlutterSecureStorage()
+          .write(key: 'firstName', value: 'สมศักดิ์');
+          await new FlutterSecureStorage()
+          .write(key: 'lastName', value: 'ศักดิ์สม');
+          await Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MenuCentralPage()),
+                          (route) => false);
         },
         child: new Text(
           'เข้าสู่ระบบ',
           style: new TextStyle(
             fontSize: 18.0,
             color: Colors.white,
-            fontWeight: FontWeight.normal,
+            fontWeight: FontWeight.w600,
             fontFamily: 'Kanit',
           ),
         ),

@@ -8,6 +8,7 @@ import 'package:mobile_mart_v3/phonics_game.dart';
 import 'package:mobile_mart_v3/product_favorite.dart';
 import 'package:mobile_mart_v3/read_book_list.dart';
 import 'package:mobile_mart_v3/register.dart';
+import 'package:mobile_mart_v3/register_shop.dart';
 import 'package:mobile_mart_v3/review_success.dart';
 import 'package:mobile_mart_v3/to_pay.dart';
 import 'package:mobile_mart_v3/to_rate.dart';
@@ -61,7 +62,7 @@ class _UserInformationCentralPageState
       'description': 'เมื่อสั่งซื้อสินค้าครั้งแรกกับแอพ'
     },
   ]);
-  late Future<dynamic> _futureDeliveryAddress;
+  Future<dynamic>? _futureDeliveryAddress;
 
   Future<dynamic> _futurePaymentOptions = Future.value([
     {
@@ -76,11 +77,6 @@ class _UserInformationCentralPageState
     {'title': 'บัตรเครดิต / เดบิต2', 'description': 'บัตร visa xxx-123'},
   ]);
 
-  late Future<dynamic> _countRedeemAll;
-  late Future<dynamic> _countRedeem;
-  late Future<dynamic> futureModel;
-  late Future<dynamic> _futureManageShop;
-  late Future<dynamic> _futureOrders;
   String profileCode = '';
   String profileImageUrl = '';
   String referenceShopCode = '';
@@ -96,17 +92,6 @@ class _UserInformationCentralPageState
 
   late String _userId;
   late String _username;
-  late String _password;
-  late String _facebookID;
-  late String _appleID;
-  late String _googleID;
-  late String _lineID;
-  late String _email;
-  late String _imageUrl;
-  late String _category;
-  late String _prefixName;
-  late String _firstName;
-  late String _lastName;
 
   final txtUsername = TextEditingController();
   final txtPassword = TextEditingController();
@@ -118,28 +103,51 @@ class _UserInformationCentralPageState
   List<dynamic> success = [];
   int review = 0;
 
+  String memberType = '1';
+  var isShopRegis;
+
   @override
   void initState() {
-    profileFirstName = '';
-    profileLastName = '';
-    _read();
-    _readUser();
+    // _read();
+    // _readUser();
+    _getUserData();
 
     super.initState();
   }
 
   void _onRefresh() async {
-    _read();
+    // _read();
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
     // _refreshController.loadComplete();
   }
 
   _getUserData() async {
-    var a = await storage.read(key: 'phoneVerified');
+    // var a = await storage.read(key: 'phoneVerified');
+    // setState(() {
+    //   verifyPhonePage = a ?? "";
+    // });
+    final fistName =
+        await new FlutterSecureStorage().read(key: 'firstName') ?? "";
+    final lastName =
+        await new FlutterSecureStorage().read(key: 'lastName') ?? "";
+    final isShop =
+        await new FlutterSecureStorage().read(key: 'isShop') ?? "false";
     setState(() {
-      verifyPhonePage = a ?? "";
+      profileFirstName = fistName;
+      profileLastName = lastName;
+      isShopRegis = isShop;
     });
+    Timer(
+      Duration(seconds: 1),
+      () => {
+        setState(
+          () {
+            loadingSuccess = true;
+          },
+        ),
+      },
+    );
   }
 
   _getCredit() async {
@@ -184,23 +192,6 @@ class _UserInformationCentralPageState
 
   _readOrder() async {
     setState(() {
-      _futureOrders = get('${server}orders').then((value) => {
-            [...value].forEach((e) => {
-                  if (e['order_details']['data'].length > 0)
-                    {
-                      if (e['status'] == 0 || e['status'] == 1)
-                        {paid.add(e)}
-                      else if (e['status'] == 10 || e['status'] == 11)
-                        {ship.add(e)}
-                      else if (e['status'] == 20)
-                        {delivery.add(e)}
-                      else if (e['status'] == 30)
-                        {success.add(e)}
-                      // else if (e['status'] == 40)
-                      //   {review.add(e)}
-                    }
-                }),
-          });
       // Timer(
       //   Duration(seconds: 1),
       //   () => {
@@ -226,11 +217,11 @@ class _UserInformationCentralPageState
   _buildBackground() {
     return Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/bg_profile.png"),
-            fit: BoxFit.cover,
-          ),
-        ),
+            // image: DecorationImage(
+            //   image: AssetImage("assets/bg_profile.png"),
+            //   fit: BoxFit.cover,
+            // ),
+            color: Colors.white),
         child: SafeArea(
           child: Scaffold(
             backgroundColor: Colors.transparent,
@@ -258,9 +249,10 @@ class _UserInformationCentralPageState
   }
 
   _buildHeader() {
+    print('----====----- ${profileFirstName}');
     return Stack(
       children: [
-        (profileCode == '' || profileCode == null)
+        (profileFirstName == '' || profileFirstName == null)
             ? _isNotProfileCode()
             : _isProfileCode(),
         Positioned(
@@ -441,18 +433,35 @@ class _UserInformationCentralPageState
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: (profileImageUrl != null)
-                    ? loadingImageNetwork(
-                        profileImageUrl,
-                        fit: BoxFit.cover,
-                        isProfile: true,
+                child: 
+                // loadingImageNetwork(
+                //         profileImageUrl,
+                //         fit: BoxFit.cover,
+                //         isProfile: true,
+                //       )
+                (isShopRegis == 'true' && memberType == '2')
+                    ? Container(
+                        height: 70,
+                        width: 70,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                        child: Image.asset(
+                          'assets/images/central/store.png',
+                          fit: BoxFit.cover,
+                          width: 50,
+                          height: 50,
+                          color: Colors.white,
+                        ),
                       )
                     : Container(
                         height: 70,
                         width: 70,
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Color(0XFF0B24FB),
+                          color: Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(35),
                         ),
                         child: Image.asset(
@@ -475,8 +484,9 @@ class _UserInformationCentralPageState
                 (profileFirstName ?? "") + ' ' + (profileLastName ?? ""),
                 style: TextStyle(
                   fontFamily: 'Kanit',
-                  fontSize: 15,
-                  color: Color(0XFF0B24FB),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).primaryColor,
                 ),
                 textScaleFactor: ScaleSize.textScaleFactor(context),
               ),
@@ -506,25 +516,15 @@ class _UserInformationCentralPageState
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25.0),
                     border: Border.all(
-                      color:
-                          (profilePhone == null || verifyPhonePage == 'false')
-                              ? Color(0xFFDF0B24)
-                              : Color(0XFF0B24FB),
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                   child: Text(
-                    profilePhone == null
-                        ? 'ยังไม่ได้เพิ่มเบอร์โทรศัพท์'
-                        : verifyPhonePage == 'false'
-                            ? 'ยังไม่ได้ยืนยันเบอร์โทรศัพท์'
-                            : 'สมาชิก ศึกษาภัณฑ์ มอลล์.',
+                    memberType == '1' ? 'สมาชิกเกษตรกร' : 'สมาชิกร้านค้า',
                     style: TextStyle(
                       fontFamily: 'Kanit',
                       fontSize: 15,
-                      color:
-                          (profilePhone == null || verifyPhonePage == 'false')
-                              ? Color(0xFFDF0B24)
-                              : Color(0XFF0B24FB),
+                      color: Theme.of(context).primaryColor,
                     ),
                     textScaleFactor: ScaleSize.textScaleFactor(context),
                   ),
@@ -539,192 +539,132 @@ class _UserInformationCentralPageState
 
   _screen() {
     final themeChange = Provider.of<DarkThemeProvider>(context);
-    return ListView(
-      shrinkWrap: true,
-      padding: EdgeInsets.all(15),
-      physics: ClampingScrollPhysics(),
-      children: <Widget>[
-        Row(
-          children: [
-            Container(
-              // width: 10,
-              child: Icon(
-                Icons.assignment_outlined,
-                color: Color(0xFFDF0B24),
-              ),
+    return memberType == '2'
+        ? Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: GridView(
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 150,
+                  childAspectRatio: 1.2,
+                  // 9/15,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10),
+              children: [
+                // /////////////////// ร้านค้า //////////////////////
+                _colTitle(Icons.integration_instructions, 'จัดการสินค้า',
+                    callback: () => {}, isShowMenu: memberType == '2'),
+                _colTitle(Icons.assignment_outlined, 'คำสั่งซื้อ',
+                    callback: () => {}, isShowMenu: memberType == '2'),
+                _colTitle(Icons.inventory, 'คลังสินค้า',
+                    callback: () => {}, isShowMenu: memberType == '2'),
+                _colTitle(Icons.local_shipping, 'จัดส่งสินค้า',
+                    callback: () => {}, isShowMenu: memberType == '2'),
+                _colTitle(Icons.account_circle, 'กลับไประบบผู้ซื้อ',
+                    callback: () => {
+                          setState(() {
+                            memberType = '1';
+                          }),
+                        },
+                    isShowMenu: memberType == '2'),
+              ],
             ),
-            SizedBox(width: 5),
-            Text(
-              'รายการสั่งซื้อของฉัน',
-              style: TextStyle(
-                fontFamily: 'Kanit',
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-              textScaleFactor: ScaleSize.textScaleFactor(context),
-            ),
-          ],
-        ),
-
-        SizedBox(height: 10),
-        _orderList(),
-        SizedBox(height: 10),
-        _rowTitle(Icons.local_shipping_outlined, 'ที่อยู่จัดส่ง',
-            callback: () => verifyPhonePage == 'true'
-                ? Navigator.push(
+          )
+        : ListView(
+            shrinkWrap: true,
+            padding: EdgeInsets.all(15),
+            physics: ClampingScrollPhysics(),
+            children: <Widget>[
+              // /////////////////// สมาชิก //////////////////////
+              _rowTitle(Icons.assignment_outlined, 'รายการสั่งซื้อของฉัน',
+                  callback: () => {}),
+              _orderList(),
+              _rowTitle(Icons.local_shipping_outlined, 'ที่อยู่จัดส่ง',
+                  callback: () => verifyPhonePage == 'true'
+                      ? Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                DeliveryAddressCentralPage(),
+                          ),
+                        )
+                      : {}),
+              _deliveryAddress(),
+              _rowTitle(Icons.confirmation_num_outlined, 'คูปองของฉัน',
+                  callback: () => verifyPhonePage == 'true'
+                      ? Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                CouponPickUpCentralPage(
+                              readMode: true,
+                            ),
+                          ),
+                        )
+                      : {},
+                  isShowMenu: memberType == '1'),
+              _coupon(),
+              _rowTitle(Icons.headset_mic, 'ติดต่อ', callback: () {
+                if (profileCode != '' && profileCode != null) {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          DeliveryAddressCentralPage(),
-                    ),
-                  )
-                : {}),
-        SizedBox(height: 10),
-        _deliveryAddress(),
-
-        SizedBox(height: 10),
-        _rowTitle(Icons.confirmation_num_outlined, 'คูปองของฉัน',
-            callback: () => verifyPhonePage == 'true'
-                ? Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          CouponPickUpCentralPage(
-                        readMode: true,
+                      builder: (context) => chatstaff(
+                        userId: _userId,
+                        userName: _username,
                       ),
                     ),
-                  )
-                : {}),
-        SizedBox(height: 10),
-        _coupon(),
-        SizedBox(
-          height: 10,
-        ),
-        _rowTitle(
-          Icons.games,
-          'เกม',
-          callback: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => GameSelectionPage(),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        _rowTitle(
-          Icons.book,
-          'อ่านนิยาย',
-          callback: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReadBookList(),
-              //   builder: (context) => PdfViewerScreen(
-              //       pdfUrl:
-              //           'http://vet.we-builds.com/vet-document/images/knowledge/knowledge_212438263.pdf'),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        _rowTitle(
-          Icons.headset_mic,
-          'ติดต่อ',
-          callback: () {
-            if (profileCode != '' && profileCode != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => chatstaff(
-                    userId: _userId,
-                    userName: _username,
-                  ),
-                ),
-              );
-            } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => LoginCentralPage(),
-                ),
-              );
-            }
-          },
-        ),
-        SizedBox(height: 10),
-        _rowTitle(Icons.reviews_outlined, 'สินค้าที่รีวิวแล้ว',
-            callback: () => verifyPhonePage == 'true'
-                ? Navigator.push(
+                  );
+                } else {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => ReviewSuccessPage(),
+                      builder: (BuildContext context) => LoginCentralPage(),
                     ),
-                  )
-                : {}),
-        SizedBox(height: 10),
-        _rowTitle(Icons.favorite_border, 'สินค้าที่ฉันถูกใจ',
-            callback: () => verifyPhonePage == 'true'
-                ? Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          ProductFavoriteCentralPage(),
-                    ),
-                  )
-                : {}),
-        SizedBox(height: 10),
-        _rowTitle(Icons.airplay, 'Suksapan Teaching',
-            callback: () => launchInWebViewWithJavaScript(
-                'https://teaching.suksapanpanit.com/th')),
-        SizedBox(height: 10),
-        _rowTitle2(
-            Icons.shopping_bag_outlined, 'ใบสั่งซื้อ', 'ร้านศึกษาภัณฑ์พาณิชย์',
-            callback: () => launchInWebViewWithJavaScript(
-                'https://crm.suksapanpanit.com/th/filesharing/viewer/ba25414e0ba3486b8d1b48940ec2e81a')),
-
-        // SizedBox(height: 10),
-        // _rowTitle('ตัวเลือกชำระเงิน',
-        //     callback: () => verifyPhonePage == 'true'
-        //         ? Navigator.push(
-        //             context,
-        //             MaterialPageRoute(
-        //               builder: (BuildContext context) =>
-        //                   MyCreditCardCentralPage(),
-        //             ),
-        //           )
-        //         : {}),
-        // SizedBox(height: 10),
-        // _paymentOptions(),
-        // SizedBox(height: 10),
-        // InkWell(
-        //   onTap: () {
-        //     // toastFail(context);
-        //     logout(context);
-        //   },
-        //   child: Row(
-        //     mainAxisSize: MainAxisSize.min,
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: <Widget>[
-        //       Icon(
-        //         Icons.power_settings_new,
-        //         color: themeChange.darkTheme ? Colors.white : Colors.red,
-        //       ),
-        //       Text(
-        //         " ออกจากระบบ",
-        //         style: new TextStyle(
-        //           fontSize: 12.0,
-        //           color: themeChange.darkTheme ? Colors.white : Colors.red,
-        //           fontWeight: FontWeight.normal,
-        //           fontFamily: 'Kanit',
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // )
-      ],
-    );
+                  );
+                }
+              }),
+              _rowTitle(Icons.reviews_outlined, 'สินค้าที่รีวิวแล้ว',
+                  callback: () => verifyPhonePage == 'true'
+                      ? Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                ReviewSuccessPage(),
+                          ),
+                        )
+                      : {}),
+              _rowTitle(Icons.favorite_border, 'สินค้าที่ฉันถูกใจ',
+                  callback: () => verifyPhonePage == 'true'
+                      ? Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                ProductFavoriteCentralPage(),
+                          ),
+                        )
+                      : {}),
+              _rowTitle(
+                  Icons.add_business,
+                  isShopRegis == 'true'
+                      ? 'ร้านค้าของฉัน'
+                      : 'สมัครสมาชิกเป็นร้านค้า',
+                  callback: () => {
+                        print('======== : ${isShopRegis}'),
+                        isShopRegis == 'true'
+                            ? setState(() {
+                                memberType = '2';
+                              })
+                            : Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      RegisterShopPage(),
+                                ),
+                              )
+                      },
+                  isShowMenu: (profileFirstName ?? '') != ''),
+            ],
+          );
   }
 
   _orderList() {
@@ -737,42 +677,12 @@ class _UserInformationCentralPageState
           'assets/logo/pay.png',
           paid.length,
           callback: () => {
-            if (profileCode == null || profileCode == '')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => LoginCentralPage(),
-                  ),
-                )
-              }
-            else if (profilePhone == null || profilePhone == '')
-              {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          UserProfileForm(mode: "addPhone"),
-                    )).then((value) => {_onRefresh()}),
-              }
-            else if (verifyPhonePage == 'false')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => VerifyPhonePage(),
-                  ),
-                )
-              }
-            else
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ToPayCentralPage(),
-                  ),
-                ).then((value) => _onRefresh())
-              }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ToPayCentralPage(),
+              ),
+            ).then((value) => _onRefresh())
           },
         ),
         _boxOrderList(
@@ -780,42 +690,12 @@ class _UserInformationCentralPageState
           'assets/logo/delivery.png',
           ship.length > 0 ? ship.length : null,
           callback: () => {
-            if (profileCode == null || profileCode == '')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => LoginCentralPage(),
-                  ),
-                )
-              }
-            else if (profilePhone == null || profilePhone == '')
-              {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          UserProfileForm(mode: "addPhone"),
-                    )).then((value) => {_onRefresh()}),
-              }
-            else if (verifyPhonePage == 'false')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => VerifyPhonePage(),
-                  ),
-                )
-              }
-            else
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ToShipCentralPage(),
-                  ),
-                ).then((value) => _onRefresh())
-              }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ToShipCentralPage(),
+              ),
+            ).then((value) => _onRefresh())
           },
         ),
         _boxOrderList(
@@ -823,196 +703,38 @@ class _UserInformationCentralPageState
           'assets/logo/car.png',
           delivery.length > 0 ? delivery.length : null,
           callback: () => {
-            if (profileCode == null || profileCode == '')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => LoginCentralPage(),
-                  ),
-                )
-              }
-            else if (profilePhone == null || profilePhone == '')
-              {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          UserProfileForm(mode: "addPhone"),
-                    )).then((value) => {_onRefresh()}),
-              }
-            else if (verifyPhonePage == 'false')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => VerifyPhonePage(),
-                  ),
-                )
-              }
-            else
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ToReceiveCentralPage(),
-                  ),
-                ).then((value) => _onRefresh())
-              }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ToReceiveCentralPage(),
+              ),
+            ).then((value) => _onRefresh())
           },
         ),
-        InkWell(
-          onTap: () => {
-            if (profileCode == null || profileCode == '')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => LoginCentralPage(),
-                  ),
-                )
-              }
-            else if (profilePhone == null || profilePhone == '')
-              {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          UserProfileForm(mode: "addPhone"),
-                    )).then((value) => {_onRefresh()}),
-              }
-            else if (verifyPhonePage == 'false')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => VerifyPhonePage(),
-                  ),
-                )
-              }
-            else
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ToSuccessPage(),
-                  ),
-                ).then((value) => _onRefresh())
-              }
+        _boxOrderList(
+          'เสร็จสิ้น',
+          'assets/logo/check.png',
+          delivery.length > 0 ? delivery.length : null,
+          callback: () => {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ToSuccessPage(),
+              ),
+            ).then((value) => _onRefresh())
           },
-          child: Container(
-            width: 60,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      // alignment: Alignment.center,
-                      width: 45,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9),
-                        color: Color(0xFFDF0B24),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(
-                          Icons.check,
-                          color: Color(0xFFFFFFFF),
-                        ),
-                      ),
-                    ),
-                  ),
-                  (profileCode != null &&
-                          success.length != null &&
-                          success.length > 0 &&
-                          verifyPhonePage == 'true')
-                      ? Positioned(
-                          right: 0,
-                          top: 0,
-                          // bottom: 5,
-                          child: Container(
-                            height: 23,
-                            width: 23,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0XFF0B24FB),
-                            ),
-                            child: Text(
-                              success.length > 99
-                                  ? '99+'
-                                  : success.length.toString(),
-                              style: TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: success.length.toString().length <= 1
-                                    ? 13
-                                    : success.length.toString().length == 2
-                                        ? 12
-                                        : 11,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        )
-                      : SizedBox(),
-                ]),
-                SizedBox(height: 5),
-                Text(
-                  'เสร็จสิ้น',
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 13,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
         ),
         _boxOrderList(
           'ที่ต้องรีวิว',
           'assets/logo/paper.png',
           review > 0 ? review : null,
           callback: () => {
-            if (profileCode == null || profileCode == '')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => LoginCentralPage(),
-                  ),
-                )
-              }
-            else if (profilePhone == null || profilePhone == '')
-              {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          UserProfileForm(mode: "addPhone"),
-                    )).then((value) => {_onRefresh()}),
-              }
-            else if (verifyPhonePage == 'false')
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => VerifyPhonePage(),
-                  ),
-                )
-              }
-            else
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ToRateCentralPage(),
-                  ),
-                ).then((value) => _onRefresh())
-              }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ToRateCentralPage(),
+              ),
+            ).then((value) => _onRefresh())
           },
         ),
       ],
@@ -1036,7 +758,7 @@ class _UserInformationCentralPageState
                   height: 45,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(9),
-                    color: Color(0xFFDF0B24),
+                    color: Theme.of(context).primaryColor,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -1093,115 +815,104 @@ class _UserInformationCentralPageState
     );
   }
 
-  _rowTitle(icon, title, {Function? callback}) {
-    return InkWell(
-      onTap: () => callback!(),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                (icon ?? '') != ''
-                    ? Container(
-                        // width: 10,
-                        child: Icon(icon,
-                            color: Color(0xFFDF0B24),
-                            size: (ScaleSize.textScaleFactor(context) +
-                                    (MediaQuery.of(context).size.aspectRatio)) +
-                                27),
-                      )
-                    : SizedBox(width: 0),
-                SizedBox(width: 5),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                  textScaleFactor: ScaleSize.textScaleFactor(context),
+  _rowTitle(icon, title, {Function? callback, bool isShowMenu = true}) {
+    return isShowMenu
+        ? Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: GestureDetector(
+              onTap: () => callback!(),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        (icon ?? '') != ''
+                            ? Container(
+                                // width: 10,
+                                child: Icon(icon,
+                                    color: Theme.of(context).primaryColor,
+                                    size: (ScaleSize.textScaleFactor(context) +
+                                            (MediaQuery.of(context)
+                                                .size
+                                                .aspectRatio)) +
+                                        27),
+                              )
+                            : SizedBox(width: 0),
+                        SizedBox(width: 5),
+                        Text(
+                          title,
+                          style: TextStyle(
+                              fontFamily: 'Kanit',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Theme.of(context).primaryColor),
+                          textScaleFactor: ScaleSize.textScaleFactor(context),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        : SizedBox();
+  }
+
+  _colTitle(icon, title, {Function? callback, bool isShowMenu = true}) {
+    return isShowMenu
+        ? Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Theme.of(context).primaryColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2), // ✅ สีของเงา
+                  spreadRadius: 2, // ✅ การกระจายของเงา
+                  blurRadius: 8, // ✅ ความเบลอของเงา
+                  offset: const Offset(2, 4), // ✅ ทิศทางของเงา (x, y)
                 ),
               ],
             ),
-            // Container(
-            //   alignment: Alignment.center,
-            //   width: (ScaleSize.textScaleFactor(context) +
-            //           (MediaQuery.of(context).size.aspectRatio)) +
-            //       20,
-            //   height: (ScaleSize.textScaleFactor(context) +
-            //           (MediaQuery.of(context).size.aspectRatio)) +
-            //       20,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(9),
-            //     color: Color(0XFFF7F7F7),
-            //   ),
-            //   child: Padding(
-            //     padding: const EdgeInsets.all(5.0),
-            //     child: Image.asset(
-            //       'assets/logo/right_arrow.png',
-            //     ),
-            //   ),
-            // ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  _rowTitle2(icon, title, title2, {Function? callback}) {
-    return InkWell(
-      onTap: () => callback!(),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                (icon ?? '') != ''
-                    ? Container(
-                        // width: 10,
-                        child: Icon(icon,
-                            color: Color(0xFFDF0B24),
-                            size: (ScaleSize.textScaleFactor(context) +
-                                    (MediaQuery.of(context).size.aspectRatio)) +
-                                27),
-                      )
-                    : SizedBox(width: 0),
-                SizedBox(width: 5),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            child: GestureDetector(
+              onTap: () => callback!(),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    (icon ?? '') != ''
+                        ? Container(
+                            // width: 10,
+
+                            child: Icon(icon,
+                                color: Colors.white,
+                                size: (ScaleSize.textScaleFactor(context) +
+                                        (MediaQuery.of(context)
+                                            .size
+                                            .aspectRatio)) +
+                                    55),
+                          )
+                        : SizedBox(width: 0),
+                    // SizedBox(width: 5),
                     Text(
                       title,
                       style: TextStyle(
-                        fontFamily: 'Kanit',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                      textScaleFactor: ScaleSize.textScaleFactor(context),
-                    ),
-                    Text(
-                      title2,
-                      style: TextStyle(
-                        fontFamily: 'Kanit',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                          fontFamily: 'Kanit',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white),
                       textScaleFactor: ScaleSize.textScaleFactor(context),
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ],
-        ),
-      ),
-    );
+          )
+        : SizedBox();
   }
 
   _coupon() {
@@ -1527,7 +1238,7 @@ class _UserInformationCentralPageState
   }
 
   _boxNotData({Function? callback}) {
-    return InkWell(
+    return GestureDetector(
       onTap: () => {
         (profileCode == '' || profileCode == null)
             ? Navigator.push(
@@ -1593,12 +1304,12 @@ class _UserInformationCentralPageState
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                "assets/logo/logo_ssp.png",
-                // fit: BoxFit.contain,
-                height: 30,
-                width: 60,
-              ),
+              // Image.asset(
+              //   "assets/logo/logo_ssp.png",
+              //   // fit: BoxFit.contain,
+              //   height: 30,
+              //   width: 60,
+              // ),
               Text(
                 (profileCode == '' || profileCode == null)
                     ? 'กรุณาเข้าสู่ระบบเพื่อใช้งาน'
@@ -1685,7 +1396,7 @@ class _UserInformationCentralPageState
 
   _readAddress() {
     _futureDeliveryAddress = get('${server}shipping-addresses');
-    _futureDeliveryAddress.then((value) => {});
+    _futureDeliveryAddress?.then((value) => {});
   }
 
   changeDefault(param, isSelect) async {

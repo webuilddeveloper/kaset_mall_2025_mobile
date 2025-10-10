@@ -22,10 +22,41 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
   bool resultProductId = false;
   String result = '';
 
+  List<dynamic> orderModel = [
+    {
+      "code": "1",
+      "title": "ปุ๋ยเคมี",
+      "price": 99000,
+      "qty": "2",
+      "discount": 0,
+      "priceTotal": 203000,
+      "shipping": 5000,
+      "imageUrl": "assets/images/mock_pro_1.png",
+      "purchaseDate": "10/10/2568 10:30:00",
+      "paidDate": "10/10/2568 10:35:00",
+      "destination_shipped_at": "15/10/2568",
+      "trackingCode": "ES83990293818",
+      "receiptShipping": "receiptShipping.pdf",
+      "receipt": "receipt.pdf",
+      "taxId": "1004293962218",
+      "phone": "0999999999",
+      "name": "สมศักดิ์ ศักดิ์สม",
+      "shipped_at": "15/10/2568",
+      "address": {
+        "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
+        "subDistrict": "จอมพล",
+        "district": "จตุจักร",
+        "province": "กรุงเทพมหานครฯ",
+        "postNo": "10900"
+      },
+      "status": "30"
+    }
+  ];
+
   @override
   void initState() {
     // _futureModel = Future.value(toRate);
-    read();
+    // read();
     super.initState();
   }
 
@@ -45,32 +76,33 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: headerCentral(context, title: 'ที่ต้องรีวิว'),
-      body: FutureBuilder<dynamic>(
-        future: read(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data.length > 0) {
-              return _buildListOrder(snapshot.data);
-            } else {
-              return Center(
-                child: Text('ยังไม่มีสินค้าที่ต้องรีวิว'),
-              );
-            }
-          } else if (snapshot.hasError) {
-            if (snapshot.data == null){
-              return Center(
-                child: Text('ยังไม่มีสินค้าที่ต้องรีวิว'),
-              );
-            }else {
-              return DataError();
-            }            
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+      body: _buildListOrder(orderModel),
+      // FutureBuilder<dynamic>(
+      //   future: read(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.hasData) {
+      //       if (snapshot.data.length > 0) {
+      //         return _buildListOrder(snapshot.data);
+      //       } else {
+      //         return Center(
+      //           child: Text('ยังไม่มีสินค้าที่ต้องรีวิว'),
+      //         );
+      //       }
+      //     } else if (snapshot.hasError) {
+      //       if (snapshot.data == null){
+      //         return Center(
+      //           child: Text('ยังไม่มีสินค้าที่ต้องรีวิว'),
+      //         );
+      //       }else {
+      //         return DataError();
+      //       }            
+      //     } else {
+      //       return Center(
+      //         child: CircularProgressIndicator(),
+      //       );
+      //     }
+      //   },
+      // ),
     );
   }
 
@@ -176,8 +208,8 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: loadingImageNetwork(
-                    param['media']['data']['url'],
+                  child: Image.asset(
+                    param['imageUrl'],
                     height: 80,
                     width: 80,
                     fit: BoxFit.cover,
@@ -190,7 +222,7 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          param['product']['data']['name'],
+                          param['title'],
                           textAlign: TextAlign.left,
                           style: TextStyle(
                             fontSize: 13,
@@ -199,7 +231,7 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      InkWell(
+                      GestureDetector(
                         onTap: 
                         result != 'true'
                             ? () => 
@@ -207,9 +239,9 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ReviewsAddPage(
-                                      orderId: param['id'],
-                                      modelProductData: param['product']['data'],
-                                      modelMediaData: param['media']['data'],
+                                      orderId: param['code'],
+                                      modelProductData: param,
+                                      modelMediaData: param,
                                     ),
                                   ),
                                 )

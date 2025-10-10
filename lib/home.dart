@@ -9,14 +9,11 @@ import 'package:mobile_mart_v3/component/carousel_banner.dart';
 import 'package:mobile_mart_v3/component/loading_image_network.dart';
 import 'package:mobile_mart_v3/component/material/loading_tween.dart';
 import 'package:mobile_mart_v3/component/toast_fail.dart';
-import 'package:mobile_mart_v3/event_calendar.dart';
 import 'package:mobile_mart_v3/event_calendar_main.dart';
-import 'package:mobile_mart_v3/login.dart';
-import 'package:mobile_mart_v3/math_game/math_game_main.dart';
 import 'package:mobile_mart_v3/news_all.dart';
+import 'package:mobile_mart_v3/privilege_all.dart';
 import 'package:mobile_mart_v3/product_all.dart';
 import 'package:mobile_mart_v3/product_from.dart';
-import 'package:mobile_mart_v3/product_list_by_category.dart';
 import 'package:mobile_mart_v3/purchase_menu.dart';
 import 'package:mobile_mart_v3/shared/api_provider.dart';
 import 'package:mobile_mart_v3/shared/extension.dart';
@@ -619,6 +616,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
+                      code: 'privilege',
                       title: 'สิทธิประโยชน์',
                       showAll: true,
                     ),
@@ -703,6 +701,14 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       MaterialPageRoute(
                         builder: (_) =>
                             NewsAllPage(title: title, mode: showAll),
+                      ),
+                    );
+                  } else if (code == 'privilege') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            PrivilegeAllPage(title: title, mode: showAll),
                       ),
                     );
                   } else {

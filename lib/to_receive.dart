@@ -21,10 +21,40 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
   late Future<dynamic> _futureModel;
   bool loading = false;
 
+  List<dynamic> orderModel = [
+    {
+      "code": "1",
+      "title": "ปุ๋ยเคมี",
+      "price": 99000,
+      "qty": "2",
+      "discount": 0,
+      "priceTotal": 203000,
+      "shipping": 5000,
+      "imageUrl": "assets/images/mock_pro_1.png",
+      "purchaseDate": "10/10/2568 10:30:00",
+      "paidDate": "10/10/2568 10:35:00",
+      "destination_shipped_at": "15/10/2568",
+      "trackingCode": "ES83990293818",
+      "receiptShipping": "receiptShipping.pdf",
+      "receipt": "receipt.pdf",
+      "taxId": "1004293962218",
+      "phone": "0999999999",
+      "name": "สมศักดิ์ ศักดิ์สม",
+      "shipped_at": "15/10/2568",
+      "address": {
+        "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
+        "subDistrict": "จอมพล",
+        "district": "จตุจักร",
+        "province": "กรุงเทพมหานครฯ",
+        "postNo": "10900"
+      }
+    }
+  ];
+
   @override
   void initState() {
     // _futureModel = Future.value(order); // mock
-    _callRead();
+    // _callRead();
     super.initState();
   }
 
@@ -73,45 +103,57 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
           child: ShowLoadingWidget(
             loading: loading,
             children: [
-              FutureBuilder(
-                future: _futureModel,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    loading = false;
-                    if (snapshot.data.length > 0) {
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (context, index) => snapshot
-                                    .data[index]['order_details']['data']
-                                    .length >
-                                0
-                            ? _buildListCategory(
-                                snapshot.data[index],
-                              )
-                            : SizedBox(),
-                        separatorBuilder: (_, __) => SizedBox(height: 0),
-                        itemCount: snapshot.data.length,
-                      );
-                    } else {
-                      return Center(
-                        child: Text('ยังไม่มีสินค้าที่เตรียมจัดส่ง'),
-                      );
-                    }
-                  } else if (snapshot.hasError) {
-                    if (snapshot.data == null) {
-                      return Center(
-                        child: Text('ไม่มีรายการ'),
-                      );
-                    } else {
-                      return DataError();
-                    }
-                  } else {
-                    return Container();
-                  }
-                },
-              )
+              ListView.separated(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, index) => orderModel.length > 0
+                    ? _buildListCategory(
+                        orderModel[index],
+                      )
+                    : SizedBox(),
+                separatorBuilder: (_, __) => SizedBox(height: 0),
+                itemCount: orderModel.length,
+              ),
+              // FutureBuilder(
+              //   future: _futureModel,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       loading = false;
+              //       if (snapshot.data.length > 0) {
+              //         return ListView.separated(
+              //           shrinkWrap: true,
+              //           physics: ClampingScrollPhysics(),
+              //           padding: EdgeInsets.zero,
+              //           itemBuilder: (context, index) => snapshot
+              //                       .data[index]['order_details']['data']
+              //                       .length >
+              //                   0
+              //               ? _buildListCategory(
+              //                   snapshot.data[index],
+              //                 )
+              //               : SizedBox(),
+              //           separatorBuilder: (_, __) => SizedBox(height: 0),
+              //           itemCount: snapshot.data.length,
+              //         );
+              //       } else {
+              //         return Center(
+              //           child: Text('ยังไม่มีสินค้าที่เตรียมจัดส่ง'),
+              //         );
+              //       }
+              //     } else if (snapshot.hasError) {
+              //       if (snapshot.data == null) {
+              //         return Center(
+              //           child: Text('ไม่มีรายการ'),
+              //         );
+              //       } else {
+              //         return DataError();
+              //       }
+              //     } else {
+              //       return Container();
+              //     }
+              //   },
+              // )
             ],
           ),
         ));
@@ -174,7 +216,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                     ),
                   ),
                   child: Text(
-                    'ท่านจะได้รับพัสดุภายในวันที่ ${dateThai(param['destination_shipped_at']).toString()}',
+                    'ท่านจะได้รับพัสดุภายในวันที่ ${param['shipped_at']}',
                     style: TextStyle(
                       fontSize: 13,
                       color: Color(0xFFDF0B24),
@@ -194,7 +236,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
             //   separatorBuilder: (_, __) => SizedBox(height: 10),
             //   itemCount: param['order_details']['data'].length,
             // ),
-            _buildListProductInOrder(param['order_details']['data'] ?? ''),
+            _buildListProductInOrder(param ?? ''),
             Row(
               children: [
                 Text(
@@ -208,7 +250,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                 SizedBox(width: 10),
                 Text(
                   // _calculatePrice(param['total']),
-                  param['tracking_code'] ?? "-",
+                  param['trackingCode'] ?? "-",
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -217,7 +259,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                 SizedBox(width: 10),
                 GestureDetector(
                   onTap: () async =>
-                      await FlutterClipboard.copy(param['tracking_code'] ?? "")
+                      await FlutterClipboard.copy(param['trackingCode'] ?? "")
                           .then(
                     (value) => toastFail(context, text: '✓  คัดลอกสำเร็จ'),
                   ),
@@ -242,43 +284,22 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
           padding: EdgeInsets.only(top: 10, bottom: 5),
           child: Row(
             children: [
-              // InkWell(
-              //   onTap: () {
-              //     _getProductById(param['product']['data']['id']);
-              //     // Navigator.pop(context);
-              //   },
-              //   child: ClipRRect(
-              //     borderRadius: BorderRadius.circular(5),
-              //     child: param['media']['data']['url'] != null
-              //         ? loadingImageNetwork(
-              //             param['media']['data']['url'],
-              //             width: 80,
-              //             height: 80,
-              //             fit: BoxFit.cover,
-              //           )
-              //         : Image.asset(
-              //             'assets/images/kaset/no-img.png',
-              //             fit: BoxFit.cover,
-              //             width: 80,
-              //             height: 80,
-              //           ),
-              //   ),
-              // ),
+              
               Stack(
                 children: [
-                  InkWell(
+                  GestureDetector(
                     onTap: () {
-                      _getProductById(param[0]['product']['data']['id']);
+                      _getProductById(param['code']);
                       // Navigator.pop(context);
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(5),
-                      child: param[0]['media']['data']['url'] != null
-                          ? loadingImageNetwork(
-                              param[0]['media']['data']['url'],
+                      child: param['imageUrl'] != null
+                          ? Image.asset(
+                              param['imageUrl'],
+                              fit: BoxFit.cover,
                               width: 90,
                               height: 90,
-                              fit: BoxFit.cover,
                             )
                           : Image.asset(
                               'assets/images/kaset/no-img.png',
@@ -288,30 +309,30 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                             ),
                     ),
                   ),
-                  param.length > 1
-                      ? Positioned(
-                          right: 10,
-                          // top: 0,
-                          bottom: 5,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 6),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                // shape: BoxShape.circle,
-                                color: Color(0XFFE3E6FE),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(25))),
-                            child: Text(
-                              '${param.length > 99 ? '99+' : param.length.toString()} ชิ้น',
-                              style: TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: 12,
-                                color: Color(0xFF0B24FB),
-                              ),
-                            ),
-                          ),
-                        )
-                      : SizedBox(),
+                  // param.length > 1
+                  //     ? Positioned(
+                  //         right: 10,
+                  //         // top: 0,
+                  //         bottom: 5,
+                  //         child: Container(
+                  //           padding: EdgeInsets.symmetric(horizontal: 6),
+                  //           alignment: Alignment.center,
+                  //           decoration: BoxDecoration(
+                  //               // shape: BoxShape.circle,
+                  //               color: Color(0XFFE3E6FE),
+                  //               borderRadius:
+                  //                   BorderRadius.all(Radius.circular(25))),
+                  //           child: Text(
+                  //             '${param.length > 99 ? '99+' : param.length.toString()} ชิ้น',
+                  //             style: TextStyle(
+                  //               fontFamily: 'Kanit',
+                  //               fontSize: 12,
+                  //               color: Color(0xFF0B24FB),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       )
+                  //     : SizedBox(),
                 ],
               ),
 
@@ -327,7 +348,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            param[0]['product']['data']['name'],
+                            param['title'],
                             style: TextStyle(
                               fontSize: 13,
                               overflow: TextOverflow.ellipsis,
@@ -352,9 +373,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                             ),
                           ),
                           child: Text(
-                            param[0]['product_variant']['data']['name'] ??
-                                param[0]['product_variant']['data']['sku'] ??
-                                '',
+                            param['title'],
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.black,
@@ -371,7 +390,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              '${moneyFormat(param[0]['product_variant']['data']['price'].toString() ?? '')} บาท',
+                              '${moneyFormat(param['price'].toString() ?? '')} บาท',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -379,7 +398,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                             ),
                           ),
                           Text(
-                            'จำนวน ' + (param[0]['quantity'].toString() ?? ''),
+                            'จำนวน ' + (param['qty'].toString() ?? ''),
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,

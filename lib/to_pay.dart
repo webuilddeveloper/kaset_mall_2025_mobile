@@ -19,14 +19,36 @@ class ToPayCentralPage extends StatefulWidget {
 class _ToPayCentralPageState extends State<ToPayCentralPage> {
   late Future<dynamic> _futureModel;
   bool loading = false;
-  List<dynamic> orderModel = [];
+  List<dynamic> orderModel = [
+    {
+      "code": "1",
+      "title": "ปุ๋ยเคมี",
+      "price": 99000,
+      "qty": "2",
+      "discount": 0,
+      "priceTotal": 203000,
+      "shipping": 5000,
+      "imageUrl": "assets/images/mock_pro_1.png",
+      "purchaseDate": "10/10/2568 10:30:00",
+      "taxId": "1004293962218",
+      "phone": "0999999999",
+      "name": "สมศักดิ์ ศักดิ์สม",
+      "address": {
+        "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
+        "subDistrict": "จอมพล",
+        "district": "จตุจักร",
+        "province": "กรุงเทพมหานครฯ",
+        "postNo": "10900"
+      }
+    }
+  ];
   late String _userId;
   late String _username;
 
   @override
   void initState() {
     // _futureModel = Future.value(order); // mock
-    _callRead();
+    // _callRead();
     _readUser();
     super.initState();
   }
@@ -41,19 +63,19 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
   }
 
   _readUser() async {
-    try {
-      final result = await get(server + 'users/me');
-      print('Result: $result');
-      // print(result['id']);
-      if (result != null) {
-        _userId = result['id'];
-        _username = result['name'];
-      } else {
-        print('No result from API');
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
+    // try {
+    //   final result = await get(server + 'users/me');
+    //   print('Result: $result');
+    //   // print(result['id']);
+    //   if (result != null) {
+    //     _userId = result['id'];
+    //     _username = result['name'];
+    //   } else {
+    //     print('No result from API');
+    //   }
+    // } catch (e) {
+    //   print('Error fetching user data: $e');
+    // }
   }
 
   _calculatePrice(List<dynamic> param) {
@@ -93,42 +115,54 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
           child: ShowLoadingWidget(
             loading: loading,
             children: [
-              FutureBuilder(
-                future: _futureModel,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    loading = false;
-                    if (snapshot.data.length > 0) {
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (context, index) => snapshot
-                                    .data[index]['order_details']['data']
-                                    .length >
-                                0
-                            ? _buildListCategory(snapshot.data[index])
-                            : SizedBox(),
-                        separatorBuilder: (_, __) => SizedBox(height: 0),
-                        itemCount: snapshot.data.length,
-                      );
-                    } else {
-                      return Center(
-                        child: Text('ยังไม่มีสินค้าที่ต้องชำระเงิน'),
-                      );
-                    }
-                  } else if (snapshot.hasError) {
-                    if (snapshot.data == null) {
-                      return Center(
-                        child: Text('ไม่มีรายการ'),
-                      );
-                    } else {
-                      return DataError();
-                    }
-                  } else {
-                    return Container();
-                  }
-                },
+              // FutureBuilder(
+              //   future: _futureModel,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       loading = false;
+              //       if (snapshot.data.length > 0) {
+              //         return ListView.separated(
+              //           shrinkWrap: true,
+              //           physics: ClampingScrollPhysics(),
+              //           padding: EdgeInsets.zero,
+              //           itemBuilder: (context, index) => snapshot
+              //                       .data[index]['order_details']['data']
+              //                       .length >
+              //                   0
+              //               ? _buildListCategory(snapshot.data[index])
+              //               : SizedBox(),
+              //           separatorBuilder: (_, __) => SizedBox(height: 0),
+              //           itemCount: snapshot.data.length,
+              //         );
+              //       } else {
+              //         return Center(
+              //           child: Text('ยังไม่มีสินค้าที่ต้องชำระเงิน'),
+              //         );
+              //       }
+              //     } else if (snapshot.hasError) {
+              //       if (snapshot.data == null) {
+              //         return Center(
+              //           child: Text('ไม่มีรายการ'),
+              //         );
+              //       } else {
+              //         return DataError();
+              //       }
+              //     } else {
+              //       return Container();
+              //     }
+              //   },
+              // )
+
+              ListView.separated(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, index) =>
+                    orderModel.length > 0
+                        ? _buildListCategory(orderModel[index])
+                        : SizedBox(),
+                separatorBuilder: (_, __) => SizedBox(height: 0),
+                itemCount: orderModel.length,
               )
             ],
           ),
@@ -157,43 +191,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
           },
           child: Column(
             children: [
-              // SizedBox(height: 5),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.end,
-              //   children: [
-              //     Container(
-              //       height: 25,
-              //       padding: EdgeInsets.symmetric(horizontal: 15),
-              //       alignment: Alignment.center,
-              //       decoration: BoxDecoration(
-              //         color: Color(0xFFE3E6FE),
-              //         borderRadius: BorderRadius.circular(
-              //           12.5,
-              //         ),
-              //       ),
-              //       child: Text(
-              //         'กำลังดำเนินการ',
-              //         style: TextStyle(
-              //           fontSize: 13,
-              //           color: Color(0xFF0B24FB),
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-
-              // ListView.separated(
-              //   shrinkWrap: true,
-              //   physics: ClampingScrollPhysics(),
-              //   padding: EdgeInsets.zero,
-              //   itemBuilder: (context, index) =>
-              //       _buildListProductInOrder(param['order_details']['data'][index]),
-              //   separatorBuilder: (_, __) => SizedBox(height: 10),
-              //   itemCount: param['order_details']['data'].length,
-              // ),
-
-              _buildListProductInOrder(param['order_details']['data'] ?? ''),
-
+              _buildListProductInOrder(param ?? ''),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -213,7 +211,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                     // padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
                       // _calculatePrice(param['total']),
-                      moneyFormat(param['total'].toString()) + ' บาท',
+                      moneyFormat(param['priceTotal'].toString()) + ' บาท',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
@@ -227,111 +225,8 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    // onPressed: () {
-                    //   if (param != null &&
-                    //       param['order_details']['data']?.isNotEmpty == true) {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) => chatstaff(
-                    //           userId:
-                    //               _userId, // ต้องแน่ใจว่ามีการกำหนดค่า _userId ไว้
-                    //           userName:
-                    //               _username, // ต้องแน่ใจว่ามีการกำหนดค่า _username ไว้
-                    //           reference: param['id'] ?? '', // ส่ง ID โดยตรง
-                    //           question: param['order_details']['data'][0]
-                    //                   ['product']['data']['name'] ??
-                    //               '',
-                    //           imageUrl: param['order_details']['data'][0]
-                    //                   ['media']['data']['url'] ??
-                    //               '',
-                    //           totalAmount: param['order_details']['data'][0]
-                    //                       ['quantity']
-                    //                   ?.toString() ??
-                    //               '0',
-                    //           totalPrice: moneyFormat(
-                    //               param['total']?.toString() ?? '0'),
-                    //           orderStatus: 'orderStatus',
-                    //         ),
-                    //       ),
-                    //     );
-                    //   } else {
-                    //     // แสดง error message หรือ handle กรณีไม่มีข้อมูล
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       SnackBar(content: Text('ไม่พบข้อมูลสินค้า')),
-                    //     );
-                    //   }
-                    // },
                     onPressed: () {
-                      try {
-                        if (param != null &&
-                            param['order_details']['data']?.isNotEmpty ==
-                                true) {
-                          // Print ค่าทั้งหมดที่จะส่งไป
-                          print(
-                              '============ Debug Chat Staff Parameters ============');
-                          print('User ID: $_userId');
-                          print('Username: $_username');
-                          print('Reference ID: ${param['id']}');
-                          print(
-                              'question: ${param['order_details']['data'][0]['product']['data']['name']}');
-                          print(
-                              'Image URL: ${param['order_details']['data'][0]['media']['data']['url']}');
-                          print(
-                              'Quantity: ${param['order_details']['data'][0]['quantity']}');
-                          print(
-                              'Total Price: ${moneyFormat(param['total']?.toString() ?? '0')}');
-                          print('orderStatus : รอชำระเงิน');
-
-                          print('type: orderStatus');
-                          print(
-                              '=====================================================');
-                          // Print entire param object for complete data structure
-                          // print('Complete param object:');
-                          // print(param);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => chatstaff(
-                                userId: _userId,
-                                userName: _username,
-                                reference: param['id'] ?? '',
-                                question: param['order_details']['data'][0]
-                                        ['product']['data']['name'] ??
-                                    '',
-                                imageUrl: param['order_details']['data'][0]
-                                        ['media']['data']['url'] ??
-                                    '',
-                                totalAmount: param['order_details']['data'][0]
-                                            ['quantity']
-                                        ?.toString() ??
-                                    '0',
-                                totalPrice: moneyFormat(
-                                    param['total']?.toString() ?? '0'),
-                                orderStatus: 'รอชำระเงิน',
-                                // orderStatus: param['status'].toString(),
-                                type: 'orderStatus',
-                              ),
-                            ),
-                          );
-                        } else {
-                          print('Error: Invalid param data');
-                          print('param value:');
-                          print('---------param---------${param}');
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('ไม่พบข้อมูลสินค้า')),
-                          );
-                        }
-                      } catch (e) {
-                        print('Error occurred:');
-                        print(e.toString());
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')),
-                        );
-                      }
+                      
                     },
 
                     style: ElevatedButton.styleFrom(
@@ -457,12 +352,12 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                 children: [
                   InkWell(
                     onTap: () {
-                      _getProductById(param[0]['product']['data']['id']);
+                      // _getProductById(param[0]['product']['data']['id']);
                       // Navigator.pop(context);
                     },
-                    child: param[0]['media']['data']['url'] != null
+                    child: param['imageUrl'] != null
                         ? loadingImageNetwork(
-                            param[0]['media']['data']['url'],
+                            param['imageUrl'],
                             width: 90,
                             height: 90,
                             fit: BoxFit.cover,
@@ -474,30 +369,30 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                             height: 90,
                           ),
                   ),
-                  param.length > 1
-                      ? Positioned(
-                          right: 10,
-                          // top: 0,
-                          bottom: 5,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 6),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                // shape: BoxShape.circle,
-                                color: Color(0XFFE3E6FE),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(25))),
-                            child: Text(
-                              '${param.length > 99 ? '99+' : param.length.toString()} ชิ้น',
-                              style: TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: 12,
-                                color: Color(0xFF0B24FB),
-                              ),
-                            ),
-                          ),
-                        )
-                      : SizedBox(),
+                  // param.length > 1
+                  //     ? Positioned(
+                  //         right: 10,
+                  //         // top: 0,
+                  //         bottom: 5,
+                  //         child: Container(
+                  //           padding: EdgeInsets.symmetric(horizontal: 6),
+                  //           alignment: Alignment.center,
+                  //           decoration: BoxDecoration(
+                  //               // shape: BoxShape.circle,
+                  //               color: Color(0XFFE3E6FE),
+                  //               borderRadius:
+                  //                   BorderRadius.all(Radius.circular(25))),
+                  //           child: Text(
+                  //             '${param.length > 99 ? '99+' : param.length.toString()} ชิ้น',
+                  //             style: TextStyle(
+                  //               fontFamily: 'Kanit',
+                  //               fontSize: 12,
+                  //               color: Color(0xFF0B24FB),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       )
+                  //     : SizedBox(),
                 ],
               ),
               SizedBox(width: 10),
@@ -512,7 +407,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            param[0]['product']['data']['name'],
+                            param['title'],
                             style: TextStyle(
                               fontSize: 13,
                               overflow: TextOverflow.ellipsis,
@@ -530,7 +425,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              '${moneyFormat(param[0]['product_variant']['data']['price'].toString())} บาท',
+                              '${moneyFormat(param['price'].toString())} บาท',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -538,7 +433,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                             ),
                           ),
                           Text(
-                            'จำนวน ' + param[0]['quantity'].toString(),
+                            'จำนวน ' + param['qty'].toString(),
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,

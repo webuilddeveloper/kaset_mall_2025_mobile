@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -47,6 +48,8 @@ class _SettingMain extends State<SettingMain> {
   String? txtAffiliation;
   String? verifyPhonePage;
   String? profileCode;
+  var profileFirstName;
+  var profileLastName;
 
   ScrollController scrollController = new ScrollController();
   dynamic _futureAffiliationModel = [
@@ -75,12 +78,37 @@ class _SettingMain extends State<SettingMain> {
     Navigator.pop(context);
   }
 
+  // _getUserData() async {
+  //   profileCode = await storage.read(key: 'profileCode10');
+  //   var a = await storage.read(key: 'phoneVerified');
+  //   setState(() {
+  //     verifyPhonePage = a ?? "";
+  //   });
+  // }
+
   _getUserData() async {
-    profileCode = await storage.read(key: 'profileCode10');
-    var a = await storage.read(key: 'phoneVerified');
+    // var a = await storage.read(key: 'phoneVerified');
+    // setState(() {
+    //   verifyPhonePage = a ?? "";
+    // });
+    final fistName =
+        await new FlutterSecureStorage().read(key: 'firstName') ?? "";
+    final lastName =
+        await new FlutterSecureStorage().read(key: 'lastName') ?? "";
     setState(() {
-      verifyPhonePage = a ?? "";
+      profileFirstName = fistName;
+      profileLastName = lastName;
     });
+    // Timer(
+    //   Duration(seconds: 1),
+    //   () => {
+    //     setState(
+    //       () {
+    //         loadingSuccess = true;
+    //       },
+    //     ),
+    //   },
+    // );
   }
 
   @override
@@ -91,20 +119,21 @@ class _SettingMain extends State<SettingMain> {
       body: SafeArea(
         child: Stack(
           children: <Widget>[
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Image.asset('assets/images/bg_setting.png'),
-            ),
+            // Positioned(
+            //   bottom: 0,
+            //   left: 0,
+            //   right: 0,
+            //   child: Image.asset('assets/images/bg_setting.png'),
+            // ),
             Container(
               padding: EdgeInsets.only(left: 15.0, right: 15.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  profileCode != null
-                      ? Container(
+                  profileFirstName != null
+                      ? 
+                      Container(
                           padding: EdgeInsets.only(bottom: 28),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,8 +179,8 @@ class _SettingMain extends State<SettingMain> {
                                   ),
                                 ),
                               ),
-                              verifyPhonePage == 'true'
-                                  ? Container(
+                             
+                                  Container(
                                       margin: EdgeInsets.only(bottom: 5),
                                       child: GestureDetector(
                                         onTap: () => {
@@ -184,10 +213,10 @@ class _SettingMain extends State<SettingMain> {
                                           ],
                                         ),
                                       ),
-                                    )
-                                  : Container(),
-                              verifyPhonePage == 'true'
-                                  ? Container(
+                                    ),
+                                  
+                                  
+                                  Container(
                                       margin: EdgeInsets.only(bottom: 5),
                                       child: GestureDetector(
                                         onTap: () => {
@@ -222,7 +251,7 @@ class _SettingMain extends State<SettingMain> {
                                         ),
                                       ),
                                     )
-                                  : Container(),
+                                 
                             ],
                           ),
                         )
@@ -418,9 +447,9 @@ class _SettingMain extends State<SettingMain> {
                           margin: EdgeInsets.only(bottom: 5),
                           child: GestureDetector(
                             onTap: () => {
-                              launchUrl(
-                                Uri.parse('https://policy.we-builds.com/ssp/'),
-                              )
+                              // launchUrl(
+                              //   Uri.parse('https://policy.we-builds.com/ssp/'),
+                              // )
                               // Navigator.push(
                               //   context,
                               //   MaterialPageRoute(
@@ -489,8 +518,9 @@ class _SettingMain extends State<SettingMain> {
                     ),
                   ),
 
-                  profileCode != null
-                      ? Row(
+                  profileFirstName != null
+                      ? 
+                      Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             MaterialButton(
