@@ -266,7 +266,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 25.0,
+                                      horizontal: 13.0,
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
