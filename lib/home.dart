@@ -591,7 +591,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     onTap: () {},
                     child: _buildTitle(
                       title: 'หมวดหมู่',
-                      showAll: true,
+                      showAll: false,
                     ),
                   ),
                   SizedBox(height: 10),

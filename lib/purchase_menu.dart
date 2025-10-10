@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_mart_v3/home.dart';
+import 'package:mobile_mart_v3/menu.dart';
 import 'package:mobile_mart_v3/purchase_order.dart';
 import 'package:mobile_mart_v3/purchase_orderlist.dart';
 import 'package:mobile_mart_v3/purchase_orderlist_draft.dart';
@@ -313,7 +314,7 @@ class _PurchaseMenuPageState extends State<PurchaseMenuPage>
             ),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => HomeCentralPage(),
+                builder: (context) => MenuCentralPage(),
               ));
             },
           ),
