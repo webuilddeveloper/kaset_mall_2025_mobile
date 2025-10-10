@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,10 +12,10 @@ import 'package:mobile_mart_v3/event_calendar.dart';
 import 'package:mobile_mart_v3/event_calendar_main.dart';
 import 'package:mobile_mart_v3/login.dart';
 import 'package:mobile_mart_v3/math_game/math_game_main.dart';
+
 import 'package:mobile_mart_v3/news_all.dart';
 import 'package:mobile_mart_v3/product_all.dart';
 import 'package:mobile_mart_v3/product_from.dart';
-import 'package:mobile_mart_v3/product_list_by_category.dart';
 import 'package:mobile_mart_v3/purchase_menu.dart';
 import 'package:mobile_mart_v3/shared/api_provider.dart';
 import 'package:mobile_mart_v3/shared/extension.dart';
@@ -226,6 +225,15 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _callRead() async {
+    _futureModelNew = postDio(server_we_build + 'm/news/read', {'limit': 999});
+
+    _futureModelEvent =
+        postDio('$server_we_build/m/eventCalendar/read', {'limit': 999});
+
+    _futureModelForYou =
+        postDio('$server_we_build/m/privilege/read', {'limit': 999});
+
+    profileCode = (await storage.read(key: 'profileCode10')) ?? '';
     // _futureBanner = postDio('${mainBannerApi}read', {'limit': 999})
     _futureBanner = postDio(
         'https://gateway.we-builds.com/kaset-mall-api/m/Banner/main/read',
@@ -245,51 +253,49 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     var element2 = "";
     var element3 = "";
 
-    var value = await postProductData(
-      server_we_build + 'm/Product/readProduct',
-      {
-        "search": "$element3",
-        "per_page": _limit.toString(),
-      },
-    );
+    // var value = await postProductData(
+    //   server_we_build + 'm/Product/readProduct',
+    //   {
+    //     "search": "$element3",
+    //     "per_page": _limit.toString(),
+    //   },
+    // );
 
-    setState(() {
-      _futureModelTrending = value;
-      total_page = value[0]['total_pages'];
-    });
+    // setState(() {
+    //   _futureModelTrending = value;
+    //   total_page = value[0]['total_pages'];
+    // });
 
-    var value2 = await postProductHot(
-      server_we_build + 'm/Product/readProductHot',
-      {"per_page": "${page.toString()}"},
-      _limit,
-    );
+    // var value2 = await postProductHot(
+    //   server_we_build + 'm/Product/readProductHot',
+    //   {"per_page": "${page.toString()}"},
+    //   _limit,
+    // );
 
-    setState(() {
-      _futureProductHot = value2;
-    });
+    // setState(() {
+    //   _futureProductHot = value2;
+    // });
 
-    value = await postProductHotSale(
-      server_we_build + 'm/Product/readProduct',
-      {
-        "search": "$element3",
-        "per_page": _limit.toString(),
-      },
-    );
+    // value = await postProductHotSale(
+    //   server_we_build + 'm/Product/readProduct',
+    //   {
+    //     "search": "$element3",
+    //     "per_page": _limit.toString(),
+    //   },
+    // );
 
-    setState(() {
-      if (value != null && value.isNotEmpty) {
-        total_page = value[0]['total_pages'];
-      } else {
-        total_page = 0;
-      }
-    });
+    // setState(() {
+    //   if (value != null && value.isNotEmpty) {
+    //     total_page = value[0]['total_pages'];
+    //   } else {
+    //     total_page = 0;
+    //   }
+    // });
 
     // postProductHotSale(server_we_build + 'm/Product/readProductHot', {});
 
     // _futureModelForYou = postProductData(
     //     server_we_build + 'm/Product/readProduct', {"search": "$element1"});
-
-    profileCode = (await storage.read(key: 'profileCode10')) ?? '';
 
     if (profileCode == '') {
       NotificationService.subscribeToAllTopic('suksapan-general');
@@ -1112,7 +1118,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     );
   }
 
-// แยก Widget สำหรับ Filter Tab
   Widget _buildFilterTab(String type) {
     final isSelected = _filterSelected == type;
     return GestureDetector(
@@ -1159,7 +1164,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         ));
   }
 
-// แยก Widget สำหรับ Product Grid
   Widget _buildProductGrid() {
     final products = _filterSelected == '0'
         ? mockProductList
@@ -1198,7 +1202,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
 
     return GestureDetector(
       onTap: () {
-        // _addLog(product);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -1722,7 +1725,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
       'image':
           'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
-      'stock': 10,
+      'stock': 0,
     },
   ];
 }

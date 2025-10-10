@@ -3102,14 +3102,15 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     print('====================> Cart Items ===================>');
     print(cartItems);
     print('==================================================');
-
-    Toast.show(
-      'เพิ่มลงรถเข็นแล้ว',
-      backgroundColor: Color(0xFF09665a),
-      duration: 3,
-      gravity: Toast.bottom,
-      textStyle: TextStyle(color: Colors.white),
-    );
+    if (type == 'cart') {
+      Toast.show(
+        'เพิ่มลงรถเข็นแล้ว',
+        backgroundColor: Color(0xFF09665a),
+        duration: 3,
+        gravity: Toast.bottom,
+        textStyle: TextStyle(color: Colors.white),
+      );
+    }
 
     Navigator.pop(context, 'success');
   }
