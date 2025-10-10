@@ -77,6 +77,34 @@ class _UserInformationCentralPageState
     {'title': 'บัตรเครดิต / เดบิต2', 'description': 'บัตร visa xxx-123'},
   ]);
 
+  List<dynamic> addressList = [
+    {
+      "name": "สมศักดิ์ ศักดิ์สม",
+      "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
+      "subDistrict": "จอมพล",
+      "district": "จตุจักร",
+      "province": "กรุงเทพมหานครฯ",
+      "postNo": "10900",
+      "main": true
+    },
+    {
+      "name": "สมศักดิ์2 ศักดิ์สม",
+      "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
+      "subDistrict": "จอมพล",
+      "district": "จตุจักร",
+      "province": "กรุงเทพมหานครฯ",
+      "postNo": "10900",
+      "main": false
+    },
+  ];
+
+  List<dynamic> discountList = [
+    {
+      "discount": 5000,
+      "minimumOrderTotal": 30000,
+    },
+  ];
+
   String profileCode = '';
   String profileImageUrl = '';
   String referenceShopCode = '';
@@ -311,7 +339,7 @@ class _UserInformationCentralPageState
                 width: 70,
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Color(0XFF0B24FB),
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(35),
                 ),
                 child: Image.asset(
@@ -433,45 +461,45 @@ class _UserInformationCentralPageState
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: 
-                // loadingImageNetwork(
-                //         profileImageUrl,
-                //         fit: BoxFit.cover,
-                //         isProfile: true,
-                //       )
-                (isShopRegis == 'true' && memberType == '2')
-                    ? Container(
-                        height: 70,
-                        width: 70,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: BorderRadius.circular(35),
-                        ),
-                        child: Image.asset(
-                          'assets/images/central/store.png',
-                          fit: BoxFit.cover,
-                          width: 50,
-                          height: 50,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Container(
-                        height: 70,
-                        width: 70,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: BorderRadius.circular(35),
-                        ),
-                        child: Image.asset(
-                          'assets/images/central/profile.png',
-                          fit: BoxFit.cover,
-                          width: 50,
-                          height: 50,
-                          color: Colors.white,
-                        ),
-                      ),
+                child:
+                    // loadingImageNetwork(
+                    //         profileImageUrl,
+                    //         fit: BoxFit.cover,
+                    //         isProfile: true,
+                    //       )
+                    (isShopRegis == 'true' && memberType == '2')
+                        ? Container(
+                            height: 70,
+                            width: 70,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(35),
+                            ),
+                            child: Image.asset(
+                              'assets/images/central/store.png',
+                              fit: BoxFit.cover,
+                              width: 50,
+                              height: 50,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Container(
+                            height: 70,
+                            width: 70,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(35),
+                            ),
+                            child: Image.asset(
+                              'assets/images/central/profile.png',
+                              fit: BoxFit.cover,
+                              width: 50,
+                              height: 50,
+                              color: Colors.white,
+                            ),
+                          ),
               ),
             ),
           ),
@@ -916,9 +944,28 @@ class _UserInformationCentralPageState
   }
 
   _coupon() {
-    if ((profileCode == null ||
-        profileCode == '' ||
-        verifyPhonePage == 'false')) {
+    if (discountList.length > 0 && (profileFirstName ?? '') != '') {
+      var row = <Widget>[];
+      for (var d in discountList) {
+        row.add(_boxCoupon(
+            'ส่วนลด ' + moneyFormat(d['discount'].toString()) + ' บาท',
+            'เมื่อซื้อครบ ' +
+                moneyFormat(d['minimumOrderTotal'].toString()) +
+                ' บาท'));
+      }
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: row,
+            ),
+          ),
+        ],
+      );
+    } else {
       return _boxNotData(
         callback: () => Navigator.push(
           context,
@@ -928,58 +975,6 @@ class _UserInformationCentralPageState
             ),
           ),
         ),
-      );
-    } else {
-      return FutureBuilder<dynamic>(
-        future: _futureCoupon,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data.length > 0) {
-              var row = <Widget>[];
-              for (var d in snapshot.data) {
-                row.add(_boxCoupon(
-                    'ส่วนลด ' + moneyFormat(d['discount'].toString()) + ' บาท',
-                    'เมื่อซื้อครบ ' +
-                        moneyFormat(d['minimum_order_total'].toString()) +
-                        ' บาท'));
-              }
-
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: row,
-                    ),
-                  ),
-                ],
-              );
-            } else
-              return _boxNotData(
-                callback: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CouponPickUpCentralPage(
-                      readMode: true,
-                    ),
-                  ),
-                ),
-              );
-          } else {
-            return _boxNotData(
-              callback: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => CouponPickUpCentralPage(
-                    readMode: true,
-                  ),
-                ),
-              ),
-            );
-          }
-        },
       );
     }
   }
@@ -1033,59 +1028,95 @@ class _UserInformationCentralPageState
   }
 
   _deliveryAddress() {
-    return FutureBuilder<dynamic>(
-      future: _futureDeliveryAddress,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data.length > 0) {
-            var row = <Widget>[];
-            // var isSelect = true;
-            for (var d in snapshot.data) {
-              row.add(
-                _boxDeliveryAndPayment(
-                  d['name'],
-                  d['address'],
-                  // d['building'],
-                  d['tambon']['data']['name_th'],
-                  d['amphoe']['data']['name_th'],
-                  d['province']['data']['name_th'],
-                  d['zip'],
-                  isSelect: d['main'],
-                  callback: () => changeDefault(d['id'], d['main']),
-                ),
-              );
-              // isSelect = false;
-            }
+    if (addressList.length > 0 && (profileFirstName ?? '') != '') {
+      var row = <Widget>[];
+      // var isSelect = true;
+      for (var d in addressList) {
+        row.add(
+          _boxDeliveryAndPayment(
+            d['name'],
+            d['address'],
+            // d['building'],
+            d['subDistrict'],
+            d['district'],
+            d['province'],
+            d['postNo'],
+            isSelect: d['main'],
+            // callback: () => changeDefault(d['id'], d['main']),
+          ),
+        );
+        // isSelect = false;
+      }
 
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: row,
-              ),
-            );
-          } else {
-            return _boxNotData(
-              callback: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      DeliveryAddressCentralPage(),
-                ),
-              ),
-            );
-          }
-        } else {
-          return _boxNotData(
-            callback: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => DeliveryAddressCentralPage(),
-              ),
-            ),
-          );
-        }
-      },
-    );
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: row,
+        ),
+      );
+    } else {
+      return _boxNotData(
+        callback: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => DeliveryAddressCentralPage(),
+          ),
+        ),
+      );
+    }
+    // FutureBuilder<dynamic>(
+    //   future: _futureDeliveryAddress,
+    //   builder: (context, snapshot) {
+    //     if (snapshot.hasData) {
+    //       if (snapshot.data.length > 0) {
+    //         var row = <Widget>[];
+    //         // var isSelect = true;
+    //         for (var d in snapshot.data) {
+    //           row.add(
+    //             _boxDeliveryAndPayment(
+    //               d['name'],
+    //               d['address'],
+    //               // d['building'],
+    //               d['tambon']['data']['name_th'],
+    //               d['amphoe']['data']['name_th'],
+    //               d['province']['data']['name_th'],
+    //               d['zip'],
+    //               isSelect: d['main'],
+    //               callback: () => changeDefault(d['id'], d['main']),
+    //             ),
+    //           );
+    //           // isSelect = false;
+    //         }
+
+    //         return SingleChildScrollView(
+    //           scrollDirection: Axis.horizontal,
+    //           child: Row(
+    //             children: row,
+    //           ),
+    //         );
+    //       } else {
+    //         return _boxNotData(
+    //           callback: () => Navigator.push(
+    //             context,
+    //             MaterialPageRoute(
+    //               builder: (BuildContext context) =>
+    //                   DeliveryAddressCentralPage(),
+    //             ),
+    //           ),
+    //         );
+    //       }
+    //     } else {
+    //       return _boxNotData(
+    //         callback: () => Navigator.push(
+    //           context,
+    //           MaterialPageRoute(
+    //             builder: (BuildContext context) => DeliveryAddressCentralPage(),
+    //           ),
+    //         ),
+    //       );
+    //     }
+    //   },
+    // );
   }
 
   _paymentOptions() {
