@@ -230,6 +230,15 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     _futureBanner = postDio(
         'https://gateway.we-builds.com/kaset-mall-api/m/Banner/main/read',
         {'limit': 999});
+    _futureModelNew = postDio(server_we_build + 'm/news/read', {'limit': 999});
+
+    _futureModelEvent =
+        postDio('$server_we_build/m/eventCalendar/read', {'limit': 999});
+
+    _futureModelForYou =
+        postDio('$server_we_build/m/privilege/read', {'limit': 999});
+
+    profileCode = (await storage.read(key: 'profileCode10')) ?? '';
 
     List<String> keySearchRandom;
     var element1 = "";
@@ -274,17 +283,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         total_page = 0;
       }
     });
-
-    _futureModelNew = postDio(
-        'https://gateway.we-builds.com/kaset-mall-api/m/news/read',
-        {'limit': 999});
-
-    _futureModelEvent = postDio(
-        'https://gateway.we-builds.com/kaset-mall-api/m/eventCalendar/read',
-        {'limit': 999});
-    _futureModelForYou = postDio(
-        'https://gateway.we-builds.com/kaset-mall-api/m/privilege/read',
-        {'limit': 999});
 
     // postProductHotSale(server_we_build + 'm/Product/readProductHot', {});
 
@@ -693,8 +691,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            EventCalendarMain(title: title),
+                        builder: (_) => EventCalendarMain(title: title),
                       ),
                     );
                   } else if (code == 'news') {
@@ -1681,6 +1678,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
       'image':
           'https://www.doae.go.th/wp-content/uploads/2021/03/rice-seed.jpg',
+      'stock': 10,
     },
     {
       'id': 2,
@@ -1691,6 +1689,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
       'image':
           'https://www.sprayerthai.com/wp-content/uploads/2021/07/sprayer-20L.jpg',
+      'stock': 10,
     },
     {
       'id': 3,
@@ -1701,6 +1700,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
       'image':
           'https://www.cpffeed.com/wp-content/uploads/2019/12/910-181x300.png',
+      'stock': 10,
     },
     {
       'id': 4,
@@ -1711,6 +1711,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
       'image':
           'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+      'stock': 10,
     },
     {
       'id': 5,
@@ -1721,6 +1722,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
       'image':
           'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
+      'stock': 10,
     },
   ];
 }
