@@ -1829,12 +1829,13 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
 
                                               if (type == 'cart') {
                                                 // เพิ่มสินค้าลงตะกร้า
+
+                                                await _addCart([model], 'cart');
+                                                Navigator.pop(context);
                                                 print('-----------------');
                                                 print('เพิ่มสินค้าลงตะกร้า');
                                                 print(model);
                                                 print(model.runtimeType);
-                                                await _addCart([model], 'cart');
-                                                Navigator.pop(context);
                                                 print('-----------------');
                                               } else {
                                                 // ซื้อสินค้าทันที
@@ -1865,7 +1866,8 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         ConfirmOrderCentralPage(
-                                                      modelCode: [model],
+                                                      // modelCode: [model],
+                                                      modelCode: cartItems,
                                                       type: 'buy',
                                                     ),
                                                   ),
@@ -3057,92 +3059,77 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
 
   List<Map<String, dynamic>> cartItems = [];
 
+  // _addCart(List<Map<String, dynamic>> products, String type) async {
+  //   // โหลด cartItems จาก storage
+  //   String? cartData = await storage.read(key: 'cartItems');
+  //   cartItems = cartData != null
+  //       ? List<Map<String, dynamic>>.from(jsonDecode(cartData))
+  //       : [];
+
+  //   int qty = int.tryParse(qtyController.text) ?? 1;
+
+  //   for (var product in products) {
+  //     var newItem = {...product, 'qty': qty};
+
+  //     int existingIndex =
+  //         cartItems.indexWhere((item) => item['id'] == newItem['id']);
+  //     if (existingIndex != -1) {
+  //       cartItems[existingIndex]['qty'] += qty;
+  //     } else {
+  //       cartItems.add(newItem);
+  //     }
+  //   }
+
+  //   await storage.write(key: 'cartItems', value: jsonEncode(cartItems));
+  //   setState(() {});
+
+  //   if (type == 'cart') {
+  //     Toast.show('เพิ่มลงรถเข็นแล้ว',
+  //         backgroundColor: Color(0xFF09665a),
+  //         duration: 3,
+  //         gravity: Toast.bottom,
+  //         textStyle: TextStyle(color: Colors.white));
+  //   }
+
+  //   Navigator.pop(context, 'success');
+  // }
   _addCart(List<Map<String, dynamic>> products, String type) async {
-    print('===================> Add Cart <===================');
-    print('type: $type');
-    print('products: $products');
-    print('qtyController: ${qtyController.text}');
-    print('===============================================');
+    // โหลด cartItems จาก storage
+    String? cartData = await storage.read(key: 'cartItems');
+    cartItems = cartData != null
+        ? List<Map<String, dynamic>>.from(jsonDecode(cartData))
+        : [];
 
     int qty = int.tryParse(qtyController.text) ?? 1;
 
-    // วนเช็คทุกสินค้าใน products
-    for (var product in products) {
-      // สร้าง Map ของสินค้าที่จะเพิ่ม
-      var newItem = {
-        ...product,
-        'qty': qty,
-      };
+    // ถ้าเป็น buy ให้เคลียร์รายการเก่าทั้งหมด
+    if (type == 'buy') {
+      cartItems.clear();
+    }
 
-      // ตรวจสอบว่ามีสินค้าเดิมใน cart แล้วหรือยัง (เช็คจาก id)
+    for (var product in products) {
+      var newItem = {...product, 'qty': qty};
+
       int existingIndex =
           cartItems.indexWhere((item) => item['id'] == newItem['id']);
-
       if (existingIndex != -1) {
-        // ถ้ามีอยู่แล้ว → บวกจำนวน
-        setState(() {
-          cartItems[existingIndex]['qty'] =
-              (cartItems[existingIndex]['qty'] ?? 0) + qty;
-        });
-        print(
-            '🟢 อัปเดตจำนวนสินค้า id=${newItem['id']} รวมเป็น ${cartItems[existingIndex]['qty']}');
+        cartItems[existingIndex]['qty'] += qty;
       } else {
-        // ถ้ายังไม่มี → เพิ่มเข้าใหม่
-        setState(() {
-          cartItems.add(newItem);
-        });
-        print('🟩 เพิ่มสินค้าใหม่ id=${newItem['id']}');
+        cartItems.add(newItem);
       }
     }
 
-    setState(() {
-      loadingAddCart = false;
-    });
+    await storage.write(key: 'cartItems', value: jsonEncode(cartItems));
+    setState(() {});
 
-    print('====================> Cart Items ===================>');
-    print(cartItems);
-    print('==================================================');
     if (type == 'cart') {
-      Toast.show(
-        'เพิ่มลงรถเข็นแล้ว',
-        backgroundColor: Color(0xFF09665a),
-        duration: 3,
-        gravity: Toast.bottom,
-        textStyle: TextStyle(color: Colors.white),
-      );
+      Toast.show('เพิ่มลงรถเข็นแล้ว',
+          backgroundColor: Color(0xFF09665a),
+          duration: 3,
+          gravity: Toast.bottom,
+          textStyle: TextStyle(color: Colors.white));
     }
 
     Navigator.pop(context, 'success');
   }
-
-  // _addCart(product_variant_id, type) async {
-  //   var cartData;
-  //   if (product_variant_id == null || product_variant_id == '') {
-  //     Toast.show('กรุณาเลือกลักษณะสินค้า',
-  //         backgroundColor: Colors.red[800] ?? Colors.red,
-  //         duration: 3,
-  //         gravity: Toast.center,
-  //         textStyle: TextStyle(color: Colors.white));
-  //   } else {
-  //     await postObjectData(server + 'carts', {
-  //       'product_variant_id': product_variant_id,
-  //       'quantity': int.parse(qtyController.text),
-  //       // 'isDefault': isDefault,
-  //     }).then((value) => {
-  //           setState(() {
-  //             loadingAddCart = false;
-  //           }),
-  //           Navigator.pop(context, 'success'),
-  //           cartData = value,
-  //           if (type == 'cart')
-  //             {
-  //               Toast.show('เพิ่มลงรถเข็นแล้ว',
-  //                   backgroundColor: Colors.red[800] ?? Colors.red,
-  //                   duration: 3,
-  //                   gravity: Toast.center,
-  //                   textStyle: TextStyle(color: Colors.white)),
-  //             }
-  //         });
-  //     return cartData;
-  //   }
 }

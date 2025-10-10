@@ -37,6 +37,15 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   String imageMock =
       'https://amarinbooks.com/wp-content/uploads/2020/11/%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%A5%E0%B8%B1%E0%B8%9A%E0%B8%84%E0%B8%99%E0%B8%AD%E0%B8%B2%E0%B8%99%E0%B8%AA%E0%B8%B7%E0%B8%AD.png';
   bool buyAll = false;
+// ============ kaset==========//
+  int qty = 0;
+  int price_kaset = 0;
+  int sum = 0;
+  int pricesum = 0;
+  int shippingcost = 0;
+
+//=============================//
+
   int totalPrice = 0;
   int total = 0;
   int deliveryPrice = 0;
@@ -92,14 +101,61 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   List<dynamic> cartId = [];
 
   @override
+  // initState() {
+  //   super.initState();
+  //   setState(() {
+  //     modelCode = widget.modelCode!;
+  //     type = widget.type!;
+  //     print('----------- initState ---------');
+  //     print(widget.modelCode);
+  //     print(modelCode[0]['price'].toString());
+  //     print(modelCode[0]['qty']);
+  //     print(model.length);
+  //     // ค่าส่ง 30
+  //     // คููปองไม่มี
+  //     print('----------------------------');
+  //   });
+  //   print('===----==== $modelCode');
+
+  //   _callRead();
+  //   _calculate();
+  // }
+  @override
   initState() {
+    super.initState(); // ย้ายขึ้นมาก่อน
+
     setState(() {
       modelCode = widget.modelCode!;
       type = widget.type!;
+      print('----------- initState ---------');
+      print('modelCode: $modelCode');
+      print('----------------------------');
     });
-    print('===----==== $modelCode');
-    _callRead();
-    super.initState();
+
+    _callRead(); // ตรวจสอบว่าฟังก์ชันนี้ทำงานจริง
+    _calculate();
+  }
+
+  _callRead() async {
+    setState(() {
+      loading = true;
+    });
+
+    // แปลง modelCode ให้เป็น model สำหรับแสดงผล
+    try {
+      setState(() {
+        model = modelCode; // หรือ logic ที่เหมาะสม
+        loading = false;
+      });
+
+      print('model length: ${model.length}');
+      print('model data: $model');
+    } catch (e) {
+      print('Error in _callRead: $e');
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
@@ -109,10 +165,10 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
     super.dispose();
   }
 
-  _callRead() async {
-    await _callAddress();
-    _callCarts();
-  }
+  // _callRead() async {
+  //   await _callAddress();
+  //   _callCarts();
+  // }
 
   _callAddress() async {
     try {
@@ -311,125 +367,125 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   _buy() async {
     dynamic modelData;
     if (isInvoice) {
-      if (!isInvoiceAddress) {
-        // return toastFail(context,
-        //     text: 'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี', duration: 3);
-        return showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (BuildContext context) {
-              return WillPopScope(
-                onWillPop: () {
-                  return Future.value(false);
-                },
-                child: CupertinoAlertDialog(
-                  title: new Text(
-                    'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี',
-                    // '',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Kanit',
-                      color: Colors.black,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  content: Text(" "),
-                  actions: [
-                    CupertinoDialogAction(
-                      isDefaultAction: true,
-                      child: new Text(
-                        "ตกลง",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontFamily: 'Kanit',
-                          color: Color(0xFFFF7514),
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            });
-      }
+      // if (!isInvoiceAddress) {
+      //   // return toastFail(context,
+      //   //     text: 'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี', duration: 3);
+      //   return showDialog(
+      //       barrierDismissible: false,
+      //       context: context,
+      //       builder: (BuildContext context) {
+      //         return WillPopScope(
+      //           onWillPop: () {
+      //             return Future.value(false);
+      //           },
+      //           child: CupertinoAlertDialog(
+      //             title: new Text(
+      //               'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี',
+      //               // '',
+      //               style: TextStyle(
+      //                 fontSize: 16,
+      //                 fontFamily: 'Kanit',
+      //                 color: Colors.black,
+      //                 fontWeight: FontWeight.normal,
+      //               ),
+      //             ),
+      //             content: Text(" "),
+      //             actions: [
+      //               CupertinoDialogAction(
+      //                 isDefaultAction: true,
+      //                 child: new Text(
+      //                   "ตกลง",
+      //                   style: TextStyle(
+      //                     fontSize: 13,
+      //                     fontFamily: 'Kanit',
+      //                     color: Color(0xFF09665a),
+      //                     fontWeight: FontWeight.normal,
+      //                   ),
+      //                 ),
+      //                 onPressed: () {
+      //                   Navigator.of(context).pop();
+      //                 },
+      //               ),
+      //             ],
+      //           ),
+      //         );
+      //       });
+      // }
       // if ((txtInvoiceBranch.text ?? '') == '') {
       //   return toastFail(context,
       //       text: 'กรุณาใส่ชื่อสำนังงาน/รหัสสาขา ใบกำกับภาษี', duration: 3);
       // }
-      if ((txtInvoiceNumber.text ?? '') == '') {
-        // return toastFail(context,
-        //     text: 'กรุณาใส่เลขประจำตัวผู้เสียภาษี', duration: 3);
-        return showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (BuildContext context) {
-              return WillPopScope(
-                onWillPop: () {
-                  return Future.value(false);
-                },
-                child: CupertinoAlertDialog(
-                  title: new Text(
-                    'กรุณาใส่เลขประจำตัวผู้เสียภาษี',
-                    // '',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Kanit',
-                      color: Colors.black,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  content: Text(" "),
-                  actions: [
-                    CupertinoDialogAction(
-                      isDefaultAction: true,
-                      child: new Text(
-                        "ตกลง",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontFamily: 'Kanit',
-                          color: Color(0xFFFF7514),
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            });
-      }
+      // if ((txtInvoiceNumber.text ?? '') == '') {
+      //   // return toastFail(context,
+      //   //     text: 'กรุณาใส่เลขประจำตัวผู้เสียภาษี', duration: 3);
+      //   return showDialog(
+      //       barrierDismissible: false,
+      //       context: context,
+      //       builder: (BuildContext context) {
+      //         return WillPopScope(
+      //           onWillPop: () {
+      //             return Future.value(false);
+      //           },
+      //           child: CupertinoAlertDialog(
+      //             title: new Text(
+      //               'กรุณาใส่เลขประจำตัวผู้เสียภาษี',
+      //               // '',
+      //               style: TextStyle(
+      //                 fontSize: 16,
+      //                 fontFamily: 'Kanit',
+      //                 color: Colors.black,
+      //                 fontWeight: FontWeight.normal,
+      //               ),
+      //             ),
+      //             content: Text(" "),
+      //             actions: [
+      //               CupertinoDialogAction(
+      //                 isDefaultAction: true,
+      //                 child: new Text(
+      //                   "ตกลง",
+      //                   style: TextStyle(
+      //                     fontSize: 13,
+      //                     fontFamily: 'Kanit',
+      //                     color: Color(0xFF09665a),
+      //                     fontWeight: FontWeight.normal,
+      //                   ),
+      //                 ),
+      //                 onPressed: () {
+      //                   Navigator.of(context).pop();
+      //                 },
+      //               ),
+      //             ],
+      //           ),
+      //         );
+      //       });
+      // }
       setState(() {
-        loading = true;
+        // loading = true;
 
-        postObjectData(server + 'orders/', {
-          'shipping_address_id': address['code'],
-          'coupon_id': couponsCode,
-          'shipping_price': deliveryPrice,
-          'tax_invoice_address_id': addressInvoice['code'],
-          'tax_invoice_branch': (txtInvoiceBranch.text ?? ''),
-          'tax_identification_number': txtInvoiceNumber.text,
-          'carts': cares_id
-        }).then(
-          (value) => {
-            print('-- PO 4'),
-            modelData = {
-              'payment_type': creditCardCode,
-              // 'order_id': 'order_BYW95EGWJDN6VK'
-              'order_id': value['id']
-            },
-            loading = false,
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => PaymentStatusCentralPage(model: modelData),
-              ),
-            ),
-          },
+        // postObjectData(server + 'orders/', {
+        //   'shipping_address_id': address['code'],
+        //   'coupon_id': couponsCode,
+        //   'shipping_price': deliveryPrice,
+        //   'tax_invoice_address_id': addressInvoice['code'],
+        //   'tax_invoice_branch': (txtInvoiceBranch.text ?? ''),
+        //   'tax_identification_number': txtInvoiceNumber.text,
+        //   'carts': cares_id
+        // }).then(
+        //   (value) => {
+        //     print('-- PO 4'),
+        //     modelData = {
+        //       'payment_type': creditCardCode,
+        //       // 'order_id': 'order_BYW95EGWJDN6VK'
+        //       'order_id': value['id']
+        //     },
+        // loading = false,
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PaymentStatusCentralPage(model: modelData),
+          ),
+          // ),
+          // },
         );
       });
     } else {
@@ -532,6 +588,78 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
     }
   }
 
+  void _calculate() {
+    // รีเซ็ตค่า
+    sum = 0;
+    qty = 0;
+
+    print('========== เริ่มคำนวณ ==========');
+    print('type: $type');
+    print('จำนวนรายการ: ${modelCode.length}');
+
+    // วนลูปคำนวณทุกรายการ
+    for (int i = 0; i < modelCode.length; i++) {
+      var item = modelCode[i];
+
+      // ดึงค่า qty และ price จากแต่ละรายการ
+      int itemQty = 0;
+      int itemPrice = 0;
+
+      if (type == 'cart') {
+        // จาก cart ใช้ 'quantity' และ 'price'
+        itemQty = _toInt(item['quantity'] ?? 1);
+        itemPrice = _toInt(item['price'] ?? 0);
+      } else if (type == 'buy') {
+        // จาก buy now ใช้ 'qty' และ 'price'
+        itemQty = _toInt(item['qty'] ?? 1);
+        itemPrice = _toInt(item['price'] ?? 0);
+      }
+
+      int itemTotal = itemQty * itemPrice;
+
+      // รวมค่า
+      qty += itemQty;
+      sum += itemTotal;
+
+      print('รายการที่ ${i + 1}: ${item['product_name'] ?? item['name']}');
+      print('  - จำนวน: $itemQty');
+      print('  - ราคาต่อชิ้น: $itemPrice บาท');
+      print('  - รวม: $itemTotal บาท');
+    }
+
+    // กำหนดค่าขนส่ง
+    shippingcost = 30;
+
+    // รวมทั้งหมด (ยังไม่รวมส่วนลด)
+    pricesum = sum + shippingcost;
+
+    // ถ้ามีส่วนลด ให้หักออก
+    if (discountAll > 0) {
+      pricesum = pricesum - discountAll;
+    }
+
+    print('========== สรุปการคำนวณ ==========');
+    print('จำนวนสินค้าทั้งหมด: $qty ชิ้น');
+    print('รวมราคาสินค้า (sum): $sum บาท');
+    print('ค่าขนส่ง (shippingcost): $shippingcost บาท');
+    print('ส่วนลด (discountAll): $discountAll บาท');
+    print('รวมทั้งหมด (pricesum): $pricesum บาท');
+    print('===================================');
+
+    setState(() {});
+  }
+
+// เพิ่ม helper function สำหรับแปลงค่าเป็น int อย่างปลอดภัย
+  int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? 0;
+    }
+    return 0;
+  }
+
   Future<String> _validate() async {
     List<String> failureList = [
       'ที่อยู่จัดส่ง',
@@ -619,218 +747,219 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                   textScaleFactor: ScaleSize.textScaleFactor(context),
                 ),
                 SizedBox(height: 10),
+                //ที่อยู่จัดส่ง
                 GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => DeliveryAddressCentralPage(
-                        notChange: true,
-                      ),
+                    // onTap: () => Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (_) => DeliveryAddressCentralPage(
+                    //       notChange: true,
+                    //     ),
+                    //   ),
+                    // ).then(
+                    //   (value) async => {
+                    //     if (value['status'] == '1') // เลือกที่อยู่
+                    //       {
+                    //         hasAddress = true,
+                    //         setState(
+                    //           () {
+                    //             name = value['name'];
+                    //             phone = value['phone'];
+                    //             address = {
+                    //               'code': value['id'],
+                    //               'address': value['address'],
+                    //               'subDistrict': value['tambon']['data']
+                    //                   ['name_th'],
+                    //               'district': value['amphoe']['data']['name_th'],
+                    //               'province': value['province']['data']
+                    //                   ['name_th'],
+                    //               'postalCode': value['zip'],
+                    //             };
+                    //             _readShippingPrice(cartId);
+                    //           },
+                    //         ),
+                    //       }
+                    //     else if (value['status'] == '2') // ไม่มีที่อยู่
+                    //       {
+                    //         setState(
+                    //           () {
+                    //             name = '';
+                    //             phone = '';
+                    //             address = {
+                    //               'code': '',
+                    //               'address': '',
+                    //               'province': '',
+                    //               'district': '',
+                    //               'subDistrict': '',
+                    //               'postalCode': ''
+                    //             };
+                    //             _readShippingPrice(cartId);
+                    //           },
+                    //         ),
+                    //       }
+                    //   },
+                    // ),
+                    child:
+                        // hasAddress
+                        //     ?
+                        Container(
+                  padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      width: 1,
+                      color: Color(0xFF09665a),
                     ),
-                  ).then(
-                    (value) async => {
-                      if (value['status'] == '1') // เลือกที่อยู่
-                        {
-                          hasAddress = true,
-                          setState(
-                            () {
-                              name = value['name'];
-                              phone = value['phone'];
-                              address = {
-                                'code': value['id'],
-                                'address': value['address'],
-                                'subDistrict': value['tambon']['data']
-                                    ['name_th'],
-                                'district': value['amphoe']['data']['name_th'],
-                                'province': value['province']['data']
-                                    ['name_th'],
-                                'postalCode': value['zip'],
-                              };
-                              _readShippingPrice(cartId);
-                            },
-                          ),
-                        }
-                      else if (value['status'] == '2') // ไม่มีที่อยู่
-                        {
-                          setState(
-                            () {
-                              name = '';
-                              phone = '';
-                              address = {
-                                'code': '',
-                                'address': '',
-                                'province': '',
-                                'district': '',
-                                'subDistrict': '',
-                                'postalCode': ''
-                              };
-                              _readShippingPrice(cartId);
-                            },
-                          ),
-                        }
-                    },
                   ),
-                  child: hasAddress
-                      ? Container(
-                          padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              width: 1,
-                              color: Color(0xFF1434F7),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    name,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    color: Color(0xFF0B24FB),
-                                    size: AdaptiveTextSize()
-                                        .getadaptiveTextSize(context, 20),
-                                  )
-                                ],
-                              ),
-                              // SizedBox(height: 7),
-                              Row(
-                                children: [
-                                  Text(
-                                    '|  ',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Color(0xFF707070),
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                  Text(
-                                    phone,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF707070),
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 7),
-                              Wrap(
-                                // crossAxisAlignment: WrapCrossAlignment.start,
-                                alignment: WrapAlignment.start,
-                                runAlignment: WrapAlignment.start,
-                                // mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      border: Border.all(
-                                        width: 1,
-                                        color: Color(0xFF1434F7),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'ที่บ้าน',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        color: Color(0xFF0B24FB),
-                                      ),
-                                      textScaleFactor:
-                                          ScaleSize.textScaleFactor(context),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    '${address['address']}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF707070),
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    '${address['subDistrict']}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF707070),
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    '${address['district']}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF707070),
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    '${address['province']}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF707070),
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    '${address['postalCode']}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF707070),
-                                    ),
-                                    textScaleFactor:
-                                        ScaleSize.textScaleFactor(context),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        )
-                      : Container(
-                          height: 100,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              width: 1,
-                              color: Color(0xFF1434F7),
-                            ),
-                          ),
-                          child: Text(
-                            "เลือกที่อยู่จัดส่งของคุณของคุณ",
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            // name,
+                            'B',
                             style: TextStyle(
-                              fontFamily: 'Kanit',
                               fontSize: 15,
+                              fontWeight: FontWeight.bold,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.fade,
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
                           ),
-                        ),
-                ),
+                          // Icon(
+                          //   Icons.arrow_forward_ios_rounded,
+                          //   color: Color(0xFF09665a),
+                          //   size: AdaptiveTextSize()
+                          //       .getadaptiveTextSize(context, 20),
+                          // )
+                        ],
+                      ),
+                      // SizedBox(height: 7),
+                      Row(
+                        children: [
+                          Text(
+                            '|  ',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                          Text(
+                            // phone,
+                            '+66973504796',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 7),
+                      Wrap(
+                        // crossAxisAlignment: WrapCrossAlignment.start,
+                        alignment: WrapAlignment.start,
+                        runAlignment: WrapAlignment.start,
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(
+                                width: 1,
+                                color: Color(0xFF09665a),
+                              ),
+                            ),
+                            child: Text(
+                              'ที่บ้าน',
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Color(0xFF09665a),
+                              ),
+                              textScaleFactor:
+                                  ScaleSize.textScaleFactor(context),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            // '${address['address']}',
+                            '299',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            // '${address['subDistrict']}',
+                            'สายไหม',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            // '${address['district']}',
+                            'สายไหม',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            // '${address['province']}',
+                            'กรุงเทพมหานคร',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            // '${address['postalCode']}',
+                            '10220',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+                    // : Container(
+                    //     height: 100,
+                    //     alignment: Alignment.center,
+                    //     decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.circular(10),
+                    //       border: Border.all(
+                    //         width: 1,
+                    //         color: Color(0xFF09665a),
+                    //       ),
+                    //     ),
+                    //     child: Text(
+                    //       "เลือกที่อยู่จัดส่งของคุณของคุณ",
+                    //       style: TextStyle(
+                    //         fontFamily: 'Kanit',
+                    //         fontSize: 15,
+                    //       ),
+                    //       maxLines: 1,
+                    //       overflow: TextOverflow.fade,
+                    //     ),
+                    //   ),
+                    ),
                 SizedBox(height: 20),
                 Text(
                   'รายการสินค้า',
@@ -862,19 +991,19 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                       ),
                       textScaleFactor: ScaleSize.textScaleFactor(context),
                     ),
-                    Container(
-                      // height: 25,
-                      // width: 25,
-                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF7F7F7),
-                        borderRadius: BorderRadius.circular(7),
-                      ),
-                      child: Icon(Icons.arrow_forward_ios_rounded,
-                          color: Color(0xFF0B24FB),
-                          size: AdaptiveTextSize()
-                              .getadaptiveTextSize(context, 17)),
-                    )
+                    // Container(
+                    //   // height: 25,
+                    //   // width: 25,
+                    //   padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                    //   decoration: BoxDecoration(
+                    //     color: Color(0xFFF7F7F7),
+                    //     borderRadius: BorderRadius.circular(7),
+                    //   ),
+                    //   child: Icon(Icons.arrow_forward_ios_rounded,
+                    //       color: Color(0xFF09665a),
+                    //       size: AdaptiveTextSize()
+                    //           .getadaptiveTextSize(context, 17)),
+                    // )
                   ],
                 ),
                 SizedBox(height: 10),
@@ -930,30 +1059,30 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           fontWeight: FontWeight.w500,
                         ),
                         textScaleFactor: ScaleSize.textScaleFactor(context)),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => MyCreditCardCentralPage(),
-                        ),
-                      ),
-                      child: Container(
-                        // height: 25,
-                        // width: 25,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF7F7F7),
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: Color(0xFF0B24FB),
-                          size: AdaptiveTextSize()
-                              .getadaptiveTextSize(context, 17),
-                        ),
-                      ),
-                    )
+                    // GestureDetector(
+                    //   onTap: () => Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (_) => MyCreditCardCentralPage(),
+                    //     ),
+                    //   ),
+                    //   child: Container(
+                    //     // height: 25,
+                    //     // width: 25,
+                    //     padding:
+                    //         EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                    //     decoration: BoxDecoration(
+                    //       color: Color(0xFFF7F7F7),
+                    //       borderRadius: BorderRadius.circular(7),
+                    //     ),
+                    //     child: Icon(
+                    //       Icons.arrow_forward_ios_rounded,
+                    //       color: Color(0xFF09665a),
+                    //       size: AdaptiveTextSize()
+                    //           .getadaptiveTextSize(context, 17),
+                    //     ),
+                    //   ),
+                    // )
                   ],
                 ),
                 SizedBox(height: 10),
@@ -969,7 +1098,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                       // if (index == 0) {
                       return StackTap(
                         borderRadius: BorderRadius.circular(10),
-                        splashColor: Color(0xFF1434F7).withOpacity(0.2),
+                        splashColor: Color(0xFF09665a).withOpacity(0.2),
                         onTap: () {
                           setState(() {
                             creditCardCode = _futurePayments[index]['id'];
@@ -984,7 +1113,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                               width: 1,
                               color:
                                   _futurePayments[index]['id'] == creditCardCode
-                                      ? Color(0xFF1434F7)
+                                      ? Color(0xFF09665a)
                                       : Color(0xFFE4E4E4),
                             ),
                           ),
@@ -1069,7 +1198,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                         ),
                         child: Icon(
                           Icons.arrow_forward_ios_rounded,
-                          color: Color(0xFF0B24FB),
+                          color: Color(0xFF09665a),
                           size: AdaptiveTextSize()
                               .getadaptiveTextSize(context, 17),
                         ),
@@ -1087,8 +1216,8 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                         decoration: InputDecoration(
                           hintText: "กรอกรหัสคูปอง",
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(7),
-                          ),
+                              borderRadius: BorderRadius.circular(7),
+                              borderSide: BorderSide(color: Color(0xFF09665a))),
                           contentPadding: EdgeInsets.symmetric(horizontal: 10),
                         ),
                       ),
@@ -1100,8 +1229,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                         await checkCoupon(couponController.text);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.pinkAccent, // ✅ ใช้ backgroundColor แทน
+                        backgroundColor: Color(0xFF09665a),
                         padding:
                             EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                         shape: RoundedRectangleBorder(
@@ -1227,7 +1355,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                             itemBuilder: (_, index) {
                               return StackTap(
                                 borderRadius: BorderRadius.circular(10),
-                                splashColor: Color(0xFF1434F7).withOpacity(0.2),
+                                splashColor: Color(0xFF09665a).withOpacity(0.2),
                                 onTap: () {
                                   if (couponsCode ==
                                       snapshot.data[index]['id']) {
@@ -1278,10 +1406,10 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       width: 1,
-                                      // color: Color(0xFF1434F7)
+                                      // color: Color(0xFF09665a)
                                       color: snapshot.data[index]['id'] ==
                                               couponsCode
-                                          ? Color(0xFF1434F7)
+                                          ? Color(0xFF09665a)
                                           : Color(0xFFE4E4E4),
                                     ),
                                   ),
@@ -1324,7 +1452,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                               //   return StackTap(
                               //     borderRadius: BorderRadius.circular(10),
                               //     splashColor:
-                              //         Color(0xFF1434F7).withOpacity(0.2),
+                              //         Color(0xFF09665a).withOpacity(0.2),
                               //     onTap: () {
 
                               //       setState(() {
@@ -1341,10 +1469,10 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                               //             BorderRadius.circular(10),
                               //         border: Border.all(
                               //             width: 1,
-                              //             // color: Color(0xFF1434F7)
+                              //             // color: Color(0xFF09665a)
                               //             color:
                               //             creditCardCode == snapshot.data[index]['id']
-                              //                 ? Color(0xFF1434F7)
+                              //                 ? Color(0xFF09665a)
                               //                 : Color(0xFFE4E4E4),
                               //             ),
                               //       ),
@@ -1380,7 +1508,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                               //   return StackTap(
                               //     borderRadius: BorderRadius.circular(10),
                               //     splashColor:
-                              //         Color(0xFF1434F7).withOpacity(0.2),
+                              //         Color(0xFF09665a).withOpacity(0.2),
                               //     onTap: () {
                               //       setState(() {
                               //         couponsCode =
@@ -1399,7 +1527,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                               //           color: snapshot.data[index]
                               //                       ['code'] ==
                               //                   creditCardCode
-                              //               ? Color(0xFF1434F7)
+                              //               ? Color(0xFF09665a)
                               //               : Color(0xFFE4E4E4),
                               //         ),
                               //       ),
@@ -1439,7 +1567,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 width: 1,
-                                // color: Color(0xFF1434F7)
+                                // color: Color(0xFF09665a)
                                 color: Color(0xFFE4E4E4),
                               ),
                             ),
@@ -1473,7 +1601,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     width: 1,
-                                    // color: Color(0xFF1434F7)
+                                    // color: Color(0xFF09665a)
                                     color: Color(0xFFE4E4E4),
                                   ),
                                 ),
@@ -1585,226 +1713,224 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                     : Container(),
                 isInvoice
                     ? GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => DeliveryAddressCentralPage(
-                              notChange: true,
-                            ),
+                        // onTap: () => Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (_) => DeliveryAddressCentralPage(
+                        //           notChange: true,
+                        //         ),
+                        //       ),
+                        //     ).then(
+                        //       (value) async => {
+                        //         if (value['status'] == '1') // เลือกที่อยู่
+                        //           {
+                        //             isInvoiceAddress = true,
+                        //             setState(
+                        //               () {
+                        //                 nameInvoice = value['name'];
+                        //                 phoneInvoice = value['phone'];
+                        //                 addressInvoice = {
+                        //                   'code': value['id'],
+                        //                   'address': value['address'],
+                        //                   'subDistrict': value['tambon']['data']
+                        //                       ['name_th'],
+                        //                   'district': value['amphoe']['data']
+                        //                       ['name_th'],
+                        //                   'province': value['province']['data']
+                        //                       ['name_th'],
+                        //                   'postalCode': value['zip'],
+                        //                 };
+                        //               },
+                        //             ),
+                        //           }
+                        //         else
+                        //           {
+                        //             setState(
+                        //               () {
+                        //                 nameInvoice = '';
+                        //                 phoneInvoice = '';
+                        //                 addressInvoice = {
+                        //                   'code': '',
+                        //                   'address': '',
+                        //                   'province': '',
+                        //                   'district': '',
+                        //                   'subDistrict': '',
+                        //                   'postalCode': ''
+                        //                 };
+                        //               },
+                        //             ),
+                        //           }
+                        //       },
+                        //     ),
+                        child:
+                            // isInvoiceAddress
+                            //     ?
+                            Container(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            width: 1,
+                            color: Color(0xFF09665a),
                           ),
-                        ).then(
-                          (value) async => {
-                            if (value['status'] == '1') // เลือกที่อยู่
-                              {
-                                isInvoiceAddress = true,
-                                setState(
-                                  () {
-                                    nameInvoice = value['name'];
-                                    phoneInvoice = value['phone'];
-                                    addressInvoice = {
-                                      'code': value['id'],
-                                      'address': value['address'],
-                                      'subDistrict': value['tambon']['data']
-                                          ['name_th'],
-                                      'district': value['amphoe']['data']
-                                          ['name_th'],
-                                      'province': value['province']['data']
-                                          ['name_th'],
-                                      'postalCode': value['zip'],
-                                    };
-                                  },
-                                ),
-                              }
-                            else
-                              {
-                                setState(
-                                  () {
-                                    nameInvoice = '';
-                                    phoneInvoice = '';
-                                    addressInvoice = {
-                                      'code': '',
-                                      'address': '',
-                                      'province': '',
-                                      'district': '',
-                                      'subDistrict': '',
-                                      'postalCode': ''
-                                    };
-                                  },
-                                ),
-                              }
-                          },
                         ),
-                        child: isInvoiceAddress
-                            ? Container(
-                                padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    width: 1,
-                                    color: Color(0xFF1434F7),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          nameInvoice,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          color: Color(0xFF0B24FB),
-                                          size: AdaptiveTextSize()
-                                              .getadaptiveTextSize(context, 20),
-                                        )
-                                      ],
-                                    ),
-                                    // SizedBox(height: 7),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          '|  ',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: Color(0xFF707070),
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                        Text(
-                                          phoneInvoice,
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xFF707070),
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 7),
-                                    Wrap(
-                                      // crossAxisAlignment: WrapCrossAlignment.start,
-                                      alignment: WrapAlignment.start,
-                                      runAlignment: WrapAlignment.start,
-                                      // mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            border: Border.all(
-                                              width: 1,
-                                              color: Color(0xFF1434F7),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            'ที่บ้าน',
-                                            style: TextStyle(
-                                              fontSize: 9,
-                                              color: Color(0xFF0B24FB),
-                                            ),
-                                            textScaleFactor:
-                                                ScaleSize.textScaleFactor(
-                                                    context),
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Text(
-                                          '${addressInvoice['address']}',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xFF707070),
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                        SizedBox(width: 5),
-                                        Text(
-                                          '${addressInvoice['subDistrict']}',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xFF707070),
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                        SizedBox(width: 5),
-                                        Text(
-                                          '${addressInvoice['district']}',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xFF707070),
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                        SizedBox(width: 5),
-                                        Text(
-                                          '${addressInvoice['province']}',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xFF707070),
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                        SizedBox(width: 5),
-                                        Text(
-                                          '${addressInvoice['postalCode']}',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: Color(0xFF707070),
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              )
-                            : Container(
-                                height: 100,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    width: 1,
-                                    color: Color(0xFF1434F7),
-                                  ),
-                                ),
-                                child: Text(
-                                  "เลือกที่อยู่เพื่อใช้ในใบกำกับภาษี",
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  // nameInvoice,
+                                  'BB',
                                   style: TextStyle(
-                                    fontFamily: 'Kanit',
                                     fontSize: 15,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
                                 ),
-                              ),
+                                Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  color: Color(0xFF09665a),
+                                  size: AdaptiveTextSize()
+                                      .getadaptiveTextSize(context, 20),
+                                )
+                              ],
+                            ),
+                            // SizedBox(height: 7),
+                            Row(
+                              children: [
+                                Text(
+                                  '|  ',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Color(0xFF707070),
+                                  ),
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
+                                ),
+                                Text(
+                                  // phoneInvoice,
+                                  '+66973504796',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF707070),
+                                  ),
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 7),
+                            Wrap(
+                              // crossAxisAlignment: WrapCrossAlignment.start,
+                              alignment: WrapAlignment.start,
+                              runAlignment: WrapAlignment.start,
+                              // mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    border: Border.all(
+                                      width: 1,
+                                      color: Color(0xFF09665a),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'ที่บ้าน',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: Color(0xFF09665a),
+                                    ),
+                                    textScaleFactor:
+                                        ScaleSize.textScaleFactor(context),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  // '${addressInvoice['address']}',
+                                  '299',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF707070),
+                                  ),
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  // '${addressInvoice['subDistrict']}',
+                                  'สายไหม',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF707070),
+                                  ),
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  // '${addressInvoice['district']}',
+                                  'สายไหม',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF707070),
+                                  ),
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  // '${addressInvoice['province']}',
+                                  'กรุงเทพมหานคร',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF707070),
+                                  ),
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  // '${addressInvoice['postalCode']}',
+                                  '10220',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF707070),
+                                  ),
+                                  textScaleFactor:
+                                      ScaleSize.textScaleFactor(context),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                       )
+                        // : Container(
+                        //     height: 100,
+                        //     alignment: Alignment.center,
+                        //     decoration: BoxDecoration(
+                        //       borderRadius: BorderRadius.circular(10),
+                        //       border: Border.all(
+                        //         width: 1,
+                        //         color: Color(0xFF09665a),
+                        //       ),
+                        //     ),
+                        //     child: Text(
+                        //       "เลือกที่อยู่เพื่อใช้ในใบกำกับภาษี",
+                        //       style: TextStyle(
+                        //         fontFamily: 'Kanit',
+                        //         fontSize: 15,
+                        //       ),
+                        //       maxLines: 1,
+                        //       overflow: TextOverflow.fade,
+                        //     ),
+                        //   ),
+                        )
                     : Container(),
                 isInvoice
                     ? Container(
@@ -1973,7 +2099,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           fontWeight: FontWeight.w500,
                         ),
                         textScaleFactor: ScaleSize.textScaleFactor(context)),
-                    Text(moneyFormat(total.toString()) + ' บาท',
+                    Text(sum.toString() + ' บาท',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -1990,7 +2116,9 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           fontWeight: FontWeight.w500,
                         ),
                         textScaleFactor: ScaleSize.textScaleFactor(context)),
-                    Text(moneyFormat(deliveryPrice.toString()) + ' บาท',
+                    Text(
+                        // moneyFormat(deliveryPrice.toString())
+                        shippingcost.toString() + ' บาท',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -2024,7 +2152,9 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           fontWeight: FontWeight.bold,
                         ),
                         textScaleFactor: ScaleSize.textScaleFactor(context)),
-                    Text(moneyFormat(totalPrice.toString()) + ' บาท',
+                    Text(
+                        // moneyFormat(totalPrice.toString())
+                        pricesum.toString() + ' บาท',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
@@ -2069,7 +2199,8 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                       textScaleFactor: ScaleSize.textScaleFactor(context)),
                   SizedBox(width: 10),
                   Text(
-                    moneyFormat(totalPrice.toString()) + ' บาท',
+                    // moneyFormat(totalPrice.toString())
+                    pricesum.toString() + ' บาท',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -2083,54 +2214,54 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                       print('-- PO 1');
                       var status = await _validate();
                       print('-- PO 2');
-                      if (status == '') {
-                        await _buy();
-                      } else {
-                        // toastFail(context, text: status);
-                        return showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return WillPopScope(
-                                onWillPop: () {
-                                  return Future.value(false);
-                                },
-                                child: CupertinoAlertDialog(
-                                  title: new Text(
-                                    status,
-                                    // '',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'Kanit',
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  content: Text(" "),
-                                  actions: [
-                                    CupertinoDialogAction(
-                                      isDefaultAction: true,
-                                      child: new Text(
-                                        "ตกลง",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontFamily: 'Kanit',
-                                          color: Color(0xFFFF7514),
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            });
-                      }
+                      // if (status == '') {
+                      await _buy();
+                      // } else {
+                      // toastFail(context, text: status);
+                      // return showDialog(
+                      //     barrierDismissible: false,
+                      //     context: context,
+                      //     builder: (BuildContext context) {
+                      //       return WillPopScope(
+                      //         onWillPop: () {
+                      //           return Future.value(false);
+                      //         },
+                      //         child: CupertinoAlertDialog(
+                      //           title: new Text(
+                      //             status,
+                      //             // '',
+                      //             style: TextStyle(
+                      //               fontSize: 16,
+                      //               fontFamily: 'Kanit',
+                      //               color: Colors.black,
+                      //               fontWeight: FontWeight.normal,
+                      //             ),
+                      //           ),
+                      //           content: Text(" "),
+                      //           actions: [
+                      //             CupertinoDialogAction(
+                      //               isDefaultAction: true,
+                      //               child: new Text(
+                      //                 "ตกลง",
+                      //                 style: TextStyle(
+                      //                   fontSize: 13,
+                      //                   fontFamily: 'Kanit',
+                      //                   color: Color(0xFF09665a),
+                      //                   fontWeight: FontWeight.normal,
+                      //                 ),
+                      //               ),
+                      //               onPressed: () {
+                      //                 Navigator.of(context).pop();
+                      //               },
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       );
+                      //     });
+                      // }
                     },
                     child: Container(
-                      color: Color(0xFFDF0B24),
+                      color: Color(0xFF09665a),
                       alignment: Alignment.center,
                       height: double.infinity,
                       width:
@@ -2165,153 +2296,175 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          param['url'] != 'null'
+          param['image'] != 'null'
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(5),
                   child: loadingImageNetwork(
-                    param['url'],
-                    // width: 80,
-                    // height: 80,
+                    param['image'],
                     height: (MediaQuery.of(context).size.width + (100)) / 5.0,
                     fit: BoxFit.contain,
                   ),
                 )
               : Container(
                   decoration: BoxDecoration(
-                    // color: Color(0XFF0B24FB),
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Image.asset(
                     'assets/images/kaset/no-img.png',
                     fit: BoxFit.contain,
-                    // color: Colors.white,
                   ),
                 ),
           SizedBox(width: 15),
           Expanded(
-              child: Container(
-            // height: (MediaQuery.of(context).size.width + (100)) / 5.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // SizedBox(
-                //   height: (MediaQuery.of(context).size.width + (100)) / 5.0,
-                //   child:
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      param['product_name'],
-                      style: TextStyle(
-                        fontSize: 13,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      textScaleFactor: ScaleSize.textScaleFactor(context),
-                      maxLines: 2,
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Color(0xFFE4E4E4),
-                                borderRadius: BorderRadius.circular(
-                                  7,
-                                ),
-                              ),
-                              child: Text(
-                                param['product_variant'] ?? '',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.black,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                maxLines: 1,
-                                textScaleFactor:
-                                    ScaleSize.textScaleFactor(context),
-                              ),
-                            ),
-                          ),
+            child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        param['product_name'] ?? param['name'] ?? '',
+                        style: TextStyle(
+                          fontSize: 13,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        param['isPromotion']
-                            ? Expanded(
+                        textScaleFactor: ScaleSize.textScaleFactor(context),
+                        maxLines: 2,
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFE4E4E4),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
                                 child: Text(
-                                  '${moneyFormat(param['price'].toString())} บาท',
+                                  param['product_variant'] ??
+                                      param['product_name'] ??
+                                      param['name'] ??
+                                      '',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.black,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
+                                  maxLines: 1,
                                   textScaleFactor:
                                       ScaleSize.textScaleFactor(context),
                                 ),
-                              )
-                            : Container(),
-                      ],
-                    )
-                  ],
-                ),
-                // ),
-                SizedBox(height: 18),
-                SizedBox(
-                  // height: 20,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                            param['isPromotion']
-                                ? '${moneyFormat(param['promotion_price'].toString())} บาท'
-                                : '${moneyFormat(param['price'].toString())} บาท',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w500,
+                              ),
                             ),
-                            textScaleFactor:
-                                ScaleSize.textScaleFactor(context)),
-                      ),
-                      Text('จำนวน',
-                          style: TextStyle(
-                            fontSize: 13,
                           ),
-                          textScaleFactor: ScaleSize.textScaleFactor(context)),
-                      SizedBox(width: 10),
-                      Container(
-                        // height:
-                        //     AdaptiveTextSize().getadaptiveTextSize(context, 20),
-                        // width:
-                        //     AdaptiveTextSize().getadaptiveTextSize(context, 20),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Color(0xFFf7f7f7),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text('${param['quantity']}',
-                            style: TextStyle(
-                              // height: AdaptiveTextSize()
-                              //     .getadaptiveTextSize(context, 0.8),
-                              fontSize: 12,
-                            ),
-                            textScaleFactor:
-                                ScaleSize.textScaleFactor(context)),
+                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
+                  SizedBox(height: 18),
+                  // 📌 เพิ่มส่วนแสดงราคาและจำนวน
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // แสดงราคาต่อชิ้น
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_toInt(param['price']).toString()} บาท',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF09665a),
+                              ),
+                              textScaleFactor:
+                                  ScaleSize.textScaleFactor(context),
+                            ),
+                            // ถ้ามีราคาโปรโมชั่น แสดงราคาเดิมขีดฆ่า
+                            if (param['promotion_price'] != null &&
+                                _toInt(param['promotion_price']) > 0)
+                              Text(
+                                '${_toInt(param['price']).toString()} บาท',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF707070),
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                                textScaleFactor:
+                                    ScaleSize.textScaleFactor(context),
+                              ),
+                          ],
+                        ),
+                      ),
+                      // แสดงจำนวน
+                      Row(
+                        children: [
+                          Text(
+                            'จำนวน',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF707070),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                          SizedBox(width: 10),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFf7f7f7),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              '${_toInt(param['quantity'] ?? param['qty'] ?? 1)}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textScaleFactor:
+                                  ScaleSize.textScaleFactor(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  // 📌 เพิ่มแสดงราคารวมของรายการนี้
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'รวม ',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF707070),
+                        ),
+                        textScaleFactor: ScaleSize.textScaleFactor(context),
+                      ),
+                      Text(
+                        '${(_toInt(param['price']) * _toInt(param['quantity'] ?? param['qty'] ?? 1)).toString()} บาท',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF09665a),
+                        ),
+                        textScaleFactor: ScaleSize.textScaleFactor(context),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );

@@ -192,7 +192,7 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
           child: Icon(
             Icons.check_circle_rounded,
             size: animationController.value * 100,
-            color: Color(0xFF1CBC51),
+            color: Color(0xFF09665a),
           ),
         ),
         SizedBox(height: 15),
@@ -203,7 +203,7 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF1CBC51),
+              color: Color(0xFF09665a),
             ),
           ),
         ),
@@ -259,7 +259,7 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
                 child: Icon(
                   Icons.payments_rounded,
                   size: animationController.value * 100,
-                  color: Color(0xFF1CBC51),
+                  color: Color(0xFF09665a),
                 ),
               ),
               SizedBox(height: 5),
@@ -270,7 +270,7 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF1CBC51),
+                    color: Color(0xFF09665a),
                   ),
                 ),
               ),
@@ -281,41 +281,49 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
                 ),
               ),
               SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                      width: 300,
-                      height: 350,
-                      // alignment: Alignment.center,
-                      // padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                      child: loadingSuccess == false
-                          ? Center(
-                              child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ))
-                          :
-                          //       Text(
-                          //   qrCode,
-                          //   style: TextStyle(
-                          //     fontSize: 15,
-                          //     fontWeight: FontWeight.w500,
-                          //     color: Color(0xFFDF0B24),
-                          //   ),
-                          // ),
-                          SvgPicture.string(qrCode, width: 200, height: 200)
-                      // Html(
-                      //     data: qrCode ?? '',
-                      //     onLinkTap: (url, attributes, element) {
-                      //       if (url != null) {
-                      //         launchInWebViewWithJavaScript(url);
-                      //       }
-                      //     },
-                      //   ),
-                      ),
-                ],
-              ),
+              Container(
+                child: Icon(
+                  Icons.qr_code_2,
+                  size: 400,
+                ),
+              ), 
+              // gen Qr Code
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   children: [
+              //     Container(
+              //         width: 300,
+              //         height: 350,
+              //         // alignment: Alignment.center,
+              //         // padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+              //         child: loadingSuccess == false
+              //             ? Center(
+              //                 child: CircularProgressIndicator(
+              //                 strokeWidth: 2,
+              //               ))
+              //             :
+              //             //       Text(
+              //             //   qrCode,
+              //             //   style: TextStyle(
+              //             //     fontSize: 15,
+              //             //     fontWeight: FontWeight.w500,
+              //             //     color: Color(0xFFDF0B24),
+              //             //   ),
+              //             // ),
+              //             SvgPicture.string(qrCode, width: 200, height: 200)
+              //         // Html(
+              //         //     data: qrCode ?? '',
+              //         //     onLinkTap: (url, attributes, element) {
+              //         //       if (url != null) {
+              //         //         launchInWebViewWithJavaScript(url);
+              //         //       }
+              //         //     },
+              //         //   ),
+              //         ),
+              //   ],
+              // ),
+
               SizedBox(height: 25),
               GestureDetector(
                 onTap: () {

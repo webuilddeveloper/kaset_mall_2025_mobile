@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -58,22 +59,26 @@ class _CartCentralPageState extends State<CartCentralPage> {
   final storage = new FlutterSecureStorage();
   String profileCode = "";
   String? emailProfile;
-
+  int totalPrice = 0;
   @override
   initState() {
+    super.initState();
     _readProfile();
     // _callRead();
-    super.initState();
+    setState(() {});
+
+    _readLocalCart();
   }
 
   _readProfile() async {
     final result = await getUser(server + 'users/me');
     setState(() {
-      verifyPhonePage = result['phone_verified'].toString();
-      emailProfile = result['email'].toString();
-      profilePhone = result['id'].toString();
+      // verifyPhonePage = result['phone_verified'].toString();
+      // emailProfile = result['email'].toString();
+      // profilePhone = result['id'].toString();
     });
-    await _callRead();
+    await _readLocalCart();
+    // await _callRead();
     // profileCode = await storage.read(key: 'profileCode10');
     // dynamic valueStorage = await storage.read(key: 'dataUserLoginDDPM');
     // dynamic dataValue = valueStorage == null ? {'email': ''} : json.decode(valueStorage);
@@ -90,47 +95,80 @@ class _CartCentralPageState extends State<CartCentralPage> {
     // }));
   }
 
-  _callRead() async {
-    var newMap = {};
-    var arr = [];
-    model = [];
-    if (verifyPhonePage == 'true') {
-      var response = await get('${server}carts');
-      arr = response;
+  _readLocalCart() async {
+    setState(() {
+      loading = true;
+    });
 
-      arr.forEach((element) async {
-        element['selected'] = false;
-        if (element['media'] == null) {
-          element['media'] = null;
-        }
-      });
+    final storage = FlutterSecureStorage();
+    String? cartData = await storage.read(key: 'cartItems');
+
+    if (cartData != null && cartData.isNotEmpty) {
+      List<dynamic> cartList = jsonDecode(cartData);
+
+      // เพิ่ม property 'selected' ให้ทุก item
+      for (var e in cartList) {
+        e['selected'] = false;
+      }
+
       setState(() {
-        model = arr;
+        model = cartList;
         loading = false;
+        print('==========_readLocalCart===========');
+        print('model : $model');
+        // print('price0 : ${model[0]['price']}');
+        // print('price1 : ${model[1]['price']}');
+        // print('qty1 : ${model[0]['qty']}');
+        // print('qty0 : ${model[1]['qty']}');
       });
     } else {
       setState(() {
-        model = arr;
+        model = [];
         loading = false;
       });
     }
-
-    //  arr.add({'selected' : false});
-    // arr.map((e) {
-    //   var selected = false;
-
-    //     // e['selected'] = e['selected'] = false;
-    //     return e;
-    //   });
-
-    // newMap = groupBy(response, (obj) => obj['id'] = 1);
   }
+  // _callRead() async {
+  //   var newMap = {};
+  //   var arr = [];
+  //   model = [];
+  //   if (verifyPhonePage == 'true') {
+  //     var response = await get('${server}carts');
+  //     arr = response;
+
+  //     arr.forEach((element) async {
+  //       element['selected'] = false;
+  //       if (element['media'] == null) {
+  //         element['media'] = null;
+  //       }
+  //     });
+  //     setState(() {
+  //       model = arr;
+  //       loading = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       model = arr;
+  //       loading = false;
+  //     });
+  //   }
+
+  //   //  arr.add({'selected' : false});
+  //   // arr.map((e) {
+  //   //   var selected = false;
+
+  //   //     // e['selected'] = e['selected'] = false;
+  //   //     return e;
+  //   //   });
+
+  //   // newMap = groupBy(response, (obj) => obj['id'] = 1);
+  // }
 
   checkItem(int indexItem) {
     var currentShopChecked;
     var arr = {};
     var a;
-    if (model[indexItem]['product_variant']['data']['stock'] > 0) {
+    if (model[indexItem]['stock'] > 0) {
       setState(
         () => {
           model[indexItem]['selected'] = !model[indexItem]['selected'],
@@ -146,7 +184,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
         buyAll = !buyAll;
         model.forEach(
           (e) => {
-            if (e['product_variant']['data']['stock'] > 0)
+            if (e['stock'] > 0)
               {
                 e['selected'] = buyAll,
               }
@@ -157,65 +195,159 @@ class _CartCentralPageState extends State<CartCentralPage> {
     );
   }
 
-  deleteAll() {
-    setState(
-      () {
-        Dio dio = new Dio();
-        loading = true;
-        model.forEach(
-          (c) async => {
-            if (c['selected'])
-              {
-                await delete(server + 'carts/' + c['id']).then((res) async {
-                  if (res['success'] == true) {
-                    _callRead();
-                    setState(() {
-                      loading = false;
-                    });
-                  }
-                })
-              }
-          },
-        );
-      },
-    );
-    Navigator.pop(context);
-  }
-
-  _priceAll() {
+  // deleteAll() {
+  //   setState(
+  //     () {
+  //       Dio dio = new Dio();
+  //       loading = true;
+  //       model.forEach(
+  //         (c) async => {
+  //           if (c['selected'])
+  //             {
+  //               // await delete(server + 'carts/' + c['id']).then(
+  //               //   (res) async {
+  //               //     if (res['success'] == true) {
+  //               //       // _callRead();
+  //               //       setState(() {
+  //               //         loading = false;
+  //               //       });
+  //               //     }
+  //               //   },
+  //               // )
+  //             }
+  //         },
+  //       );
+  //     },
+  //   );
+  //   Navigator.pop(context);
+  // }
+  String _priceAll() {
     num totalPrice = 0;
-    model.forEach(
-      (c) => {
-        if (c['selected'])
-          {
-            totalPrice = totalPrice +
-                ((c['product_variant']['data']['promotion_active'] == true
-                        ? c['product_variant']['data']['promotion_price']
-                        : c['product_variant']['data']['price']) *
-                    c['quantity'])
-          }
-      },
-    );
-    print('totalPrice ------------->> ${totalPrice}');
-    return moneyFormat(totalPrice.toString()) + ' บาท';
+
+    for (var item in model) {
+      if (item['selected'] == true) {
+        num price = num.tryParse(item['price'].toString()) ?? 0;
+        num qty = num.tryParse(item['qty'].toString()) ?? 0;
+        totalPrice += (price * qty);
+      }
+    }
+
+    return '${totalPrice.round().toString()} บาท';
+  }
+  // _priceAll() {
+  //   num totalPrice = 0;
+
+  //   // model.forEach((c) {
+  //   //   if (c['selected'] == true) {
+  //   //     num price = num.tryParse(c['price'].toString()) ?? 0;
+  //   //     num qty = num.tryParse(c['qty'].toString()) ?? 0;
+
+  //   //     totalPrice += price * qty;
+  //   //   }
+  //   // });
+
+  //   // แปลงเป็น int ก่อนแสดง
+  //   int totalInt = totalPrice.round(); // ปัดเป็นจำนวนเต็ม
+
+  //   print('totalPrice ------------->> $totalInt');
+  //   return totalInt.toString() + ' บาท';
+  // }
+
+  String _calculateItemPrice(dynamic item) {
+    num price = num.tryParse(item['price'].toString()) ?? 0;
+    num qty = num.tryParse(item['qty'].toString()) ?? 0;
+    num total = price * qty;
+
+    return total.round().toString();
   }
 
-  void deleteItem(int index, String id) async {
+  _changeCarts(action, param) async {
+    if (action == 0) {
+      // ลดจำนวน
+      if (param['qty'] == 1) {
+        return null;
+      } else {
+        setState(() {
+          param['qty']--;
+        });
+        await _saveCartToStorage(); // บันทึกลง storage
+      }
+    } else {
+      // เพิ่มจำนวน
+      int stock = param['stock'] ?? 999; // ถ้าไม่มีข้อมูล stock ให้ใช้ค่าสูงๆ
+
+      if (param['qty'] >= stock) {
+        toastFail(context, text: 'สินค้าเหลือเพียง $stock ชิ้น เท่านั้น');
+        return null;
+      } else {
+        setState(() {
+          param['qty']++;
+        });
+        await _saveCartToStorage(); // บันทึกลง storage
+      }
+    }
+  }
+
+  Future<void> _saveCartToStorage() async {
+    final storage = FlutterSecureStorage();
+    String cartData = jsonEncode(model);
+    await storage.write(key: 'cartItems', value: cartData);
+  }
+
+  deleteAll() async {
     setState(() {
       loading = true;
     });
-    Dio dio = new Dio();
-    await delete(server + 'carts/' + id).then((res) async {
-      if (res['success'] == true) {
-        setState(() => model.removeAt(index));
-        // if (model[index]['items'].length == 0) model.removeAt(index);
-        setState(() {
-          loading = false;
-        });
-      }
-      Navigator.pop(context);
+
+    // ลบเฉพาะรายการที่เลือก
+    model.removeWhere((item) => item['selected'] == true);
+
+    // บันทึกกลับลง storage
+    await _saveCartToStorage();
+
+    setState(() {
+      loading = false;
+      buyAll = false;
     });
+
+    Navigator.pop(context);
   }
+  // void deleteItem(int index, String id) async {
+  //   setState(() {
+  //     loading = true;
+  //   });
+
+  //   // ลบออกจาก model
+  //   setState(() {
+  //     model.removeAt(index);
+  //   });
+
+  //   // บันทึกกลับลง storage
+  //   await _saveCartToStorage();
+
+  //   setState(() {
+  //     loading = false;
+  //   });
+
+  //   Navigator.pop(context);
+  // }
+
+  // void deleteItem(int index, String id) async {
+  //   setState(() {
+  //     loading = true;
+  //   });
+  //   Dio dio = new Dio();
+  //   await delete(server + 'carts/' + id).then((res) async {
+  //     if (res['success'] == true) {
+  //       setState(() => model.removeAt(index));
+  //       // if (model[index]['items'].length == 0) model.removeAt(index);
+  //       setState(() {
+  //         loading = false;
+  //       });
+  //     }
+  //     Navigator.pop(context);
+  //   });
+  // }
 
   readProduct(param) async {
     var result;
@@ -411,6 +543,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                     Expanded(
                       child: Text(
                         _priceAll(),
+                        // '_priceAll',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -425,33 +558,23 @@ class _CartCentralPageState extends State<CartCentralPage> {
                         List<dynamic> data = [];
 
                         model.forEach((e) {
-                          if (e['selected'])
+                          if (e['selected']) {
                             data.add({
-                              'product_name':
-                                  e['product']['data']['name'] ?? '',
-                              'url': e['media']['data']['url'],
-                              'product_variant': e['product_variant']['data']
-                                      ['name'] ??
-                                  e['product_variant']['data']['sku'],
-                              'price': e['product_variant']['data']['price'],
-                              'quantity': e['quantity'],
-                              'cart_id': e['id'],
-                              'promotion_price': e['product_variant']['data']
-                                          ['promotion_active'] ==
-                                      true
-                                  ? e['product_variant']['data']
-                                      ['promotion_price']
-                                  : 0,
-                              'isPromotion': e['product_variant']['data']
-                                          ['promotion_active'] ==
-                                      true
-                                  ? true
-                                  : false,
+                              'name': e['name'] ?? '',
+                              'image': e['image'] ?? '',
+                              'price': e['price'] ?? 0,
+                              'quantity': e['qty'] ?? 1,
+                              'cart_id': e['id']
                             });
+                          }
                         });
 
                         if (data.length > 0) {
-                          print('================ $data');
+                          print(
+                              '================ ข้อมูลที่เลือก ================');
+                          print('จำนวนรายการ: ${data.length}');
+                          print('ข้อมูล: $data');
+
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -459,6 +582,13 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                   modelCode: data, type: 'cart'),
                             ),
                           );
+
+                          // Refresh cart หลังกลับมาจากหน้า Confirm Order
+                          await _readLocalCart();
+                        } else {
+                          // แสดง toast เมื่อไม่มีรายการที่เลือก
+                          toastFail(context,
+                              text: 'กรุณาเลือกสินค้าที่ต้องการชำระเงิน');
                         }
                       },
                       child: Container(
@@ -561,8 +691,8 @@ class _CartCentralPageState extends State<CartCentralPage> {
         ),
         child: GestureDetector(
           onTap: () async {
-            var productModel = await readProduct(param['product_id']);
-            await _addLog(productModel);
+            // var productModel = await readProduct(param['product_id']);
+            // await _addLog(productModel);
             // await Navigator.push(
             //   context,
             //   MaterialPageRoute(
@@ -593,9 +723,9 @@ class _CartCentralPageState extends State<CartCentralPage> {
                 SizedBox(width: 10),
                 ClipRRect(
                     borderRadius: BorderRadius.circular(5),
-                    child: param['media'] != null
+                    child: param['image'] != null
                         ? loadingImageNetwork(
-                            param['media']['data']['url'],
+                            param['image'],
                             width: AdaptiveTextSize()
                                 .getadaptiveTextSize(context, 80),
                             height: AdaptiveTextSize()
@@ -625,8 +755,9 @@ class _CartCentralPageState extends State<CartCentralPage> {
                             Padding(
                               padding: const EdgeInsets.only(right: 5),
                               child: Text(
-                                param['product']['data']['name'] ??
-                                    param['product']['data']['sku'],
+                                param['name'],
+                                // ??
+                                //     param['product']['data']['sku'],
                                 style: TextStyle(
                                   fontSize: 13,
                                   overflow: TextOverflow.ellipsis,
@@ -652,10 +783,9 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                         ),
                                       ),
                                       child: Text(
-                                        param['product_variant']['data']
-                                                ['name'] ??
-                                            param['product_variant']['data']
-                                                ['sku'],
+                                        param['name'],
+                                        // ?? param['product_variant']['data']
+                                        //     ['sku'],
                                         style: TextStyle(
                                           fontSize: 13,
                                           color: Colors.black,
@@ -668,24 +798,25 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                     ),
                                   ),
                                 ),
-                                param['product_variant']['data']
-                                            ['promotion_active'] ==
-                                        true
-                                    ? Expanded(
-                                        child: Text(
-                                          '${moneyFormat(param['product_variant']['data']['price'].toString())} บาท',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                          ),
-                                          textScaleFactor:
-                                              ScaleSize.textScaleFactor(
-                                                  context),
-                                        ),
-                                      )
-                                    : Container(),
+                                // param['product_variant']['data']
+                                //             ['promotion_active'] ==
+                                //         true
+                                //     ?
+                                // Expanded(
+                                //         child: Text(
+                                //           '${moneyFormat(param['product_variant']['data']['price'].toString())} บาท',
+                                //           style: TextStyle(
+                                //             fontSize: 13,
+                                //             fontWeight: FontWeight.bold,
+                                //             decoration:
+                                //                 TextDecoration.lineThrough,
+                                //           ),
+                                //           textScaleFactor:
+                                //               ScaleSize.textScaleFactor(
+                                //                   context),
+                                //         ),
+                                //       )
+                                //     : Container(),
                               ],
                             )
                           ],
@@ -703,11 +834,13 @@ class _CartCentralPageState extends State<CartCentralPage> {
                           children: [
                             Expanded(
                               child: Text(
-                                param['product_variant']['data']
-                                            ['promotion_active'] ==
-                                        true
-                                    ? '${moneyFormat(param['product_variant']['data']['promotion_price'].toString())} บาท'
-                                    : '${moneyFormat(param['product_variant']['data']['price'].toString())} บาท',
+                                // param['product_variant']['data']
+                                //             ['promotion_active'] ==
+                                //         true
+                                //     ? '${moneyFormat(param['product_variant']['data']['promotion_price'].toString())} บาท'
+                                // :
+                                '${_calculateItemPrice(param)} บาท',
+                                // 'TEST',
                                 style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -735,7 +868,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                   style: TextStyle(
                                     height: 0.9,
                                     fontSize: 25,
-                                    color: param['quantity'] > 1
+                                    color: param['qty'] > 1
                                         ? Color(0xFF707070)
                                         : Color.fromARGB(255, 184, 183, 183),
                                   ),
@@ -754,7 +887,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Text(
-                                param['quantity'].toString(),
+                                param['qty'].toString(),
                                 style: TextStyle(
                                   height: 0.9,
                                   fontSize: 8,
@@ -995,7 +1128,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                     ),
                   ),
                   onPressed: () {
-                    deleteItem(index, id);
+                    (index, id);
                   },
                 ),
               ],
@@ -1061,34 +1194,34 @@ class _CartCentralPageState extends State<CartCentralPage> {
         });
   }
 
-  _changeCarts(action, param) {
-    if (action == 0) {
-      if (param['quantity'] == 1) {
-        return null;
-      } else {
-        param['quantity']--;
-        _updateCart(param);
-      }
-    } else {
-      if (param['quantity'] >= param['product_variant']['data']['stock']) {
-        toastFail(context,
-            text:
-                'สินค้าเหลือเพียง ${param['product_variant']['data']['stock']} ชิ้น เท่านั้น');
-        return null;
-      } else {
-        param['quantity']++;
-        _updateCart(param);
-      }
-    }
-  }
+  // _changeCartsn, param) {
+  //   if (action == 0) {
+  //     if (param['qty'] == 1) {
+  //       return null;
+  //     } else {
+  //       param['qty']--;
+  //       // _updateCart(param);
+  //     }
+  //   } else {
+  //     if (param['qty'] >= param['product_variant']['data']['stock']) {
+  //       toastFail(context,
+  //           text:
+  //               'สินค้าเหลือเพียง ${param['product_variant']['data']['stock']} ชิ้น เท่านั้น');
+  //       return null;
+  //     } else {
+  //       param['qty']++;
+  //       // _updateCart(param);
+  //     }
+  //   }
+  // }
 
-  _updateCart(param) {
-    setState(() {
-      widget;
-      put(server + 'carts/' + param['id'], {
-        'product_variant_id': param['product_variant_id'],
-        'quantity': param['quantity']
-      });
-    });
-  }
+  // _updateCart(param) {
+  //   setState(() {
+  //     widget;
+  //     put(server + 'carts/' + param['id'], {
+  //       'product_variant_id': param['product_variant_id'],
+  //       'quantity': param['quantity']
+  //     });
+  //   });
+  // }
 }
