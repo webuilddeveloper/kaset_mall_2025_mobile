@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -130,19 +131,29 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _getCountItemInCart() async {
-    await get(server + 'carts').then((value) async {
-      if (value != null) {
-        setState(() {
-          amountItemInCart = value.length;
-        });
+    String? value = await storage.read(key: 'cartItems');
 
-        if (amountItemInCart > 0) {
-          NotificationService.subscribeToAllTopic('suksapan-item');
-        } else {
-          NotificationService.subscribeToAllTopic('suksapan-mall');
-        }
-      }
-    });
+    if (value != null) {
+      // แปลง JSON เป็น List
+      List<dynamic> items = jsonDecode(value);
+
+      setState(() {
+        amountItemInCart = items.length;
+        print('------->>_getCountItemInCart  ');
+        print(amountItemInCart);
+      });
+
+      // ถ้าต้องการทำ logic กับ notification
+      // if (amountItemInCart > 0) {
+      //   NotificationService.subscribeToAllTopic('suksapan-item');
+      // } else {
+      //   NotificationService.subscribeToAllTopic('suksapan-mall');
+      // }
+    } else {
+      setState(() {
+        amountItemInCart = 0;
+      });
+    }
   }
 
   _getCategory() async {
