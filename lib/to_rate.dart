@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/component/loading_image_network.dart';
-import 'package:kaset_mall/reviews_add.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/data_error.dart';
-import 'package:kaset_mall/widget/header.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
+import 'package:kasetmall/reviews_add.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/data_error.dart';
+import 'package:kasetmall/widget/header.dart';
 
 import 'order_details.dart';
 

@@ -1,4 +1,4 @@
-package td.webuild.kaset_mall 
+package td.webuild.kasetmall 
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,6 +1,6 @@
-import 'package:kaset_mall/component/gallery_view.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/shared/extension.dart';
+import 'package:kasetmall/component/gallery_view.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/extension.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

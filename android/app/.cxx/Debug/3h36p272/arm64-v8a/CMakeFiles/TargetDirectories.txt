@@ -1,2 +1,2 @@
-/Users/panuwitchaiton/webuild/ssm_mall/kaset_mall/android/app/.cxx/Debug/3h36p272/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/panuwitchaiton/webuild/ssm_mall/kaset_mall/android/app/.cxx/Debug/3h36p272/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/panuwitchaiton/webuild/ssm_mall/kasetmall/android/app/.cxx/Debug/3h36p272/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/panuwitchaiton/webuild/ssm_mall/kasetmall/android/app/.cxx/Debug/3h36p272/arm64-v8a/CMakeFiles/rebuild_cache.dir

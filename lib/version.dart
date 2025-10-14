@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:kaset_mall/splash.dart';
+import 'package:kasetmall/splash.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'shared/api_provider.dart';

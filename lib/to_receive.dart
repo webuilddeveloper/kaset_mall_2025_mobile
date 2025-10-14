@@ -1,12 +1,12 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/component/loading_image_network.dart';
-import 'package:kaset_mall/component/toast_fail.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/shared/extension.dart';
-import 'package:kaset_mall/widget/data_error.dart';
-import 'package:kaset_mall/widget/header.dart';
-import 'package:kaset_mall/widget/show_loading.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
+import 'package:kasetmall/component/toast_fail.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/extension.dart';
+import 'package:kasetmall/widget/data_error.dart';
+import 'package:kasetmall/widget/header.dart';
+import 'package:kasetmall/widget/show_loading.dart';
 
 import 'order_details.dart';
 

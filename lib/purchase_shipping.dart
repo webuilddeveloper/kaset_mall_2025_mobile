@@ -5,12 +5,12 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/home.dart';
-import 'package:kaset_mall/purchase_order.dart';
-import 'package:kaset_mall/purchase_orderlist.dart';
-import 'package:kaset_mall/purchase_orderlist_draft.dart';
+import 'package:kasetmall/home.dart';
+import 'package:kasetmall/purchase_order.dart';
+import 'package:kasetmall/purchase_orderlist.dart';
+import 'package:kasetmall/purchase_orderlist_draft.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:kaset_mall/widget/dialog.dart';
+import 'package:kasetmall/widget/dialog.dart';
 
 class PurchaseShipping extends StatefulWidget {
   final dynamic allItems;

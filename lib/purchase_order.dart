@@ -5,9 +5,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaset_mall/purchase_menu.dart';
+import 'package:kasetmall/purchase_menu.dart';
 import 'dart:math';
-import 'package:kaset_mall/purchase_shipping.dart';
+import 'package:kasetmall/purchase_shipping.dart';
 
 class purchaseOrder extends StatefulWidget {
   final dynamic result;

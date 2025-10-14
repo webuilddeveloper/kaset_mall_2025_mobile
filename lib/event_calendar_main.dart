@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/calendar.dart';
-import 'package:kaset_mall/component/header.dart';
-import 'package:kaset_mall/event_calendar_list.dart';
+import 'package:kasetmall/calendar.dart';
+import 'package:kasetmall/component/header.dart';
+import 'package:kasetmall/event_calendar_list.dart';
 
 class EventCalendarMain extends StatefulWidget {
   EventCalendarMain({Key? key, required this.title}) : super(key: key);

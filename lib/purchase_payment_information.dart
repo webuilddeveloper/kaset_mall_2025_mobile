@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/home.dart';
+import 'package:kasetmall/home.dart';
 
-import 'package:kaset_mall/widget/dialog.dart';
+import 'package:kasetmall/widget/dialog.dart';
 
 class PurchasePaymentInformation extends StatefulWidget {
   final Future<void> Function() onConfirmPayment;

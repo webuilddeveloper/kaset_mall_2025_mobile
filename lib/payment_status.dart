@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:kaset_mall/menu.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/shared/extension.dart';
+import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/extension.dart';
 
 import '../component/link_url_in.dart';
 

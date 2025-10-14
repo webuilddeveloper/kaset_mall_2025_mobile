@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/menu.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/shared/api_provider.dart';
 
 class SplashPage extends StatefulWidget {
   @override

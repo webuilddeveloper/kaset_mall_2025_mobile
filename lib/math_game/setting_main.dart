@@ -9,12 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:kaset_mall/delete_user.dart';
-import 'package:kaset_mall/delivery_address.dart';
-import 'package:kaset_mall/my_credit_card.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/user_profile_form.dart';
-import 'package:kaset_mall/widget/header.dart';
+import 'package:kasetmall/delete_user.dart';
+import 'package:kasetmall/delivery_address.dart';
+import 'package:kasetmall/my_credit_card.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/user_profile_form.dart';
+import 'package:kasetmall/widget/header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingMain extends StatefulWidget {

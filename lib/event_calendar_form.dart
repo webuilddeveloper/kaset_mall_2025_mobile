@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/component/comment.dart';
-import 'package:kaset_mall/component/content.dart';
+import 'package:kasetmall/component/comment.dart';
+import 'package:kasetmall/component/content.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../component/button_close_back.dart';

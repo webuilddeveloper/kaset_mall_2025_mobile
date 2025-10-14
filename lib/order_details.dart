@@ -5,11 +5,11 @@ import 'package:clipboard/clipboard.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/component/toast_fail.dart';
-import 'package:kaset_mall/payment_status.dart';
-import 'package:kaset_mall/product_from.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/scroll_behavior.dart';
+import 'package:kasetmall/component/toast_fail.dart';
+import 'package:kasetmall/payment_status.dart';
+import 'package:kasetmall/product_from.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/scroll_behavior.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../component/link_url_in.dart';

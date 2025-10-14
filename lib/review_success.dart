@@ -2,8 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/data_error.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/data_error.dart';
 
 import '../component/gallery_view.dart';
 import '../component/loading_image_network.dart';

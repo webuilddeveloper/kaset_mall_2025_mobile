@@ -1,12 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/component/carousel_form.dart';
-import 'package:kaset_mall/component/link_url_in.dart';
-import 'package:kaset_mall/component/loading_image_network.dart';
-import 'package:kaset_mall/component/material/loading_tween.dart';
-import 'package:kaset_mall/exercise_main.dart';
-import 'package:kaset_mall/login.dart';
+import 'package:kasetmall/component/carousel_form.dart';
+import 'package:kasetmall/component/link_url_in.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
+import 'package:kasetmall/component/material/loading_tween.dart';
+import 'package:kasetmall/exercise_main.dart';
+import 'package:kasetmall/login.dart';
 
 class CarouselBanner extends StatefulWidget {
   CarouselBanner({Key? key, this.model, this.url, this.height = 70})

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/component/blank_data.dart';
-import 'package:kaset_mall/event_calendar_form.dart';
+import 'package:kasetmall/component/blank_data.dart';
+import 'package:kasetmall/event_calendar_form.dart';
 
 class EventCalendarListVertical extends StatefulWidget {
   EventCalendarListVertical({

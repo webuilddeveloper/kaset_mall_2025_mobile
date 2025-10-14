@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/cart.dart';
-import 'package:kaset_mall/product_from.dart';
-import 'package:kaset_mall/widget/search_result.dart';
+import 'package:kasetmall/cart.dart';
+import 'package:kasetmall/product_from.dart';
+import 'package:kasetmall/widget/search_result.dart';
 import 'package:toast/toast.dart';
 import 'package:video_player/video_player.dart';
 

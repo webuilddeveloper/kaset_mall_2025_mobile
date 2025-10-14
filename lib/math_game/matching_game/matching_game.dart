@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:kaset_mall/math_game/setting_main.dart';
+import 'package:kasetmall/math_game/setting_main.dart';
 
 class MatchingGameScreen extends StatefulWidget {
   @override

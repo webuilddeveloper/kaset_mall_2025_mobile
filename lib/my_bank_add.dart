@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/widget/header.dart';
+import 'package:kasetmall/widget/header.dart';
 
 class MyBankAddCentralPage extends StatefulWidget {
   MyBankAddCentralPage({Key? key, this.code, this.title, this.callback})

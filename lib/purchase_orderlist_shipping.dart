@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/purchase_payment.dart';
+import 'package:kasetmall/purchase_payment.dart';
 
 class PurchaseOrderShippingSum extends StatefulWidget {
   final dynamic order;

@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/component/key_search.dart';
-import 'package:kaset_mall/component/loading_image_network.dart';
-import 'package:kaset_mall/component/material/loading_tween.dart';
-import 'package:kaset_mall/news_form.dart';
-import 'package:kaset_mall/privilege_form.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/shared/extension.dart';
+import 'package:kasetmall/component/key_search.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
+import 'package:kasetmall/component/material/loading_tween.dart';
+import 'package:kasetmall/news_form.dart';
+import 'package:kasetmall/privilege_form.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/extension.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 // ignore: must_be_immutable

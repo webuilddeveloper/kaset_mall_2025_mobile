@@ -3,11 +3,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/history_coupon.dart';
-import 'package:kaset_mall/login.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/user_profile_form.dart';
-import 'package:kaset_mall/verify_phone.dart';
+import 'package:kasetmall/history_coupon.dart';
+import 'package:kasetmall/login.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/user_profile_form.dart';
+import 'package:kasetmall/verify_phone.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../shared/extension.dart';

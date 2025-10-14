@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/text_form_field.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/text_form_field.dart';
 import '../../login.dart';
 import '../widget/header.dart';
 import '../widget/text_field.dart';

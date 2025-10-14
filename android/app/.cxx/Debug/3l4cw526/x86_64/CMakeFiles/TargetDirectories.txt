@@ -1,0 +1,2 @@
+/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86_64/CMakeFiles/edit_cache.dir
+/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86_64/CMakeFiles/rebuild_cache.dir

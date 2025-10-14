@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/cart.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/scroll_behavior.dart';
-import 'package:kaset_mall/widget/search_result.dart';
+import 'package:kasetmall/cart.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/scroll_behavior.dart';
+import 'package:kasetmall/widget/search_result.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class SearchPage extends StatefulWidget {

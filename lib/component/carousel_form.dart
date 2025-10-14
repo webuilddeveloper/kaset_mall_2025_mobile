@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart';
-import 'package:kaset_mall/component/button_close_back.dart';
-import 'package:kaset_mall/component/content_carousel.dart';
+import 'package:kasetmall/component/button_close_back.dart';
+import 'package:kasetmall/component/content_carousel.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 // ignore: must_be_immutable

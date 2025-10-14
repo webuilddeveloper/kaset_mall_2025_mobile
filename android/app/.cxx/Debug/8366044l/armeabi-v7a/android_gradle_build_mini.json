@@ -6,14 +6,14 @@
     [
       "/Users/webuild/Library/Android/sdk/cmake/3.22.1/bin/ninja",
       "-C",
-      "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/Debug/8366044l/armeabi-v7a",
+      "/Users/webuild/Sources/SSP/kasetmall_real/android/app/.cxx/Debug/8366044l/armeabi-v7a",
       "clean"
     ]
   ],
   "buildTargetsCommandComponents": [
     "/Users/webuild/Library/Android/sdk/cmake/3.22.1/bin/ninja",
     "-C",
-    "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/Debug/8366044l/armeabi-v7a",
+    "/Users/webuild/Sources/SSP/kasetmall_real/android/app/.cxx/Debug/8366044l/armeabi-v7a",
     "{LIST_OF_TARGETS_TO_BUILD}"
   ],
   "libraries": {}

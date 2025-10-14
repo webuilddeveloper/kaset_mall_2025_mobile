@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/widget/header.dart';
+import 'package:kasetmall/widget/header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../shared/api_provider.dart';

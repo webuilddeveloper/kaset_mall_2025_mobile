@@ -4,16 +4,16 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/forgot_password.dart';
-import 'package:kaset_mall/menu.dart';
-import 'package:kaset_mall/register.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/shared/apple.dart';
-import 'package:kaset_mall/shared/facebook_firebase.dart';
-import 'package:kaset_mall/shared/google.dart';
-import 'package:kaset_mall/shared/line.dart';
-import 'package:kaset_mall/verify_phone.dart';
-import 'package:kaset_mall/widget/text_field.dart';
+import 'package:kasetmall/forgot_password.dart';
+import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/register.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/apple.dart';
+import 'package:kasetmall/shared/facebook_firebase.dart';
+import 'package:kasetmall/shared/google.dart';
+import 'package:kasetmall/shared/line.dart';
+import 'package:kasetmall/verify_phone.dart';
+import 'package:kasetmall/widget/text_field.dart';
 
 DateTime now = new DateTime.now();
 void main() {

@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/math_game/math_game.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kasetmall/math_game/math_game.dart';
+import 'package:kasetmall/shared/api_provider.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../home.dart';

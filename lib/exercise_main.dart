@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/data_error.dart';
-import 'package:kaset_mall/widget/header.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/data_error.dart';
+import 'package:kasetmall/widget/header.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 

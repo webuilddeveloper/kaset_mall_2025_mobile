@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/component/key_search.dart';
-import 'package:kaset_mall/event_calendar_list_vertical.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kasetmall/component/key_search.dart';
+import 'package:kasetmall/event_calendar_list_vertical.dart';
+import 'package:kasetmall/shared/api_provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class EventCalendarList extends StatefulWidget {

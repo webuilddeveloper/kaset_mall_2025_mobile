@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/widget/videoForm.dart';
+import 'package:kasetmall/widget/videoForm.dart';
 import 'package:video_player/video_player.dart';
 
 class MyVideoWidget extends StatefulWidget {

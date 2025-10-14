@@ -1,4 +1,4 @@
-# kaset_mall
+# kasetmall
 
 A new Flutter project.
 

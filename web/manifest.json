@@ -1,6 +1,6 @@
 {
-    "name": "kaset_mall",
-    "short_name": "kaset_mall",
+    "name": "kasetmall",
+    "short_name": "kasetmall",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

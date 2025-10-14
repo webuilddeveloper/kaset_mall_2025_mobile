@@ -4,11 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/menu.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/verify_phone.dart';
-import 'package:kaset_mall/widget/header.dart';
-import 'package:kaset_mall/widget/input.dart';
+import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/verify_phone.dart';
+import 'package:kasetmall/widget/header.dart';
+import 'package:kasetmall/widget/input.dart';
 
 import 'home.dart';
 

@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaset_mall/purchase_menu.dart';
+import 'package:kasetmall/purchase_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:kaset_mall/purchase_order.dart';
+// import 'package:kasetmall/purchase_order.dart';
 
 class IDVerificationScreen extends StatefulWidget {
   const IDVerificationScreen({Key? key}) : super(key: key);

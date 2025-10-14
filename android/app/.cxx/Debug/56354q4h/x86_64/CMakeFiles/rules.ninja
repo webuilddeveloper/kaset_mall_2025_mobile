@@ -23,7 +23,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /Users/saksitmukdasanit/Library/Android/sdk/cmake/3.22.1/bin/cmake --regenerate-during-build -S/Users/saksitmukdasanit/Dev/flutter/packages/flutter_tools/gradle/src/main/groovy -B/Users/saksitmukdasanit/Sources/ssp/mobile_mart_v3/android/app/.cxx/Debug/56354q4h/x86_64
+  command = /Users/saksitmukdasanit/Library/Android/sdk/cmake/3.22.1/bin/cmake --regenerate-during-build -S/Users/saksitmukdasanit/Dev/flutter/packages/flutter_tools/gradle/src/main/groovy -B/Users/saksitmukdasanit/Sources/ssp/kasetmall/android/app/.cxx/Debug/56354q4h/x86_64
   description = Re-running CMake...
   generator = 1
 

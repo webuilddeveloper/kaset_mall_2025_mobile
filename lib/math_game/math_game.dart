@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kasetmall/shared/api_provider.dart';
 
 import '../../shared/extension.dart';
 

@@ -9,9 +9,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/header.dart';
-import 'package:kaset_mall/widget/image_picker.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/header.dart';
+import 'package:kasetmall/widget/image_picker.dart';
 
 class UserProfileForm extends StatefulWidget {
   UserProfileForm(

@@ -7,13 +7,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:kaset_mall/component/loading_image_network.dart';
-import 'package:kaset_mall/component/toast_fail.dart';
-import 'package:kaset_mall/confirm_order.dart';
-import 'package:kaset_mall/menu.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/shared/extension.dart';
-import 'package:kaset_mall/widget/show_loading.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
+import 'package:kasetmall/component/toast_fail.dart';
+import 'package:kasetmall/confirm_order.dart';
+import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/extension.dart';
+import 'package:kasetmall/widget/show_loading.dart';
 import 'package:uuid/uuid.dart';
 
 class CartCentralPage extends StatefulWidget {

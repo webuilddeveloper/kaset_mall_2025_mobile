@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/component/loading_image_network.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
 
 class CarouselRotation extends StatefulWidget {
   const CarouselRotation({super.key, required this.model, required this.nav});

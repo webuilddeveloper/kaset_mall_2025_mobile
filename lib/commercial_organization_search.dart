@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/menu.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
-import 'package:kaset_mall/widget/scroll_behavior.dart';
+import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/widget/scroll_behavior.dart';
 
 class CommercialOrganizationSearchPage extends StatefulWidget {
   const CommercialOrganizationSearchPage({Key? key}) : super(key: key);

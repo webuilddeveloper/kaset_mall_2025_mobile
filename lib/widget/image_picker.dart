@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:kaset_mall/widget/stack_tap.dart';
+import 'package:kasetmall/widget/stack_tap.dart';
 
 class ImageUploadPicker extends StatefulWidget {
   ImageUploadPicker({Key? key, this.onTap, this.child, required this.callback})

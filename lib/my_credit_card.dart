@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/credit_card_form_field.dart';
-import 'package:kaset_mall/my_bank_add.dart';
-import 'package:kaset_mall/my_credit_card_add.dart';
-import 'package:kaset_mall/widget/data_error.dart';
+import 'package:kasetmall/credit_card_form_field.dart';
+import 'package:kasetmall/my_bank_add.dart';
+import 'package:kasetmall/my_credit_card_add.dart';
+import 'package:kasetmall/widget/data_error.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../shared/api_provider.dart';

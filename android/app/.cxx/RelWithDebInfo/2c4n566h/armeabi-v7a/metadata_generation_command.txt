@@ -9,10 +9,10 @@
 -DCMAKE_ANDROID_NDK=/Users/webuild/Library/Android/sdk/ndk/27.0.12077973
 -DCMAKE_TOOLCHAIN_FILE=/Users/webuild/Library/Android/sdk/ndk/27.0.12077973/build/cmake/android.toolchain.cmake
 -DCMAKE_MAKE_PROGRAM=/Users/webuild/Library/Android/sdk/cmake/3.22.1/bin/ninja
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/webuild/Sources/SSP/kaset_mall_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/armeabi-v7a
--DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/webuild/Sources/SSP/kaset_mall_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/armeabi-v7a
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/webuild/Sources/SSP/kasetmall_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/armeabi-v7a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/webuild/Sources/SSP/kasetmall_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/armeabi-v7a
 -DCMAKE_BUILD_TYPE=RelWithDebInfo
--B/Users/webuild/Sources/SSP/kaset_mall_real/android/app/.cxx/RelWithDebInfo/2c4n566h/armeabi-v7a
+-B/Users/webuild/Sources/SSP/kasetmall_real/android/app/.cxx/RelWithDebInfo/2c4n566h/armeabi-v7a
 -GNinja
 -Wno-dev
 --no-warn-unused-cli

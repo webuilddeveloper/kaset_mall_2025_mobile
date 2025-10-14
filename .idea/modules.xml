@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/kaset_mall.iml" filepath="$PROJECT_DIR$/kaset_mall.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android/kaset_mall_android.iml" filepath="$PROJECT_DIR$/android/kaset_mall_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kasetmall.iml" filepath="$PROJECT_DIR$/kasetmall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/kasetmall_android.iml" filepath="$PROJECT_DIR$/android/kasetmall_android.iml" />
     </modules>
   </component>
 </project>

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/component/comment_loading.dart';
-import 'package:kaset_mall/component/toast_fail.dart';
+import 'package:kasetmall/component/comment_loading.dart';
+import 'package:kasetmall/component/toast_fail.dart';
 
 import '../shared/api_provider.dart';
 import '../shared/extension.dart';

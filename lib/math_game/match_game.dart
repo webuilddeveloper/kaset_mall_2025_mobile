@@ -7,7 +7,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kasetmall/shared/api_provider.dart';
 
 class MatchGamePage extends StatefulWidget {
   MatchGamePage({Key? key, required this.profileCode}) : super(key: key);

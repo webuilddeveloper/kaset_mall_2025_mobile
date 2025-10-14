@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:kaset_mall/purchase_shipping.dart';
-import 'package:kaset_mall/widget/dialog.dart';
+import 'package:kasetmall/purchase_shipping.dart';
+import 'package:kasetmall/widget/dialog.dart';
 
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 

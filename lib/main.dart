@@ -11,11 +11,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kaset_mall/dark_mode.dart';
-import 'package:kaset_mall/version.dart';
+import 'package:kasetmall/dark_mode.dart';
+import 'package:kasetmall/version.dart';
 import 'package:provider/provider.dart';
 // import 'package:wereward/shared/notification_service.dart';
-import 'package:kaset_mall/shared/notification_service.dart';
+import 'package:kasetmall/shared/notification_service.dart';
 
 import 'shared/api_provider.dart';
 

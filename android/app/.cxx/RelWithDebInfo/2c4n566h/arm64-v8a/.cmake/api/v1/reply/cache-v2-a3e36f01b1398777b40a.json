@@ -151,7 +151,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/arm64-v8a"
+			"value" : "/Users/webuild/Sources/SSP/kasetmall_real/android/app/.cxx/RelWithDebInfo/2c4n566h/arm64-v8a"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -763,7 +763,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/Users/webuild/Sources/SSP/mobile_mart_v3_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/arm64-v8a"
+			"value" : "/Users/webuild/Sources/SSP/kasetmall_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/arm64-v8a"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -1035,7 +1035,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/Users/webuild/Sources/SSP/mobile_mart_v3_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/arm64-v8a"
+			"value" : "/Users/webuild/Sources/SSP/kasetmall_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/arm64-v8a"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -1355,7 +1355,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/arm64-v8a"
+			"value" : "/Users/webuild/Sources/SSP/kasetmall_real/android/app/.cxx/RelWithDebInfo/2c4n566h/arm64-v8a"
 		},
 		{
 			"name" : "Project_IS_TOP_LEVEL",

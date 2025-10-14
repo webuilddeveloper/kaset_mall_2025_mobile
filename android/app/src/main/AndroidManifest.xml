@@ -110,7 +110,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="td.webuild.kaset_mall" android:host="td.webuild.kaset_mall"/>
+                <data android:scheme="td.webuild.kasetmall" android:host="td.webuild.kasetmall"/>
                 
             </intent-filter>
         </activity>
