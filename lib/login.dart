@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,10 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
       _password = "";
       _category = "";
     });
+
+    final random = Random();
+    selectedAgency = mockAgencyList[random.nextInt(mockAgencyList.length)];
+
     super.initState();
   }
 
@@ -132,7 +137,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'เข้าสู่ระบบ',
+                            'เข้าสู่ระบบ ',
                             style: TextStyle(
                               fontSize: 27,
                               fontFamily: 'Kanit',
@@ -515,6 +520,24 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
     );
   }
 
+  Map<String, dynamic>? selectedAgency;
+  // Mock list หน่วยงาน (เหมือนมาจาก API)
+  final List<Map<String, dynamic>> mockAgencyList = [
+    {'code': 10, 'title': 'กรมส่งเสริมการเกษตร'},
+    {'code': 20, 'title': 'กรมวิชาการเกษตร'},
+    {'code': 30, 'title': 'กรมปศุสัตว์'},
+    {'code': 40, 'title': 'กรมประมง'},
+    {'code': 50, 'title': 'กรมชลประทาน'},
+    {'code': 60, 'title': 'กรมหม่อนไหม'},
+    {'code': 70, 'title': 'กรมพัฒนาที่ดิน'},
+    {'code': 80, 'title': 'กรมป่าไม้'},
+    {'code': 90, 'title': 'กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช'},
+    {'code': 100, 'title': 'สำนักงานเศรษฐกิจการเกษตร (สศก.)'},
+    {'code': 110, 'title': 'องค์การตลาดเพื่อเกษตรกร (อตก.)'},
+    {'code': 120, 'title': 'สถาบันวิจัยและพัฒนาการเกษตร'},
+    {'code': 130, 'title': 'ศูนย์วิจัยและพัฒนาการเกษตรภูมิภาค'},
+  ];
+
   _buildLoginButton() {
     return Material(
       // elevation: 5.0,
@@ -529,6 +552,15 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
               .write(key: 'firstName', value: 'สมศักดิ์');
           await new FlutterSecureStorage()
               .write(key: 'lastName', value: 'ศักดิ์สม');
+
+          // mock
+          print('===============================');
+          print('selectedAgency :$selectedAgency');
+          print('selectedAgency  title:${selectedAgency?['title']}');
+
+          await new FlutterSecureStorage()
+              .write(key: 'Agency', value: '${selectedAgency?['title']}');
+
           await Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => MenuCentralPage()),

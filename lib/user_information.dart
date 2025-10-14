@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,6 +20,7 @@ import 'package:kasetmall/user_profile_form.dart';
 import 'package:kasetmall/verify_phone.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'chats_staff.dart';
 import '../component/link_url_in.dart';
 import '../component/loading_image_network.dart';
@@ -30,6 +32,8 @@ import 'cart.dart';
 import 'coupons_pickup.dart';
 import 'delivery_address.dart';
 import 'login.dart';
+
+import 'dart:math';
 
 class UserInformationCentralPage extends StatefulWidget {
   @override
@@ -112,6 +116,7 @@ class _UserInformationCentralPageState
   String profilePhone = '';
   var profileFirstName;
   var profileLastName;
+  var agency;
 
   bool isShop = false;
   String verifyPhonePage = 'false';
@@ -150,6 +155,22 @@ class _UserInformationCentralPageState
     // _refreshController.loadComplete();
   }
 
+  final Map<String, Color> agencyColors = {
+    'กรมส่งเสริมการเกษตร': Colors.green,
+    'กรมวิชาการเกษตร': Colors.orange,
+    'กรมปศุสัตว์': Colors.brown,
+    'กรมประมง': Colors.blue,
+    'กรมชลประทาน': Colors.lightBlue,
+    'กรมหม่อนไหม': Colors.purple,
+    'กรมพัฒนาที่ดิน': Colors.teal,
+    'กรมป่าไม้': Colors.greenAccent,
+    'กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช': Colors.red,
+    'สำนักงานเศรษฐกิจการเกษตร (สศก.)': Colors.indigo,
+    'องค์การตลาดเพื่อเกษตรกร (อตก.)': Colors.deepOrange,
+    'สถาบันวิจัยและพัฒนาการเกษตร': Colors.cyan,
+    'ศูนย์วิจัยและพัฒนาการเกษตรภูมิภาค': Colors.amber,
+  };
+
   _getUserData() async {
     // var a = await storage.read(key: 'phoneVerified');
     // setState(() {
@@ -161,19 +182,25 @@ class _UserInformationCentralPageState
         await new FlutterSecureStorage().read(key: 'lastName') ?? "";
     final isShop =
         await new FlutterSecureStorage().read(key: 'isShop') ?? "false";
+
+    final Agency = await new FlutterSecureStorage().read(key: 'Agency') ?? "";
+
+    print('============>>> agency : ${Agency}');
+
     setState(() {
       profileFirstName = fistName;
       profileLastName = lastName;
       isShopRegis = isShop;
+      agency = Agency;
     });
     Timer(
       Duration(seconds: 1),
-      () => {
+      () {
         setState(
           () {
             loadingSuccess = true;
           },
-        ),
+        );
       },
     );
   }
@@ -284,7 +311,7 @@ class _UserInformationCentralPageState
             ? _isNotProfileCode()
             : _isProfileCode(),
         Positioned(
-          top: 25,
+          top: 12,
           // bottom: -30,
           right: 20,
           child: GestureDetector(
@@ -544,16 +571,19 @@ class _UserInformationCentralPageState
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25.0),
                     border: Border.all(
-                      color: Theme.of(context).primaryColor,
+                      color: agencyColors[agency] ??
+                          Theme.of(context).primaryColor,
                     ),
                   ),
                   child: Text(
-                    memberType == '1' ? 'สมาชิกเกษตรกร' : 'สมาชิกร้านค้า',
+                    memberType == '1' ? '$agency' : 'สมาชิกร้านค้า',
                     style: TextStyle(
                       fontFamily: 'Kanit',
                       fontSize: 15,
-                      color: Theme.of(context).primaryColor,
+                      color: agencyColors[agency] ??
+                          Theme.of(context).primaryColor,
                     ),
+                    maxLines: 2,
                     textScaleFactor: ScaleSize.textScaleFactor(context),
                   ),
                 ),
