@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/widget/text_form_field.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/widget/text_form_field.dart';
 import '../../login.dart';
 import '../widget/header.dart';
 import '../widget/text_field.dart';
@@ -30,10 +30,9 @@ class _ForgotPasswordCentralPageState extends State<ForgotPasswordCentralPage> {
   }
 
   Future<dynamic> submitForgotPassword() async {
-    postRegister(server+'forgot-password', {
+    postRegister(server + 'forgot-password', {
       'email': txtEmail.text,
-    }).then((value) => {
-    });
+    }).then((value) => {});
 
     // final result = await postObjectData('forgot-password', {
     //   'email': txtEmail.text,

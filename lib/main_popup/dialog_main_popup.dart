@@ -4,11 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_mart_v3/component/button_close_back.dart';
-import 'package:mobile_mart_v3/component/carousel_form.dart';
-import 'package:mobile_mart_v3/component/link_url_in.dart';
-import 'package:mobile_mart_v3/main_popup/mainpop_up_form.dart';
-
+import 'package:kaset_mall/component/button_close_back.dart';
+import 'package:kaset_mall/component/carousel_form.dart';
+import 'package:kaset_mall/component/link_url_in.dart';
+import 'package:kaset_mall/main_popup/mainpop_up_form.dart';
 
 class MainPopupDialog extends StatefulWidget {
   MainPopupDialog(

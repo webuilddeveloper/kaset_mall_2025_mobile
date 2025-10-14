@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/register_shop.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/verify_phone.dart';
-import 'package:mobile_mart_v3/widget/header.dart';
-import 'package:mobile_mart_v3/widget/input.dart';
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/register_shop.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/verify_phone.dart';
+import 'package:kaset_mall/widget/header.dart';
+import 'package:kaset_mall/widget/input.dart';
 
 import 'home.dart';
 
@@ -695,8 +695,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => RegisterShopPage(
-                      ),
+                      builder: (_) => RegisterShopPage(),
                     ),
                   );
                 },

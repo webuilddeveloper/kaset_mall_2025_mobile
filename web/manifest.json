@@ -1,6 +1,6 @@
 {
-    "name": "mobile_mart_v3",
-    "short_name": "mobile_mart_v3",
+    "name": "kaset_mall",
+    "short_name": "kaset_mall",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

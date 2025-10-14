@@ -5,11 +5,11 @@ import 'package:clipboard/clipboard.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/component/toast_fail.dart';
-import 'package:mobile_mart_v3/payment_status.dart';
-import 'package:mobile_mart_v3/product_from.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/widget/scroll_behavior.dart';
+import 'package:kaset_mall/component/toast_fail.dart';
+import 'package:kaset_mall/payment_status.dart';
+import 'package:kaset_mall/product_from.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/widget/scroll_behavior.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../component/link_url_in.dart';
@@ -868,8 +868,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     Flexible(
                       child: Container(
                         child: Text(
-                          (modelProduct['taxId'] ?? '-')
-                              .toString(),
+                          (modelProduct['taxId'] ?? '-').toString(),
                           style: TextStyle(
                             fontSize: 13,
                             // fontWeight: FontWeight.bold,
@@ -879,7 +878,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ],
                 ),
-              
               ]),
         ),
         Container(
@@ -960,8 +958,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               Container(
                 child: _buildListProduct(
-                    modelProduct,
-                  ),
+                  modelProduct,
+                ),
                 // ListView.separated(
                 //   shrinkWrap: true,
                 //   physics: ClampingScrollPhysics(),
@@ -1028,28 +1026,28 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               // for (var i = 0;
               //     i < modelProduct['order_details']['data'].length;
               //     i++)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      child: Text(
-                        'ยอดสินค้า',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        '${moneyFormat(modelProduct['price'].toString())} บาท',
-                        style: TextStyle(
-                          fontSize: 14,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    child: Text(
+                      'ยอดสินค้า',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
                           // fontWeight: FontWeight.bold,
-                        ),
+                          ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      '${moneyFormat(modelProduct['price'].toString())} บาท',
+                      style: TextStyle(
+                        fontSize: 14,
+                        // fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: 5,
               ),
@@ -1377,8 +1375,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        (modelProduct['taxId'] ?? '-')
-                            .toString(),
+                        (modelProduct['taxId'] ?? '-').toString(),
                         style: TextStyle(
                           fontSize: 13,
                           // fontWeight: FontWeight.bold,
@@ -1574,8 +1571,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 height: 5,
               ),
               _buildListProduct(
-                    modelProduct,
-                  ),
+                modelProduct,
+              ),
               // Container(
               //   child: ListView.separated(
               //     shrinkWrap: true,
@@ -1643,28 +1640,28 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               // for (var i = 0;
               //     i < modelProduct['order_details']['data'].length;
               //     i++)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      child: Text(
-                        'ยอดสินค้า',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
-                        style: TextStyle(
-                          fontSize: 14,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    child: Text(
+                      'ยอดสินค้า',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
                           // fontWeight: FontWeight.bold,
-                        ),
+                          ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
+                      style: TextStyle(
+                        fontSize: 14,
+                        // fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: 5,
               ),
@@ -1996,8 +1993,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        (modelProduct['taxId'] ?? '-')
-                            .toString(),
+                        (modelProduct['taxId'] ?? '-').toString(),
                         style: TextStyle(
                           fontSize: 13,
                           // fontWeight: FontWeight.bold,

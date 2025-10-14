@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
 <plist version="1.0">
 	<dict>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
@@ -75,7 +76,7 @@
 		<key>FacebookClientToken</key>
 		<string>CLIENT-TOKEN</string>
 		<key>FacebookDisplayName</key>
-		<string>SUKSAPAN Mall</string>
+		<string>KASET Mall</string>
 		<key>FirebaseAppDelegateProxyEnabled</key>
 		<false />
 		<key>LSApplicationQueriesSchemes</key>
@@ -104,19 +105,19 @@
 			<true />
 		</dict>
 		<key>NSAppleMusicUsageDescription</key>
-		<string>SUKSAPAN Mall Music Usage</string>
+		<string>KASET Mall Music Usage</string>
 		<key>NSBluetoothAlwaysUsageDescription</key>
-		<string>SUKSAPAN Mall Bluetool Usage</string>
+		<string>KASET Mall Bluetool Usage</string>
 		<key>NSBluetoothPeripheralUsageDescription</key>
-		<string>SUKSAPAN Mall BluetoothPeripheral</string>
+		<string>KASET Mall BluetoothPeripheral</string>
 		<key>NSCalendarsUsageDescription</key>
-		<string>SUKSAPAN Mall Calendar Usage</string>
+		<string>KASET Mall Calendar Usage</string>
 		<key>NSCameraUsageDescription</key>
 		<string>เพื่อแสดงรูปภาพโปรไฟล์ของคุณ</string>
 		<key>NSContactsUsageDescription</key>
-		<string>SUKSAPAN Mall ต้องการเข้าถึงข้อมูลการติดต่อของคุณ</string>
+		<string>KASET Mall ต้องการเข้าถึงข้อมูลการติดต่อของคุณ</string>
 		<key>NSFaceIDUsageDescription</key>
-		<string>SUKSAPAN Mall FaceID Usage</string>
+		<string>KASET Mall FaceID Usage</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>เพื่อแสดงตำแหน่งปัจจุบันของคุณ และแนะนำสถานที่น่าสนใจให้กับคุณ</string>
 		<key>NSLocationUsageDescription</key>
@@ -124,21 +125,21 @@
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>เพื่อแสดงตำแหน่งปัจจุบันของคุณ และแนะนำสถานที่น่าสนใจให้กับคุณ</string>
 		<key>NSMicrophoneUsageDescription</key>
-		<string>SUKSAPAN Mall Microphone Usage</string>
+		<string>KASET Mall Microphone Usage</string>
 		<key>NSMotionUsageDescription</key>
-		<string>SUKSAPAN Mall Motion Usage</string>
+		<string>KASET Mall Motion Usage</string>
 		<key>NSPhotoLibraryAddUsageDescription</key>
 		<string>เพื่อแสดงรูปภาพโปรไฟล์ของคุณ</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>เพื่อแสดงรูปภาพโปรไฟล์ของคุณ</string>
 		<key>NSRemindersUsageDescription</key>
-		<string>SUKSAPAN Mall Reminder Usage</string>
+		<string>KASET Mall Reminder Usage</string>
 		<key>NSSiriUsageDescription</key>
-		<string>SUKSAPAN Mall Siri Usage</string>
+		<string>KASET Mall Siri Usage</string>
 		<key>NSSpeechRecognitionUsageDescription</key>
-		<string>SUKSAPAN Mall Speech Recognition Usage</string>
+		<string>KASET Mall Speech Recognition Usage</string>
 		<key>NSVideoSubscriberAccountUsageDescription</key>
-		<string>SUKSAPAN Mall Video Subscribe Usage</string>
+		<string>KASET Mall Video Subscribe Usage</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true />
 		<key>UIBackgroundModes</key>
@@ -172,6 +173,13 @@
 		<key>io.flutter.embedded_views_preview</key>
 		<true />
 		<key>kTCCServiceMediaLibrary</key>
-		<string>SUKSAPAN Mall MediaLibrary Usage</string>
+		<string>KASET Mall MediaLibrary Usage</string>
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>แอปต้องการเข้าถึงเครือข่ายภายในเพื่อเชื่อมต่ออุปกรณ์ในเครือข่ายเดียวกัน</string>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_http._tcp</string>
+			<string>_https._tcp</string>
+		</array>
 	</dict>
 </plist>

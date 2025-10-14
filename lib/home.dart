@@ -4,21 +4,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/cart.dart';
-import 'package:mobile_mart_v3/component/carousel_banner.dart';
-import 'package:mobile_mart_v3/component/loading_image_network.dart';
-import 'package:mobile_mart_v3/component/material/loading_tween.dart';
-import 'package:mobile_mart_v3/component/toast_fail.dart';
-import 'package:mobile_mart_v3/event_calendar_main.dart';
-import 'package:mobile_mart_v3/news_all.dart';
-import 'package:mobile_mart_v3/privilege_all.dart';
-import 'package:mobile_mart_v3/product_all.dart';
-import 'package:mobile_mart_v3/product_from.dart';
-import 'package:mobile_mart_v3/purchase_menu.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/shared/extension.dart';
-import 'package:mobile_mart_v3/shared/notification_service.dart';
-import 'package:mobile_mart_v3/verify_phone.dart';
+import 'package:kaset_mall/cart.dart';
+import 'package:kaset_mall/component/carousel_banner.dart';
+import 'package:kaset_mall/component/loading_image_network.dart';
+import 'package:kaset_mall/component/material/loading_tween.dart';
+import 'package:kaset_mall/component/toast_fail.dart';
+import 'package:kaset_mall/event_calendar_main.dart';
+import 'package:kaset_mall/news_all.dart';
+import 'package:kaset_mall/privilege_all.dart';
+import 'package:kaset_mall/product_all.dart';
+import 'package:kaset_mall/product_from.dart';
+import 'package:kaset_mall/purchase_menu.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/shared/extension.dart';
+import 'package:kaset_mall/shared/notification_service.dart';
+import 'package:kaset_mall/verify_phone.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -591,8 +591,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       child: CarouselBanner(
                         model: _futureBanner,
                         url: 'main/',
-                        height:
-                            (MediaQuery.of(context).size.width + (10)) / 2.4,
+                        height: MediaQuery.of(context).size.height * 0.25,
                       ),
                     ),
                   ),

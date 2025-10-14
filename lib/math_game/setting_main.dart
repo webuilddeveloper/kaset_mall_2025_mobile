@@ -9,12 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_mart_v3/delete_user.dart';
-import 'package:mobile_mart_v3/delivery_address.dart';
-import 'package:mobile_mart_v3/my_credit_card.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/user_profile_form.dart';
-import 'package:mobile_mart_v3/widget/header.dart';
+import 'package:kaset_mall/delete_user.dart';
+import 'package:kaset_mall/delivery_address.dart';
+import 'package:kaset_mall/my_credit_card.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/user_profile_form.dart';
+import 'package:kaset_mall/widget/header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingMain extends StatefulWidget {
@@ -132,8 +132,7 @@ class _SettingMain extends State<SettingMain> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   profileFirstName != null
-                      ? 
-                      Container(
+                      ? Container(
                           padding: EdgeInsets.only(bottom: 28),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,79 +178,72 @@ class _SettingMain extends State<SettingMain> {
                                   ),
                                 ),
                               ),
-                             
-                                  Container(
-                                      margin: EdgeInsets.only(bottom: 5),
-                                      child: GestureDetector(
-                                        onTap: () => {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  DeliveryAddressCentralPage(),
-                                            ),
-                                          ),
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              child: Text('ที่อยู่ของฉัน',
-                                                  style: TextStyle(
-                                                    color: Color(0xFF000000),
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                  )),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_forward_ios_rounded,
-                                              color: Color(0xFF000000),
-                                              size: 17,
-                                            )
-                                          ],
-                                        ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 5),
+                                child: GestureDetector(
+                                  onTap: () => {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            DeliveryAddressCentralPage(),
                                       ),
                                     ),
-                                  
-                                  
-                                  Container(
-                                      margin: EdgeInsets.only(bottom: 5),
-                                      child: GestureDetector(
-                                        onTap: () => {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  MyCreditCardCentralPage(),
-                                            ),
-                                          ),
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              child: Text(
-                                                  'ข้อมูลบัญชีธนาคาร / บัตร',
-                                                  style: TextStyle(
-                                                    color: Color(0xFF000000),
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                  )),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_forward_ios_rounded,
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        child: Text('ที่อยู่ของฉัน',
+                                            style: TextStyle(
                                               color: Color(0xFF000000),
-                                              size: 17,
-                                            )
-                                          ],
-                                        ),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.normal,
+                                            )),
                                       ),
-                                    )
-                                 
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: Color(0xFF000000),
+                                        size: 17,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(bottom: 5),
+                                child: GestureDetector(
+                                  onTap: () => {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            MyCreditCardCentralPage(),
+                                      ),
+                                    ),
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        child: Text('ข้อมูลบัญชีธนาคาร / บัตร',
+                                            style: TextStyle(
+                                              color: Color(0xFF000000),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.normal,
+                                            )),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: Color(0xFF000000),
+                                        size: 17,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
                             ],
                           ),
                         )
@@ -519,8 +511,7 @@ class _SettingMain extends State<SettingMain> {
                   ),
 
                   profileFirstName != null
-                      ? 
-                      Row(
+                      ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             MaterialButton(

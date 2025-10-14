@@ -4,16 +4,16 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/forgot_password.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/register.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/shared/apple.dart';
-import 'package:mobile_mart_v3/shared/facebook_firebase.dart';
-import 'package:mobile_mart_v3/shared/google.dart';
-import 'package:mobile_mart_v3/shared/line.dart';
-import 'package:mobile_mart_v3/verify_phone.dart';
-import 'package:mobile_mart_v3/widget/text_field.dart';
+import 'package:kaset_mall/forgot_password.dart';
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/register.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/shared/apple.dart';
+import 'package:kaset_mall/shared/facebook_firebase.dart';
+import 'package:kaset_mall/shared/google.dart';
+import 'package:kaset_mall/shared/line.dart';
+import 'package:kaset_mall/verify_phone.dart';
+import 'package:kaset_mall/widget/text_field.dart';
 
 DateTime now = new DateTime.now();
 void main() {
@@ -87,12 +87,12 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
         },
         child: Container(
             decoration: BoxDecoration(
-              // image: DecorationImage(
-              //   image: AssetImage("assets/bg_login.png"),
-              //   fit: BoxFit.cover,
-              // ),
-              // color: Colors.white
-            ),
+                // image: DecorationImage(
+                //   image: AssetImage("assets/bg_login.png"),
+                //   fit: BoxFit.cover,
+                // ),
+                // color: Colors.white
+                ),
             child: SafeArea(
               child: Center(
                 child: ListView(
@@ -119,7 +119,9 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(19),
                         // color: Colors.white.withOpacity(0.63),
-                        color: Theme.of(context).primaryColorLight.withOpacity(0.3),
+                        color: Theme.of(context)
+                            .primaryColorLight
+                            .withOpacity(0.3),
                         // border: Border.all(
                         //   // width: 1,
                         //   // color: Theme.of(context).accentColor,
@@ -132,10 +134,11 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                           Text(
                             'เข้าสู่ระบบ',
                             style: TextStyle(
-                                fontSize: 27,
-                                fontFamily: 'Kanit',
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).primaryColor,),
+                              fontSize: 27,
+                              fontFamily: 'Kanit',
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
                           ),
                           SizedBox(height: 10.0),
                           labelTextField(
@@ -523,14 +526,13 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
         onPressed: () async {
           // loginWithGuest();
           await new FlutterSecureStorage()
-          .write(key: 'firstName', value: 'สมศักดิ์');
+              .write(key: 'firstName', value: 'สมศักดิ์');
           await new FlutterSecureStorage()
-          .write(key: 'lastName', value: 'ศักดิ์สม');
+              .write(key: 'lastName', value: 'ศักดิ์สม');
           await Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MenuCentralPage()),
-                          (route) => false);
+              context,
+              MaterialPageRoute(builder: (context) => MenuCentralPage()),
+              (route) => false);
         },
         child: new Text(
           'เข้าสู่ระบบ',

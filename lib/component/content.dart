@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:mobile_mart_v3/component/link_url_out.dart';
+import 'package:kaset_mall/component/link_url_out.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -41,7 +41,8 @@ class ContentState extends State<Content> {
     super.initState();
     // sharedApi();
     print('>>>>>> code: ${widget.code}');
-    _futureModel = postObjectData(widget.url!, {'skip': 0, 'limit': 1, 'code': widget.code});
+    _futureModel = postObjectData(
+        widget.url!, {'skip': 0, 'limit': 1, 'code': widget.code});
 
     // readGallery();
   }
@@ -93,7 +94,6 @@ class ContentState extends State<Content> {
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         // AsyncSnapshot<Your object type>
         if (snapshot.hasData) {
-         
           // setState(() {
           //   urlImage = [snapshot.data[0].imageUrl];
           // });
@@ -301,7 +301,6 @@ class ContentState extends State<Content> {
         model['fileUrl'] != '' ? fileUrl(model) : Container(),
       ],
     );
-  
   }
 
   linkButton(dynamic model) {
@@ -315,16 +314,16 @@ class ContentState extends State<Content> {
             borderRadius: BorderRadius.circular(12.0),
             color: Theme.of(context).primaryColor,
             gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Theme.of(context).primaryColor,
-                    Theme.of(context).primaryColorLight,
-                  ],
-                  stops: [
-                    0.0,
-                    0.8
-                  ]),
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).primaryColorLight,
+                ],
+                stops: [
+                  0.0,
+                  0.8
+                ]),
           ),
           child: GestureDetector(
             // minWidth: MediaQuery.of(context).size.width,

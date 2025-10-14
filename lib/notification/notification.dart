@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/notification/notification_main.dart';
+import 'package:kaset_mall/notification/notification_main.dart';
 
 import '../cart.dart';
 

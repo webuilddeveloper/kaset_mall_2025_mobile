@@ -2,8 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/widget/data_error.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/widget/data_error.dart';
 
 import '../component/gallery_view.dart';
 import '../component/loading_image_network.dart';
@@ -173,7 +173,7 @@ class _ReviewSuccessPageState extends State<ReviewSuccessPage> {
                         Icons.star,
                         color: Colors.amber,
                       ),
-                      itemSize: 15, onRatingUpdate: (double value) {  },
+                      itemSize: 15, onRatingUpdate: (double value) {},
                       // onRatingUpdate: (rating) {
                       //   setState(() {
                       //     _rating = rating.toInt();
@@ -197,34 +197,37 @@ class _ReviewSuccessPageState extends State<ReviewSuccessPage> {
                     // SizedBox(
                     //   height: 10,
                     // ),
-                    param['media']['data'].length > 0 ?
-                    Container(
-                      height:AdaptiveTextSize().getadaptiveTextSize(context, 30),
-                      padding: EdgeInsets.only(top: 0),
-                      child: ListView.separated(
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.horizontal,
-                        separatorBuilder: (_, __) => SizedBox(width: 5),
-                        itemCount: param['media']['data'].length,
-                        itemBuilder: (context, index) => ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: GestureDetector(
-                            onTap: () {
-                              showCupertinoDialog(
-                                context: context,
-                                builder: (context) {
-                                  return ImageViewer(
-                                    initialIndex: 0,
-                                    imageProviders: images.map((e) => NetworkImage(e['url'])).toList() ?? [],
-                                  );
-                                },
-                              );
-                              
-                          
-                            },
-                            child: 
-                                // Text(param['media']['data'][index]['url'].toString())
-                                loadingImageNetwork(
+                    param['media']['data'].length > 0
+                        ? Container(
+                            height: AdaptiveTextSize()
+                                .getadaptiveTextSize(context, 30),
+                            padding: EdgeInsets.only(top: 0),
+                            child: ListView.separated(
+                              padding: EdgeInsets.zero,
+                              scrollDirection: Axis.horizontal,
+                              separatorBuilder: (_, __) => SizedBox(width: 5),
+                              itemCount: param['media']['data'].length,
+                              itemBuilder: (context, index) => ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showCupertinoDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ImageViewer(
+                                          initialIndex: 0,
+                                          imageProviders: images
+                                                  .map((e) =>
+                                                      NetworkImage(e['url']))
+                                                  .toList() ??
+                                              [],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child:
+                                      // Text(param['media']['data'][index]['url'].toString())
+                                      loadingImageNetwork(
                                     // _checkImage(param['media']['data'][index]['url']),
                                     param['media']['data'][index]['url'],
                                     height: AdaptiveTextSize()
@@ -232,10 +235,11 @@ class _ReviewSuccessPageState extends State<ReviewSuccessPage> {
                                     width: AdaptiveTextSize()
                                         .getadaptiveTextSize(context, 50),
                                   ),
-                          ),
-                        ),
-                      ),
-                    ) : Container(),
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(),
 
                     // InkWell(
                     //   onTap:

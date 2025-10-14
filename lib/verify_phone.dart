@@ -6,9 +6,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/widget/text_field.dart';
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/widget/text_field.dart';
 
 DateTime now = new DateTime.now();
 void main() {
@@ -16,7 +16,7 @@ void main() {
 }
 
 class VerifyPhonePage extends StatefulWidget {
-  VerifyPhonePage({Key? key, this.title , this.sendOtp}) : super(key: key);
+  VerifyPhonePage({Key? key, this.title, this.sendOtp}) : super(key: key);
   final String? title;
   bool? sendOtp;
   @override
@@ -41,9 +41,8 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
     if (sendOTP) {
       _reSendOTP();
     }
-    
+
     super.initState();
-    
   }
 
   @override
@@ -111,128 +110,127 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
                   //     borderRadius: BorderRadius.circular(19.0),
                   //   ),
                   //   elevation: 10,
-                  //   child: 
-                    Container(
-                      margin: EdgeInsets.only(top: 20),
-                      padding: EdgeInsets.all(30),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(19),
-                          color: Colors.white.withOpacity(0.63),
-                          // border: Border.all(
-                          //   // width: 1,
-                          //   // color: Theme.of(context).accentColor,
-                          // ),
-                        ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            alignment: Alignment.center,
-                            child: Text(
-                              'ยืนยัน OTP',
-                              style: TextStyle(
-                                  fontSize: 27,
-                                  fontFamily: 'Kanit',
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0XFF0B24FB)),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          SizedBox(height: 5.0),
-                          Text(
-                            'กรุณาตรวจสอบรหัส OTP ที่ได้รับทาง SMS ของเบอร์โทรศัพท์ที่ลงทะเบียน',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Kanit',
-                                // fontWeight: FontWeight.bold,
-                                color: Color(0xFF707070)),
-                          ),
-                          Text(
-                            '** หากไม่ได้รับรหัส OTP ทาง SMS กรุณากดขอรหัส OTP อีกครั้ง **',
-                            style: TextStyle(
-                                fontSize: 10,
-                                fontFamily: 'Kanit',
-                                // fontWeight: FontWeight.bold,
-                                color: Color(0xFFDF0B24)),
-                          ),
-                          SizedBox(height: 15.0),
-                          textFieldCentral(
-                            verification_code,
-                            null,
-                            'กรุณากรอกรหัส OTP ที่ได้รับ',
-                            'กรุณากรอกรหัส OTP ที่ได้รับ',
-                            true,
-                            false,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                TextButton(
-                                  child: Text(
-                                      buttonIsActive == false
-                                          ? 'ขอรหัส OTP อีกครั้ง'
-                                          : 'ขอรหัสใหม่ได้ในอีก ${countDownNumber.toString()} วินาที',
-                                      style: TextStyle(fontSize: 14)),
-                                  style: ButtonStyle(
-                                    foregroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            buttonIsActive == false
-                                                ? Colors.black
-                                                : Colors.grey),
-                                  ),
-                                  onPressed: () {
-                                    // _reSendOTP();
-                                    buttonIsActive == false
-                                        ? _countDown()
-                                        : null;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 0.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (verification_code.text == null || verification_code.text == '') { 
-                                    } else {
-                                      _sendOTP();
-                                    }
-                                  },
-                                  child: Text(
-                                    "ยืนยัน OTP",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'Kanit',
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFFFFFFFF),
-                                    ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFDF0B24),
-                                    // shadowColor: Color(0xFFDF0B24),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 25.0,
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          30), // <-- Radius
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                  //   child:
+                  Container(
+                    margin: EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.all(30),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(19),
+                      color: Colors.white.withOpacity(0.63),
+                      // border: Border.all(
+                      //   // width: 1,
+                      //   // color: Theme.of(context).accentColor,
+                      // ),
                     ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'ยืนยัน OTP',
+                            style: TextStyle(
+                                fontSize: 27,
+                                fontFamily: 'Kanit',
+                                fontWeight: FontWeight.w600,
+                                color: Color(0XFF0B24FB)),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        Text(
+                          'กรุณาตรวจสอบรหัส OTP ที่ได้รับทาง SMS ของเบอร์โทรศัพท์ที่ลงทะเบียน',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Kanit',
+                              // fontWeight: FontWeight.bold,
+                              color: Color(0xFF707070)),
+                        ),
+                        Text(
+                          '** หากไม่ได้รับรหัส OTP ทาง SMS กรุณากดขอรหัส OTP อีกครั้ง **',
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: 'Kanit',
+                              // fontWeight: FontWeight.bold,
+                              color: Color(0xFFDF0B24)),
+                        ),
+                        SizedBox(height: 15.0),
+                        textFieldCentral(
+                          verification_code,
+                          null,
+                          'กรุณากรอกรหัส OTP ที่ได้รับ',
+                          'กรุณากรอกรหัส OTP ที่ได้รับ',
+                          true,
+                          false,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              TextButton(
+                                child: Text(
+                                    buttonIsActive == false
+                                        ? 'ขอรหัส OTP อีกครั้ง'
+                                        : 'ขอรหัสใหม่ได้ในอีก ${countDownNumber.toString()} วินาที',
+                                    style: TextStyle(fontSize: 14)),
+                                style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          buttonIsActive == false
+                                              ? Colors.black
+                                              : Colors.grey),
+                                ),
+                                onPressed: () {
+                                  // _reSendOTP();
+                                  buttonIsActive == false ? _countDown() : null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 0.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (verification_code.text == null ||
+                                      verification_code.text == '') {
+                                  } else {
+                                    _sendOTP();
+                                  }
+                                },
+                                child: Text(
+                                  "ยืนยัน OTP",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontFamily: 'Kanit',
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFFFFFFFF),
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFFDF0B24),
+                                  // shadowColor: Color(0xFFDF0B24),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 25.0,
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(30), // <-- Radius
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   // ),
                 ],
               ),
@@ -280,9 +278,8 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
   _reSendOTP() async {
     get('${server}users/verify/otp/resend');
     // a.then((value) => {
-      
+
     // });
-   
   }
 
   _countDown() {
@@ -358,8 +355,8 @@ class _VerifyPhonePageState extends State<VerifyPhonePage> {
     //     });
 
     if (result['phone_verified'] == true) {
-      await new FlutterSecureStorage()
-            .write(key: 'phoneVerified', value: result['phone_verified'].toString());
+      await new FlutterSecureStorage().write(
+          key: 'phoneVerified', value: result['phone_verified'].toString());
       return showDialog(
           barrierDismissible: false,
           context: context,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/notification/notification_form.dart';
+import 'package:kaset_mall/notification/notification_form.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../shared/api_provider.dart';

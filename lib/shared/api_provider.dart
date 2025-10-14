@@ -2,8 +2,8 @@ import 'dart:convert';
 // import 'package:camera/camera.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/models/user.dart';
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/models/user.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -12,8 +12,8 @@ import 'package:http_parser/http_parser.dart';
 import 'dart:io';
 
 const appName = 'SUKSAPAN Mall';
-const versionName = '1.6.2';
-const versionNumber = 162;
+const versionName = '0.0.1';
+const versionNumber = 001;
 
 // flutter build apk --build-name=1.0.0 --build-number=1
 // flutter build appbundle
@@ -55,7 +55,8 @@ const aboutUsApi = server + "m/aboutus/";
 const welfareApi = server + 'm/welfare/';
 const welfareGalleryApi = server + 'm/welfare/gallery/read';
 const eventCalendarApi = server_we_build + 'm/eventCalendar/';
-const eventCalendarGalleryApi = server_we_build + 'm/eventCalendar/gallery/read';
+const eventCalendarGalleryApi =
+    server_we_build + 'm/eventCalendar/gallery/read';
 const pollGalleryApi = server + 'm/poll/gallery/read';
 const reporterApi = server + 'm/v2/reporter/';
 const reporterGalleryApi = server + 'm/Reporter/gallery/';
@@ -333,7 +334,6 @@ Future<dynamic> post(String url, dynamic criteria) async {
     "Content-Type": "application/json"
   });
   var data = json.decode(response.body);
-  
 
   return Future.value(data['objectData']);
 }

@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:773066081983:android:df4a69b17adb4a5151680a",
         "android_client_info": {
-          "package_name": "td.webuild.ssp"
+          "package_name": "td.webuild.kaset_mall"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "773066081983-6374t8cdc5u5p1utaadobotr95pqglim.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "td.webuild.ssp",
+            "package_name": "td.webuild.kaset_mall",
             "certificate_hash": "64c096db56886970dcec9f9429f2542b30acc842"
           }
         },
@@ -25,7 +25,7 @@
           "client_id": "773066081983-c4lbq801fq3m46fipt4dbe6c6c51qj0v.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "td.webuild.ssp",
+            "package_name": "td.webuild.kaset_mall",
             "certificate_hash": "513a21e01cacda73a6fb7cd1155024be57457ea7"
           }
         },
@@ -33,7 +33,7 @@
           "client_id": "773066081983-m5hqmc0cgp0r9u7mi2infkd5832cdjlk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "td.webuild.ssp",
+            "package_name": "td.webuild.kaset_mall",
             "certificate_hash": "feb7f6fecc08344b4abfc2ae4c07a7e6b41bcc24"
           }
         },
@@ -41,7 +41,7 @@
           "client_id": "773066081983-udu4iurgv4p86sf9cdhuj3ang6prshhh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "td.webuild.ssp",
+            "package_name": "td.webuild.kaset_mall",
             "certificate_hash": "a492c8e734a3afcc4b81acacfcb7bc8ba7a752dc"
           }
         },
@@ -66,7 +66,7 @@
               "client_id": "773066081983-eqsp8qc9fridlun1s4k7fdvhmjl6kpvu.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "td.webuild.ssp"
+                "bundle_id": "td.webuild.kaset_mall"
               }
             }
           ]

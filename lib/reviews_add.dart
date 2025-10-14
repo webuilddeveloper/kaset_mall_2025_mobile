@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_mart_v3/component/loading_image_network.dart';
-import 'package:mobile_mart_v3/component/toast_fail.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/to_rate.dart';
-import 'package:mobile_mart_v3/widget/image_picker.dart';
-import 'package:mobile_mart_v3/widget/loading_page.dart';
+import 'package:kaset_mall/component/loading_image_network.dart';
+import 'package:kaset_mall/component/toast_fail.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/to_rate.dart';
+import 'package:kaset_mall/widget/image_picker.dart';
+import 'package:kaset_mall/widget/loading_page.dart';
 import '../widget/header.dart';
 import 'package:http_parser/http_parser.dart';
 

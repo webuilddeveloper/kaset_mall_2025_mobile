@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:mobile_mart_v3/math_game/setting_main.dart';
+import 'package:kaset_mall/math_game/setting_main.dart';
 
 class MatchingGameScreen extends StatefulWidget {
   @override
@@ -277,7 +277,8 @@ class _MatchingGameScreenState extends State<MatchingGameScreen> {
                                               matchedPairs[pairId] =
                                                   data; // เก็บรูปที่จับคู่
                                             });
-                                            print('------345------$matchedPairs');
+                                            print(
+                                                '------345------$matchedPairs');
                                           },
                                           builder: (context, candidateData,
                                               rejectedData) {
@@ -313,8 +314,7 @@ class _MatchingGameScreenState extends State<MatchingGameScreen> {
                                                       ),
                                                       // SizedBox(height: 8),
                                                       // แสดงรูปที่เลือกหรือข้อความว่าง
-                                                      matchedPairs[pairId] !=
-                                                              ""
+                                                      matchedPairs[pairId] != ""
                                                           ? Image.network(
                                                               matchedPairs[
                                                                   pairId]!,

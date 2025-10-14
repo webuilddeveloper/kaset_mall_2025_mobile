@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/component/comment.dart';
-import 'package:mobile_mart_v3/component/content.dart';
+import 'package:kaset_mall/component/comment.dart';
+import 'package:kaset_mall/component/content.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../component/button_close_back.dart';
@@ -66,26 +66,26 @@ class _PrivilegeForm extends State<PrivilegeForm> {
         child: Stack(
           children: [
             ListView(
-                physics: ClampingScrollPhysics(),
-                padding: EdgeInsets.zero,
-                children: [
-                  Content(
-                    pathShare: 'content/privilege/',
-                    code: widget.model['code'],
-                    url: '${privilegeApi}/read',
-                    model: widget.model,
-                    urlGallery: widget.urlGallery,
-                  ),
-                  // widget.urlComment != '' ? comment! : Container(),
-                ],
-              ),
+              physics: ClampingScrollPhysics(),
+              padding: EdgeInsets.zero,
+              children: [
+                Content(
+                  pathShare: 'content/privilege/',
+                  code: widget.model['code'],
+                  url: '${privilegeApi}/read',
+                  model: widget.model,
+                  urlGallery: widget.urlGallery,
+                ),
+                // widget.urlComment != '' ? comment! : Container(),
+              ],
+            ),
             Content(
-                    pathShare: 'content/privilege/',
-                    code: widget.model['code'],
-                    url: '${privilegeApi}/read',
-                    model: widget.model,
-                    urlGallery: widget.urlGallery,
-                  ),
+              pathShare: 'content/privilege/',
+              code: widget.model['code'],
+              url: '${privilegeApi}/read',
+              model: widget.model,
+              urlGallery: widget.urlGallery,
+            ),
             Positioned(
               right: 0,
               top: 0,

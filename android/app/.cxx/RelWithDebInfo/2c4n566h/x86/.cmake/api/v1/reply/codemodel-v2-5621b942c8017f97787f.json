@@ -32,7 +32,7 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86",
+		"build" : "/Users/webuild/Sources/SSP/kaset_mall_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86",
 		"source" : "/Users/webuild/Development/flutter/packages/flutter_tools/gradle/src/main/groovy"
 	},
 	"version" : 

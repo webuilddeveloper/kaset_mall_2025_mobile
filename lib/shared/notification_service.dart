@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final storage = new FlutterSecureStorage();

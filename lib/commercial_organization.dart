@@ -5,14 +5,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mobile_mart_v3/commercial_organization_search.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/widget/scroll_behavior.dart';
-import 'package:mobile_mart_v3/widget/text_header.dart';
+import 'package:kaset_mall/commercial_organization_search.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/widget/scroll_behavior.dart';
+import 'package:kaset_mall/widget/text_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../component/link_url_in.dart';
 import 'cart.dart';
-import 'package:google_maps_flutter_platform_interface/src/types/marker.dart' as google_maps_marker;
+import 'package:google_maps_flutter_platform_interface/src/types/marker.dart'
+    as google_maps_marker;
 
 class CommercialOrganizationPage extends StatefulWidget {
   const CommercialOrganizationPage({
@@ -66,8 +67,8 @@ class _CommercialOrganizationPageState
   }
 
   _readBranch() async {
-    _futureBranch = postDio(
-        server_we_build + 'branch/read', {'code': widget.commercialOrganization});
+    _futureBranch = postDio(server_we_build + 'branch/read',
+        {'code': widget.commercialOrganization});
   }
 
   Widget googleMap(double lat, double lng) {
@@ -191,10 +192,11 @@ class _CommercialOrganizationPageState
   }
 
   column1(dynamic model) {
-    print('latitude ============ ${double.tryParse(model['latitude'].toString())}');
+    print(
+        'latitude ============ ${double.tryParse(model['latitude'].toString())}');
     // print('longitude ============ ${double.parse(model['longitude']).runtimeType}');
-            // model['latitude'].toString() ?? lat,
-            // model['longitude'].toString() ?? lng,
+    // model['latitude'].toString() ?? lat,
+    // model['longitude'].toString() ?? lng,
     return Container(
       color: Color(0xFFFFFFFF),
       // padding: const EdgeInsets.only(right: 15, left: 15, top: 20),
@@ -490,8 +492,10 @@ class _CommercialOrganizationPageState
             child: googleMap(
               // model['latitude'] ?? double.parse(lat),
               // model['longitude'] ?? double.parse(lng),
-              double.tryParse(model['latitude'].toString()) ?? double.tryParse(lat)!,
-              double.tryParse(model['longitude'].toString()) ?? double.tryParse(lng)!,
+              double.tryParse(model['latitude'].toString()) ??
+                  double.tryParse(lat)!,
+              double.tryParse(model['longitude'].toString()) ??
+                  double.tryParse(lng)!,
             ),
           ),
           Container(

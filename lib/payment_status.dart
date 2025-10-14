@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/shared/extension.dart';
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/shared/extension.dart';
 
 import '../component/link_url_in.dart';
 
@@ -286,7 +286,7 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
                   Icons.qr_code_2,
                   size: 400,
                 ),
-              ), 
+              ),
               // gen Qr Code
               // Row(
               //   mainAxisAlignment: MainAxisAlignment.center,

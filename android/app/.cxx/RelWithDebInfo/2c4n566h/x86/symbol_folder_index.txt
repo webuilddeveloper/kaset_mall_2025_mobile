@@ -1,1 +1,1 @@
-/Users/webuild/Sources/SSP/mobile_mart_v3_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/x86
+/Users/webuild/Sources/SSP/kaset_mall_real/build/app/intermediates/cxx/RelWithDebInfo/2c4n566h/obj/x86

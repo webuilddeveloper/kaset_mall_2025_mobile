@@ -151,7 +151,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/mobile_mart_v3/android/app/.cxx/Debug/3h36p272/x86"
+			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/kaset_mall/android/app/.cxx/Debug/3h36p272/x86"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -763,7 +763,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/mobile_mart_v3/build/app/intermediates/cxx/Debug/3h36p272/obj/x86"
+			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/kaset_mall/build/app/intermediates/cxx/Debug/3h36p272/obj/x86"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -1035,7 +1035,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/mobile_mart_v3/build/app/intermediates/cxx/Debug/3h36p272/obj/x86"
+			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/kaset_mall/build/app/intermediates/cxx/Debug/3h36p272/obj/x86"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -1355,7 +1355,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/mobile_mart_v3/android/app/.cxx/Debug/3h36p272/x86"
+			"value" : "/Users/panuwitchaiton/webuild/ssm_mall/kaset_mall/android/app/.cxx/Debug/3h36p272/x86"
 		},
 		{
 			"name" : "Project_IS_TOP_LEVEL",

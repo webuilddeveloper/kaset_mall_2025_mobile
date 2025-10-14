@@ -7,13 +7,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:mobile_mart_v3/component/loading_image_network.dart';
-import 'package:mobile_mart_v3/component/toast_fail.dart';
-import 'package:mobile_mart_v3/confirm_order.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/shared/extension.dart';
-import 'package:mobile_mart_v3/widget/show_loading.dart';
+import 'package:kaset_mall/component/loading_image_network.dart';
+import 'package:kaset_mall/component/toast_fail.dart';
+import 'package:kaset_mall/confirm_order.dart';
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/shared/extension.dart';
+import 'package:kaset_mall/widget/show_loading.dart';
 import 'package:uuid/uuid.dart';
 
 class CartCentralPage extends StatefulWidget {
@@ -949,7 +949,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
             'assets/images/cart.png',
             height: 50,
             width: 50,
-            color: Color(0xFF0B24FB),
+            color: Color(0xFF09665a),
           ),
           SizedBox(height: 15),
           InkWell(

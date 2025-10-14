@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/component/comment_loading.dart';
-import 'package:mobile_mart_v3/component/toast_fail.dart';
+import 'package:kaset_mall/component/comment_loading.dart';
+import 'package:kaset_mall/component/toast_fail.dart';
 
 import '../shared/api_provider.dart';
 import '../shared/extension.dart';
@@ -193,10 +193,7 @@ class _Comment extends State<Comment> {
             children: [
               Text(
                 'ความคิดเห็น',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -237,7 +234,9 @@ class _Comment extends State<Comment> {
         physics: ClampingScrollPhysics(), // 2nd
         // scrollDirection: Axis.horizontal,
         itemCount: model.length,
-        separatorBuilder: (context, index) => SizedBox(height: 20,),
+        separatorBuilder: (context, index) => SizedBox(
+          height: 20,
+        ),
         itemBuilder: (context, index) {
           return ListTile(
             leading: Container(

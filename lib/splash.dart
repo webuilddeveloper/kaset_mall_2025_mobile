@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -24,7 +23,7 @@ class _SplashPageState extends State<SplashPage> {
     return _buildSplash();
   }
 
-  _callRead() async{
+  _callRead() async {
     futureModel = postDio('${server_we_build}m/splash/read', {});
   }
 

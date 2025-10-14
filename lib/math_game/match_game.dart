@@ -7,7 +7,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
 
 class MatchGamePage extends StatefulWidget {
   MatchGamePage({Key? key, required this.profileCode}) : super(key: key);
@@ -354,7 +354,9 @@ class _MatchGamePageState extends State<MatchGamePage>
                       child: Text(
                         'เริ่มเกมส์เลย',
                         style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.w500,color: Colors.white),
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
                       ),
                     ),
                   ),
@@ -390,7 +392,9 @@ class _MatchGamePageState extends State<MatchGamePage>
                       child: Text(
                         'ดูอันดับคะแนนคนเก่ง',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500,color: Colors.white),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
                       ),
                     ),
                   ),
@@ -414,8 +418,14 @@ class _MatchGamePageState extends State<MatchGamePage>
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Center(child: Text('  ย้อนกลับ  ',style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.w500,color: Colors.white),)),
+              child: Center(
+                  child: Text(
+                '  ย้อนกลับ  ',
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
+              )),
             )),
       ],
     );
@@ -510,10 +520,9 @@ class _MatchGamePageState extends State<MatchGamePage>
               child: Text(
                 'ออกจากเกมส์',
                 style: TextStyle(
-                  fontSize: 16, 
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white
-                ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
               ),
             ),
           ],
@@ -787,7 +796,10 @@ class _MatchGamePageState extends State<MatchGamePage>
               },
               child: Text(
                 'กลับหน้าหลัก',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500,color: Colors.white),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
               ),
             ),
           ],
@@ -1263,7 +1275,10 @@ class _MatchGamePageState extends State<MatchGamePage>
               },
               child: Text(
                 'ดูผลคะแนน',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500,color: Colors.white),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
               ),
             ),
             SizedBox(
@@ -1289,7 +1304,10 @@ class _MatchGamePageState extends State<MatchGamePage>
               },
               child: Text(
                 'กลับหน้ากลัก',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500,color: Colors.white),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
               ),
             )
           ],

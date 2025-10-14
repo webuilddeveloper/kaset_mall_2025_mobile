@@ -3,12 +3,11 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/cart.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/widget/scroll_behavior.dart';
-import 'package:mobile_mart_v3/widget/search_result.dart';
+import 'package:kaset_mall/cart.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/widget/scroll_behavior.dart';
+import 'package:kaset_mall/widget/search_result.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -598,7 +597,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-   _buildSearchWrap(List<dynamic> model) {
+  _buildSearchWrap(List<dynamic> model) {
     return Wrap(
       spacing: 6,
       runSpacing: 8,
@@ -636,7 +635,6 @@ class _SearchPageState extends State<SearchPage> {
           .toList(),
     );
   }
-
 
   _resultSearch() {
     return Material(

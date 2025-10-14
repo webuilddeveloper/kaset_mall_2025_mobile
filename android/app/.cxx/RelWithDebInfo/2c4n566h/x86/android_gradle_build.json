@@ -6,14 +6,14 @@
     [
       "/Users/webuild/Library/Android/sdk/cmake/3.22.1/bin/ninja",
       "-C",
-      "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86",
+      "/Users/webuild/Sources/SSP/kaset_mall_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86",
       "clean"
     ]
   ],
   "buildTargetsCommandComponents": [
     "/Users/webuild/Library/Android/sdk/cmake/3.22.1/bin/ninja",
     "-C",
-    "/Users/webuild/Sources/SSP/mobile_mart_v3_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86",
+    "/Users/webuild/Sources/SSP/kaset_mall_real/android/app/.cxx/RelWithDebInfo/2c4n566h/x86",
     "{LIST_OF_TARGETS_TO_BUILD}"
   ],
   "libraries": {},

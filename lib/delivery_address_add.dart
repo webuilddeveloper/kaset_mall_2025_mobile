@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/widget/data_error.dart';
-import 'package:mobile_mart_v3/widget/loading_page.dart';
-import 'package:mobile_mart_v3/widget/stack_tap.dart';
+import 'package:kaset_mall/widget/data_error.dart';
+import 'package:kaset_mall/widget/loading_page.dart';
+import 'package:kaset_mall/widget/stack_tap.dart';
 import 'package:toast/toast.dart';
 import '../shared/api_provider.dart';
 import '../widget/header.dart';

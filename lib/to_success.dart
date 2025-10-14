@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/payment_status.dart';
-import 'package:mobile_mart_v3/widget/data_error.dart';
+import 'package:kaset_mall/payment_status.dart';
+import 'package:kaset_mall/widget/data_error.dart';
 
 import '../component/loading_image_network.dart';
 import '../shared/api_provider.dart';

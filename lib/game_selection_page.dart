@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/cart.dart';
-import 'package:mobile_mart_v3/math_game/match_game.dart';
-import 'package:mobile_mart_v3/math_game/matching_game/matching_game_main.dart';
-import 'package:mobile_mart_v3/math_game/math_game_main.dart';
-
+import 'package:kaset_mall/cart.dart';
+import 'package:kaset_mall/math_game/match_game.dart';
+import 'package:kaset_mall/math_game/matching_game/matching_game_main.dart';
+import 'package:kaset_mall/math_game/math_game_main.dart';
 
 class GameSelectionPage extends StatelessWidget {
   get profileCode => null;

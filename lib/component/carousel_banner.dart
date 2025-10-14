@@ -1,12 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/component/carousel_form.dart';
-import 'package:mobile_mart_v3/component/link_url_in.dart';
-import 'package:mobile_mart_v3/component/loading_image_network.dart';
-import 'package:mobile_mart_v3/component/material/loading_tween.dart';
-import 'package:mobile_mart_v3/exercise_main.dart';
-import 'package:mobile_mart_v3/login.dart';
+import 'package:kaset_mall/component/carousel_form.dart';
+import 'package:kaset_mall/component/link_url_in.dart';
+import 'package:kaset_mall/component/loading_image_network.dart';
+import 'package:kaset_mall/component/material/loading_tween.dart';
+import 'package:kaset_mall/exercise_main.dart';
+import 'package:kaset_mall/login.dart';
 
 class CarouselBanner extends StatefulWidget {
   CarouselBanner({Key? key, this.model, this.url, this.height = 70})
@@ -199,7 +199,7 @@ class _CarouselBanner extends State<CarouselBanner>
                           borderRadius: BorderRadius.circular(10),
                           child: loadingImageNetwork(
                             document['imageUrl'],
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                             height: double.infinity,
                             width: double.infinity,
                           ),

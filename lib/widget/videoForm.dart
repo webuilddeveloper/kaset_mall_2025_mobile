@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/cart.dart';
-import 'package:mobile_mart_v3/product_from.dart';
-import 'package:mobile_mart_v3/widget/search_result.dart';
+import 'package:kaset_mall/cart.dart';
+import 'package:kaset_mall/product_from.dart';
+import 'package:kaset_mall/widget/search_result.dart';
 import 'package:toast/toast.dart';
 import 'package:video_player/video_player.dart';
 
@@ -341,7 +341,7 @@ class _VideoAppState extends State<VideoApp> {
       () {
         getData(server + 'products/$productId').then(
           (value) async => {
-             setState(
+            setState(
               () {
                 if (value != null) {
                   _controller.pause();

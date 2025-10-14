@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/widget/header.dart';
+import 'package:kaset_mall/widget/header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../shared/api_provider.dart';
@@ -61,11 +61,11 @@ class _NotificationFormPage extends State<NotificationFormPage> {
                 widget.model['imageUrl'] != "" &&
                         widget.model['imageUrl'] != null
                     ? Image.network(
-                      widget.model['imageUrl'],
-                      height: MediaQuery.of(context).size.width,
-                      width: MediaQuery.of(context).size.width,
-                      // fit: BoxFit.cover,
-                    )
+                        widget.model['imageUrl'],
+                        height: MediaQuery.of(context).size.width,
+                        width: MediaQuery.of(context).size.width,
+                        // fit: BoxFit.cover,
+                      )
                     : Container(
                         height: 250,
                         // width: (height * 12) / 100,

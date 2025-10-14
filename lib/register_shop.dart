@@ -4,11 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/menu.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/verify_phone.dart';
-import 'package:mobile_mart_v3/widget/header.dart';
-import 'package:mobile_mart_v3/widget/input.dart';
+import 'package:kaset_mall/menu.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/verify_phone.dart';
+import 'package:kaset_mall/widget/header.dart';
+import 'package:kaset_mall/widget/input.dart';
 
 import 'home.dart';
 
@@ -471,9 +471,9 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
                   //   submitRegister();
                   // }
                   new FlutterSecureStorage()
-                    .write(key: 'isShop', value: 'true');
+                      .write(key: 'isShop', value: 'true');
                   new FlutterSecureStorage()
-                    .write(key: 'shopName', value: 'Farmer Shop');
+                      .write(key: 'shopName', value: 'Farmer Shop');
 
                   _buildDialogSuccess();
                 },

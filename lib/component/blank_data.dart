@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/blank_page/blank_loading.dart';
+import 'package:kaset_mall/blank_page/blank_loading.dart';
 
 blankListData(BuildContext context, {double height = 100}) {
   return Container(

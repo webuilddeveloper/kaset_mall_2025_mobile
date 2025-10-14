@@ -4,14 +4,14 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_mart_v3/component/key_search.dart';
-import 'package:mobile_mart_v3/component/loading_image_network.dart';
-import 'package:mobile_mart_v3/component/material/loading_tween.dart';
-import 'package:mobile_mart_v3/news_form.dart';
-import 'package:mobile_mart_v3/product_from.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
-import 'package:mobile_mart_v3/shared/extension.dart';
-import 'package:mobile_mart_v3/verify_phone.dart';
+import 'package:kaset_mall/component/key_search.dart';
+import 'package:kaset_mall/component/loading_image_network.dart';
+import 'package:kaset_mall/component/material/loading_tween.dart';
+import 'package:kaset_mall/news_form.dart';
+import 'package:kaset_mall/product_from.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
+import 'package:kaset_mall/shared/extension.dart';
+import 'package:kaset_mall/verify_phone.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 // ignore: must_be_immutable
@@ -75,8 +75,8 @@ class _NewsAllPageState extends State<NewsAllPage> {
   _callRead() async {
     setState(() {
       loadProduct = true;
-      _futureModel = postObjectData(
-          newsApi + '/read', {"keySearch": keySearch, "category": categorySelected});
+      _futureModel = postObjectData(newsApi + '/read',
+          {"keySearch": keySearch, "category": categorySelected});
 
       // Timer(
       //   Duration(seconds: 1),

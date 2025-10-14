@@ -1,7 +1,6 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_mart_v3/shared/api_provider.dart';
+import 'package:kaset_mall/shared/api_provider.dart';
 
 import '../component/link_url_in.dart';
 import 'menu.dart';
@@ -25,7 +24,6 @@ class _DeleteUserState extends State<DeleteUser> with TickerProviderStateMixin {
 
   @override
   void initState() {
-
     _callDeleteUser();
     animationController = AnimationController(
       value: 0.25,
@@ -46,9 +44,8 @@ class _DeleteUserState extends State<DeleteUser> with TickerProviderStateMixin {
   }
 
   _callDeleteUser() {
-    delete(server + 'users/me').then((value) => {
-      print('delete ===== >>>>>> ${value}')
-    });
+    delete(server + 'users/me')
+        .then((value) => {print('delete ===== >>>>>> ${value}')});
   }
 
   @override
@@ -141,16 +138,14 @@ class _DeleteUserState extends State<DeleteUser> with TickerProviderStateMixin {
         ),
         InkWell(
           onTap: () {
-            
             launchInWebViewWithJavaScript('mailto:korn.th@mywawa.me');
           },
           child: Text(
             'korn.th@mywawa.me',
             style: TextStyle(
-              fontSize: 16,
-              color: Color.fromARGB(255, 13, 150, 213),
-              fontWeight: FontWeight.w600
-            ),
+                fontSize: 16,
+                color: Color.fromARGB(255, 13, 150, 213),
+                fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
           ),
         ),
@@ -173,7 +168,7 @@ class _DeleteUserState extends State<DeleteUser> with TickerProviderStateMixin {
             );
             // myTimerCheck.cancel();
           },
-                 child: Container(
+          child: Container(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25),
