@@ -366,181 +366,172 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
 
   _buy() async {
     dynamic modelData;
-    if (isInvoice) {
-      // if (!isInvoiceAddress) {
-      //   // return toastFail(context,
-      //   //     text: 'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี', duration: 3);
-      //   return showDialog(
-      //       barrierDismissible: false,
-      //       context: context,
-      //       builder: (BuildContext context) {
-      //         return WillPopScope(
-      //           onWillPop: () {
-      //             return Future.value(false);
-      //           },
-      //           child: CupertinoAlertDialog(
-      //             title: new Text(
-      //               'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี',
-      //               // '',
-      //               style: TextStyle(
-      //                 fontSize: 16,
-      //                 fontFamily: 'Kanit',
-      //                 color: Colors.black,
-      //                 fontWeight: FontWeight.normal,
-      //               ),
-      //             ),
-      //             content: Text(" "),
-      //             actions: [
-      //               CupertinoDialogAction(
-      //                 isDefaultAction: true,
-      //                 child: new Text(
-      //                   "ตกลง",
-      //                   style: TextStyle(
-      //                     fontSize: 13,
-      //                     fontFamily: 'Kanit',
-      //                     color: Color(0xFF09665a),
-      //                     fontWeight: FontWeight.normal,
-      //                   ),
-      //                 ),
-      //                 onPressed: () {
-      //                   Navigator.of(context).pop();
-      //                 },
-      //               ),
-      //             ],
-      //           ),
-      //         );
-      //       });
-      // }
-      // if ((txtInvoiceBranch.text ?? '') == '') {
-      //   return toastFail(context,
-      //       text: 'กรุณาใส่ชื่อสำนังงาน/รหัสสาขา ใบกำกับภาษี', duration: 3);
-      // }
-      // if ((txtInvoiceNumber.text ?? '') == '') {
-      //   // return toastFail(context,
-      //   //     text: 'กรุณาใส่เลขประจำตัวผู้เสียภาษี', duration: 3);
-      //   return showDialog(
-      //       barrierDismissible: false,
-      //       context: context,
-      //       builder: (BuildContext context) {
-      //         return WillPopScope(
-      //           onWillPop: () {
-      //             return Future.value(false);
-      //           },
-      //           child: CupertinoAlertDialog(
-      //             title: new Text(
-      //               'กรุณาใส่เลขประจำตัวผู้เสียภาษี',
-      //               // '',
-      //               style: TextStyle(
-      //                 fontSize: 16,
-      //                 fontFamily: 'Kanit',
-      //                 color: Colors.black,
-      //                 fontWeight: FontWeight.normal,
-      //               ),
-      //             ),
-      //             content: Text(" "),
-      //             actions: [
-      //               CupertinoDialogAction(
-      //                 isDefaultAction: true,
-      //                 child: new Text(
-      //                   "ตกลง",
-      //                   style: TextStyle(
-      //                     fontSize: 13,
-      //                     fontFamily: 'Kanit',
-      //                     color: Color(0xFF09665a),
-      //                     fontWeight: FontWeight.normal,
-      //                   ),
-      //                 ),
-      //                 onPressed: () {
-      //                   Navigator.of(context).pop();
-      //                 },
-      //               ),
-      //             ],
-      //           ),
-      //         );
-      //       });
-      // }
-      setState(() {
-        // loading = true;
+    // if (isInvoice) {
+    // if (!isInvoiceAddress) {
+    //   // return toastFail(context,
+    //   //     text: 'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี', duration: 3);
+    //   return showDialog(
+    //       barrierDismissible: false,
+    //       context: context,
+    //       builder: (BuildContext context) {
+    //         return WillPopScope(
+    //           onWillPop: () {
+    //             return Future.value(false);
+    //           },
+    //           child: CupertinoAlertDialog(
+    //             title: new Text(
+    //               'กรุณาเลือกที่อยู่เพื่อใช้ในใบกำกับภาษี',
+    //               // '',
+    //               style: TextStyle(
+    //                 fontSize: 16,
+    //                 fontFamily: 'Kanit',
+    //                 color: Colors.black,
+    //                 fontWeight: FontWeight.normal,
+    //               ),
+    //             ),
+    //             content: Text(" "),
+    //             actions: [
+    //               CupertinoDialogAction(
+    //                 isDefaultAction: true,
+    //                 child: new Text(
+    //                   "ตกลง",
+    //                   style: TextStyle(
+    //                     fontSize: 13,
+    //                     fontFamily: 'Kanit',
+    //                     color: Color(0xFF09665a),
+    //                     fontWeight: FontWeight.normal,
+    //                   ),
+    //                 ),
+    //                 onPressed: () {
+    //                   Navigator.of(context).pop();
+    //                 },
+    //               ),
+    //             ],
+    //           ),
+    //         );
+    //       });
+    // }
+    // if ((txtInvoiceBranch.text ?? '') == '') {
+    //   return toastFail(context,
+    //       text: 'กรุณาใส่ชื่อสำนังงาน/รหัสสาขา ใบกำกับภาษี', duration: 3);
+    // }
+    // if ((txtInvoiceNumber.text ?? '') == '') {
+    //   // return toastFail(context,
+    //   //     text: 'กรุณาใส่เลขประจำตัวผู้เสียภาษี', duration: 3);
+    //   return showDialog(
+    //       barrierDismissible: false,
+    //       context: context,
+    //       builder: (BuildContext context) {
+    //         return WillPopScope(
+    //           onWillPop: () {
+    //             return Future.value(false);
+    //           },
+    //           child: CupertinoAlertDialog(
+    //             title: new Text(
+    //               'กรุณาใส่เลขประจำตัวผู้เสียภาษี',
+    //               // '',
+    //               style: TextStyle(
+    //                 fontSize: 16,
+    //                 fontFamily: 'Kanit',
+    //                 color: Colors.black,
+    //                 fontWeight: FontWeight.normal,
+    //               ),
+    //             ),
+    //             content: Text(" "),
+    //             actions: [
+    //               CupertinoDialogAction(
+    //                 isDefaultAction: true,
+    //                 child: new Text(
+    //                   "ตกลง",
+    //                   style: TextStyle(
+    //                     fontSize: 13,
+    //                     fontFamily: 'Kanit',
+    //                     color: Color(0xFF09665a),
+    //                     fontWeight: FontWeight.normal,
+    //                   ),
+    //                 ),
+    //                 onPressed: () {
+    //                   Navigator.of(context).pop();
+    //                 },
+    //               ),
+    //             ],
+    //           ),
+    //         );
+    //       });
+    // }
+    setState(() {
+      // loading = true;
 
-        // postObjectData(server + 'orders/', {
-        //   'shipping_address_id': address['code'],
-        //   'coupon_id': couponsCode,
-        //   'shipping_price': deliveryPrice,
-        //   'tax_invoice_address_id': addressInvoice['code'],
-        //   'tax_invoice_branch': (txtInvoiceBranch.text ?? ''),
-        //   'tax_identification_number': txtInvoiceNumber.text,
-        //   'carts': cares_id
-        // }).then(
-        //   (value) => {
-        //     print('-- PO 4'),
-        //     modelData = {
-        //       'payment_type': creditCardCode,
-        //       // 'order_id': 'order_BYW95EGWJDN6VK'
-        //       'order_id': value['id']
-        //     },
-        // loading = false,
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PaymentStatusCentralPage(model: modelData),
-          ),
-          // ),
-          // },
-        );
-      });
-    } else {
-      setState(() {
-        loading = true;
-      });
-      try {
-        postObjectData(server + 'orders/', {
-          'shipping_address_id': address['code'],
-          'coupon_id': couponsCode,
-          'shipping_price': deliveryPrice,
-          'carts': cares_id
-        }).then(
-          (value) async => {
-            print('--===--===--==-- ${value}'),
-            setState(
-              () async {
-                // if (value['status2'] == 'S') {
+      // postObjectData(server + 'orders/', {
+      //   'shipping_address_id': address['code'],
+      //   'coupon_id': couponsCode,
+      //   'shipping_price': deliveryPrice,
+      //   'tax_invoice_address_id': addressInvoice['code'],
+      //   'tax_invoice_branch': (txtInvoiceBranch.text ?? ''),
+      //   'tax_identification_number': txtInvoiceNumber.text,
+      //   'carts': cares_id
+      // }).then(
+      //   (value) => {
+      //     print('-- PO 4'),
+      //     modelData = {
+      //       'payment_type': creditCardCode,
+      //       // 'order_id': 'order_BYW95EGWJDN6VK'
+      //       'order_id': value['id']
+      //     },
+      // loading = false,
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PaymentStatusCentralPage(model: modelData),
+        ),
+        // ),
+        // },
+      );
+    });
+    // } else {
+    //   setState(() {
+    //     loading = true;
+    //   });
+    //   try {
+    //     postObjectData(server + 'orders/', {
+    //       'shipping_address_id': address['code'],
+    //       'coupon_id': couponsCode,
+    //       'shipping_price': deliveryPrice,
+    //       'carts': cares_id
+    //     }).then(
+    //       (value) async => {
+    //         print('--===--===--==-- ${value}'),
+    //         setState(
+    //           () async {
+    //             // if (value['status2'] == 'S') {
 
-                // } else {
-                //   loading = false;
-                //   toastFail(context, text: value['error_message']);
-                // }
-                print('==================');
-                print('-------->> $creditCardCode');
-                modelData = {
-                  'payment_type': creditCardCode,
-
-                  // 'order_id': 'order_BYW95EGWJDN6VK'
-                  'order_id': value['id']
-                };
-                print('=======1111===========');
-                print(modelData.runtimeType);
-                print(modelData.toString());
-                print(modelData);
-                print('=========1111=========');
-
-                loading = false;
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => PaymentStatusCentralPage(model: modelData),
-                  ),
-                );
-              },
-            )
-          },
-        );
-      } catch (e) {
-        setState(() {
-          loading = false;
-        });
-        toastFail(context, text: e.toString());
-      }
-    }
+    //             // } else {
+    //             //   loading = false;
+    //             //   toastFail(context, text: value['error_message']);
+    //             // }
+    //             modelData = {
+    //               'payment_type': creditCardCode,
+    //               // 'order_id': 'order_BYW95EGWJDN6VK'
+    //               'order_id': value['id']
+    //             };
+    //             loading = false;
+    //             await Navigator.push(
+    //               context,
+    //               MaterialPageRoute(
+    //                 builder: (_) => PaymentStatusCentralPage(model: modelData),
+    //               ),
+    //             );
+    //           },
+    //         )
+    //       },
+    //     );
+    //   } catch (e) {
+    //     setState(() {
+    //       loading = false;
+    //     });
+    //     toastFail(context, text: e.toString());
+    //   }
+    // }
     // if (creditCardCode == '1') {
 
     // } else if (creditCardCode == '2') {
