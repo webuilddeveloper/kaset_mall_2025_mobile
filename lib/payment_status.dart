@@ -32,6 +32,11 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
 
   @override
   void initState() {
+    print('=======initState=========');
+    print(widget.model);
+    print(widget.model['payment_type']);
+    print(widget.model['order_id']);
+    print('=======initState=========');
     if (widget.model['payment_type'] == '3') {
       _getQRCode();
     }

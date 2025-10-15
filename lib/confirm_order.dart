@@ -509,11 +509,20 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                 //   loading = false;
                 //   toastFail(context, text: value['error_message']);
                 // }
+                print('==================');
+                print('-------->> $creditCardCode');
                 modelData = {
                   'payment_type': creditCardCode,
+
                   // 'order_id': 'order_BYW95EGWJDN6VK'
                   'order_id': value['id']
                 };
+                print('=======1111===========');
+                print(modelData.runtimeType);
+                print(modelData.toString());
+                print(modelData);
+                print('=========1111=========');
+
                 loading = false;
                 await Navigator.push(
                   context,

@@ -599,7 +599,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 25, vertical: 10),
                         child: Text(
-                          'ชำระเงิน',
+                          'ชำระเงิน ',
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,

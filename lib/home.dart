@@ -951,6 +951,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                           MaterialPageRoute(
                             builder: (context) => EventCalendarFormPage(
                               model: snapshot.data[index],
+                              // code: model['code'],
                             ),
                           ),
                         );
