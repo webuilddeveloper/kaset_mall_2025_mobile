@@ -1001,7 +1001,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                 page = 0;
                               },
                             ),
-                            _onLoading(),
+                            _hotSale(),
                           },
                           child: Text(
                             'เครื่องมือ',
