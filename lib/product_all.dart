@@ -73,11 +73,70 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     super.dispose();
   }
 
+  // final List<dynamic> mockProductList = [
+  //   {
+  //     'id': 1,
+  //     'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
+  //     'type': '1', // พรรณพืช
+  //     'price': 120.0,
+  //     'description':
+  //         'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
+  //     'image':
+  //         'https://www.doae.go.th/wp-content/uploads/2021/03/rice-seed.jpg',
+  //     'stock': 10,
+  //   },
+  //   {
+  //     'id': 2,
+  //     'name': 'เครื่องพ่นยาแบตเตอรี่ 20 ลิตร',
+  //     'type': '2', // เครื่องมือ
+  //     'price': 890.0,
+  //     'description':
+  //         'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
+  //     'image':
+  //         'https://www.sprayerthai.com/wp-content/uploads/2021/07/sprayer-20L.jpg',
+  //     'stock': 10,
+  //   },
+  //   {
+  //     'id': 3,
+  //     'name': 'อาหารไก่เนื้อเบอร์ 910',
+  //     'type': '3', // อาหารสัตว์
+  //     'price': 250.0,
+  //     'description':
+  //         'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
+  //     'image':
+  //         'https://www.cpffeed.com/wp-content/uploads/2019/12/910-181x300.png',
+  //     'stock': 10,
+  //   },
+  //   {
+  //     'id': 4,
+  //     'name': 'ปุ๋ยเคมีสูตร 15-15-15',
+  //     'type': '4', // เคมีภัณฑ์
+  //     'price': 450.0,
+  //     'description':
+  //         'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
+  //     'image':
+  //         'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+  //     'stock': 10,
+  //   },
+  //   {
+  //     'id': 5,
+  //     'name': 'ยาฆ่าแมลงตราช้างแดง',
+  //     'type': '4', // เคมีภัณฑ์
+  //     'price': 195.0,
+  //     'description':
+  //         'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
+  //     'image':
+  //         'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
+  //     'stock': 0,
+  //   },
+  // ];
+
   final List<dynamic> mockProductList = [
+    // พรรณพืช
     {
       'id': 1,
       'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
-      'type': '1', // พรรณพืช
+      'type': '1',
       'price': 120.0,
       'description':
           'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
@@ -86,9 +145,52 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       'stock': 10,
     },
     {
+      'id': 6,
+      'name': 'เมล็ดพันธุ์ผักบุ้งจีน',
+      'type': '1',
+      'price': 35.0,
+      'description':
+          'เมล็ดพันธุ์ผักบุ้งจีน ปลูกง่าย โตเร็ว เหมาะสำหรับปลูกในฤดูฝน',
+      'image':
+          'https://www.doae.go.th/wp-content/uploads/2021/03/vegetable-seed.jpg',
+      'stock': 50,
+    },
+    {
+      'id': 7,
+      'name': 'เมล็ดพันธุ์ถั่วฝักยาว',
+      'type': '1',
+      'price': 40.0,
+      'description': 'เมล็ดถั่วฝักยาวพันธุ์ดี ให้ผลผลิตสูง ทนโรคและแมลง',
+      'image':
+          'https://www.doae.go.th/wp-content/uploads/2021/03/longbean-seed.jpg',
+      'stock': 30,
+    },
+    {
+      'id': 8,
+      'name': 'เมล็ดพันธุ์มะเขือเทศ',
+      'type': '1',
+      'price': 50.0,
+      'description': 'มะเขือเทศพันธุ์คุณภาพ ให้ผลผลิตลูกใหญ่ สีแดงสด',
+      'image':
+          'https://www.doae.go.th/wp-content/uploads/2021/03/tomato-seed.jpg',
+      'stock': 25,
+    },
+    {
+      'id': 9,
+      'name': 'เมล็ดพันธุ์ข้าวโพดหวาน',
+      'type': '1',
+      'price': 60.0,
+      'description': 'ข้าวโพดหวานพันธุ์ดี รสหวาน ปลูกง่าย ผลผลิตสูง',
+      'image':
+          'https://www.doae.go.th/wp-content/uploads/2021/03/corn-seed.jpg',
+      'stock': 40,
+    },
+
+    // เครื่องมือ
+    {
       'id': 2,
       'name': 'เครื่องพ่นยาแบตเตอรี่ 20 ลิตร',
-      'type': '2', // เครื่องมือ
+      'type': '2',
       'price': 890.0,
       'description':
           'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
@@ -97,9 +199,51 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       'stock': 10,
     },
     {
+      'id': 10,
+      'name': 'กรรไกรตัดแต่งกิ่ง',
+      'type': '2',
+      'price': 150.0,
+      'description': 'กรรไกรคุณภาพสูง ตัดแต่งกิ่งไม้และพืชสวนได้สะดวก',
+      'image':
+          'https://www.sprayerthai.com/wp-content/uploads/2021/07/pruner.jpg',
+      'stock': 20,
+    },
+    {
+      'id': 11,
+      'name': 'จอบขุดดิน',
+      'type': '2',
+      'price': 200.0,
+      'description': 'จอบขุดดินคุณภาพ แข็งแรง ใช้งานได้นาน',
+      'image':
+          'https://www.sprayerthai.com/wp-content/uploads/2021/07/shovel.jpg',
+      'stock': 15,
+    },
+    {
+      'id': 12,
+      'name': 'สายยางรดน้ำ 20 ม.',
+      'type': '2',
+      'price': 350.0,
+      'description': 'สายยางคุณภาพสูง ยาว 20 เมตร เหมาะสำหรับรดน้ำสวน',
+      'image':
+          'https://www.sprayerthai.com/wp-content/uploads/2021/07/hose.jpg',
+      'stock': 30,
+    },
+    {
+      'id': 13,
+      'name': 'เครื่องตัดหญ้าไฟฟ้า',
+      'type': '2',
+      'price': 2500.0,
+      'description': 'เครื่องตัดหญ้าไฟฟ้า ประสิทธิภาพสูง ใช้งานง่าย',
+      'image':
+          'https://www.sprayerthai.com/wp-content/uploads/2021/07/grasscutter.jpg',
+      'stock': 5,
+    },
+
+    // อาหารสัตว์
+    {
       'id': 3,
       'name': 'อาหารไก่เนื้อเบอร์ 910',
-      'type': '3', // อาหารสัตว์
+      'type': '3',
       'price': 250.0,
       'description':
           'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
@@ -108,9 +252,51 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       'stock': 10,
     },
     {
+      'id': 14,
+      'name': 'อาหารหมูลูกพันธุ์ 101',
+      'type': '3',
+      'price': 300.0,
+      'description': 'อาหารหมูลูกพันธุ์ สำหรับลูกหมูอายุ 0-8 สัปดาห์ โปรตีนสูง',
+      'image':
+          'https://www.cpffeed.com/wp-content/uploads/2019/12/pig-feed.png',
+      'stock': 20,
+    },
+    {
+      'id': 15,
+      'name': 'อาหารปลานิล',
+      'type': '3',
+      'price': 220.0,
+      'description': 'อาหารปลานิลเม็ดคุณภาพดี ช่วยเร่งการเจริญเติบโตของปลา',
+      'image':
+          'https://www.cpffeed.com/wp-content/uploads/2019/12/fish-feed.png',
+      'stock': 25,
+    },
+    {
+      'id': 16,
+      'name': 'อาหารวัวกระทิง',
+      'type': '3',
+      'price': 400.0,
+      'description': 'อาหารวัวชนิดเม็ด เสริมโปรตีนและแร่ธาตุสำหรับวัวเนื้อ',
+      'image':
+          'https://www.cpffeed.com/wp-content/uploads/2019/12/cow-feed.png',
+      'stock': 15,
+    },
+    {
+      'id': 17,
+      'name': 'อาหารไก่ไข่เบอร์ 210',
+      'type': '3',
+      'price': 280.0,
+      'description': 'อาหารไก่ไข่ เสริมโปรตีนและแคลเซียม ให้ไข่มีคุณภาพ',
+      'image':
+          'https://www.cpffeed.com/wp-content/uploads/2019/12/layer-feed.png',
+      'stock': 20,
+    },
+
+    // เคมีภัณฑ์
+    {
       'id': 4,
       'name': 'ปุ๋ยเคมีสูตร 15-15-15',
-      'type': '4', // เคมีภัณฑ์
+      'type': '4',
       'price': 450.0,
       'description':
           'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
@@ -121,13 +307,54 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     {
       'id': 5,
       'name': 'ยาฆ่าแมลงตราช้างแดง',
-      'type': '4', // เคมีภัณฑ์
+      'type': '4',
       'price': 195.0,
       'description':
           'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
       'image':
           'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
       'stock': 0,
+    },
+    {
+      'id': 18,
+      'name': 'ปุ๋ยยูเรียเม็ด',
+      'type': '4',
+      'price': 220.0,
+      'description': 'ปุ๋ยยูเรียเสริมไนโตรเจน สำหรับพืชผลผลิตสูง',
+      'image':
+          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+      'stock': 30,
+    },
+    {
+      'id': 19,
+      'name': 'ยาฆ่าแมลงกำจัดเพลี้ย',
+      'type': '4',
+      'price': 180.0,
+      'description': 'ยาฆ่าแมลงสูตรเข้มข้น กำจัดเพลี้ยและแมลงศัตรูพืชได้ดี',
+      'image':
+          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+      'stock': 20,
+    },
+    {
+      'id': 20,
+      'name': 'ปุ๋ยสูตรฟอสฟอรัสสูง',
+      'type': '4',
+      'price': 350.0,
+      'description': 'ปุ๋ยฟอสฟอรัสสูง เพิ่มการเจริญเติบโตของรากพืช',
+      'image':
+          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+      'stock': 25,
+    },
+    {
+      'id': 21,
+      'name': 'สารปรับสภาพดิน',
+      'type': '4',
+      'price': 300.0,
+      'description':
+          'สารปรับสภาพดิน ช่วยให้ดินร่วนซุย เพิ่มประสิทธิภาพการใช้ปุ๋ย',
+      'image':
+          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+      'stock': 15,
     },
   ];
 
@@ -827,7 +1054,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                             _hotSale(),
                           },
                           child: Text(
-                            'อาหารสัตว์',
+                            'เคมีภัณฑ์',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: _filterSelected == '4'
