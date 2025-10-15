@@ -22,6 +22,7 @@ import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
 import 'package:kasetmall/shared/notification_service.dart';
 import 'package:kasetmall/verify_phone.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -385,129 +386,138 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
             margin:
                 EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10),
             padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Stack(
               children: [
-                InkWell(
-                  onTap: () async {
-                    // Check if user has previously logged in
-                    final prefs = await SharedPreferences.getInstance();
-                    final String? savedCardId =
-                        prefs.getString('saved_card_id');
+                Lottie.asset('assets/lotties/bee.json'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        // Check if user has previously logged in
+                        final prefs = await SharedPreferences.getInstance();
+                        final String? savedCardId =
+                            prefs.getString('saved_card_id');
 
-                    // if (savedCardId != null && savedCardId.isNotEmpty) {
-                    // User has logged in before, navigate directly to PurchaseMenuPage
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PurchaseMenuPage(
-                          cardid: savedCardId,
-                        ),
-                      ),
-                    );
-                    // }
-                    // else {
-                    // First time login, go to verification screen
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => IDVerificationScreen(),
-                    //   ),
-                    // );
-                    // }
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'สวัสดีตอนเช้า',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF000000),
-                        ),
-                        textScaleFactor: ScaleSize.textScaleFactor(context),
-                      ),
-                      Text(
-                        'คุณออกแบบ ทดลอง',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF000000),
-                        ),
-                        textScaleFactor: ScaleSize.textScaleFactor(context),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    // if (profileCode == '') {
-                    //   Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (BuildContext context) => LoginCentralPage(),
-                    //     ),
-                    //   );
-                    // } else if (verifyPhonePage == 'false') {
-                    //   _showVerifyCheckDialog();
-                    // } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CartCentralPage(),
-                      ),
-                    ).then((value) => _getCountItemInCart());
-                    // }
-                  },
-                  child: Stack(
-                    children: [
-                      Container(
-                        height:
-                            AdaptiveTextSize().getadaptiveTextSize(context, 35),
-                        width:
-                            AdaptiveTextSize().getadaptiveTextSize(context, 35),
-                        padding: EdgeInsets.all(8),
-                        child: Image.asset(
-                          'assets/images/kaset/basket.png',
-                          color: Color(0xFF000000),
-                          scale: AdaptiveTextSize()
-                              .getadaptiveTextSize(context, 1),
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          height: AdaptiveTextSize()
-                              .getadaptiveTextSize(context, 15),
-                          width: AdaptiveTextSize()
-                              .getadaptiveTextSize(context, 15),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFe4253f),
+                        // if (savedCardId != null && savedCardId.isNotEmpty) {
+                        // User has logged in before, navigate directly to PurchaseMenuPage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PurchaseMenuPage(
+                              cardid: savedCardId,
+                            ),
                           ),
-                          child: Text(
-                            amountItemInCart > 99
-                                ? '99+'
-                                : amountItemInCart.toString(),
+                        );
+                        // }
+                        // else {
+                        // First time login, go to verification screen
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => IDVerificationScreen(),
+                        //   ),
+                        // );
+                        // }
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'สวัสดีตอนเช้า',
                             style: TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: amountItemInCart.toString().length <= 1
-                                  ? 10
-                                  : amountItemInCart.toString().length == 2
-                                      ? 9
-                                      : 8,
-                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF000000),
                             ),
                             textScaleFactor: ScaleSize.textScaleFactor(context),
                           ),
-                        ),
+                          Text(
+                            'คุณสมศักดิ์ เกษตร',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF000000),
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () {
+                        // if (profileCode == '') {
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (BuildContext context) => LoginCentralPage(),
+                        //     ),
+                        //   );
+                        // } else if (verifyPhonePage == 'false') {
+                        //   _showVerifyCheckDialog();
+                        // } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CartCentralPage(),
+                          ),
+                        ).then((value) => _getCountItemInCart());
+                        // }
+                      },
+                      child: Stack(
+                        children: [
+                          Container(
+                            height: AdaptiveTextSize()
+                                .getadaptiveTextSize(context, 35),
+                            width: AdaptiveTextSize()
+                                .getadaptiveTextSize(context, 35),
+                            padding: EdgeInsets.all(8),
+                            child: Image.asset(
+                              'assets/images/kaset/basket.png',
+                              color: Color(0xFF000000),
+                              scale: AdaptiveTextSize()
+                                  .getadaptiveTextSize(context, 1),
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              height: AdaptiveTextSize()
+                                  .getadaptiveTextSize(context, 15),
+                              width: AdaptiveTextSize()
+                                  .getadaptiveTextSize(context, 15),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(0xFFe4253f),
+                              ),
+                              child: Text(
+                                amountItemInCart > 99
+                                    ? '99+'
+                                    : amountItemInCart.toString(),
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: amountItemInCart
+                                              .toString()
+                                              .length <=
+                                          1
+                                      ? 10
+                                      : amountItemInCart.toString().length == 2
+                                          ? 9
+                                          : 8,
+                                  color: Color.fromARGB(255, 255, 255, 255),
+                                ),
+                                textScaleFactor:
+                                    ScaleSize.textScaleFactor(context),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -567,7 +577,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     child: TextField(
                       controller: searchController,
                       decoration: InputDecoration(
-                        hintText: 'Search',
+                        hintText: 'ค้นหาผลิตภัณฑ์สินค้าเกษตร',
                         prefixIcon: Icon(Icons.search_rounded),
                         suffixIcon: Image.asset(
                           'assets/images/kaset/filter.png',
@@ -640,7 +650,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   ),
                   _buildForYou(),
 
-                  _buildTitle(title: 'สินค้า', showAll: true),
+                  _buildTitle(
+                    code: 'product',
+                    title: 'สินค้า',
+                    showAll: true,
+                  ),
                   SizedBox(height: 5),
                   _buildTrending(),
                 ],
@@ -723,16 +737,20 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            PrivilegeAllPage(title: title, mode: showAll),
+                        builder: (_) => PrivilegeAllPage(
+                          title: title,
+                          mode: showAll,
+                        ),
                       ),
                     );
                   } else {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            ProductAllCentralPage(title: title, mode: showAll),
+                        builder: (_) => ProductAllCentralPage(
+                          title: title,
+                          mode: showAll,
+                        ),
                       ),
                     ).then((value) => _getCountItemInCart());
                   }

@@ -85,29 +85,31 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       // emailProfile = dataValue['email'].toString() ?? "";
       // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
       if (widget.mode) {
-        _futureModel = postProductHotSale(
-            server_we_build + 'm/Product/readProductHot',
-            // {"per_page": "${_limit.toString()}"}
-            {});
-        _futureModel!.then((value) async => {
-              setState(() {
-                // total_page = value[0]['total_pages'];
-                _listModelMore = [...value];
-                _listModelMore.length == 0 ? loadProduct = false : true;
-              })
-            });
-      } else {
-        _futureModel =
-            postProductData(server_we_build + 'm/Product/readProduct', {});
-        _futureModel!.then((value) async => {
-              setState(() {
-                total_page = value[0]['total_pages'];
-                _listModelMore = [...value];
-                _listModelMore.length == 0 ? loadProduct = false : true;
-                print('total_page ========== ${total_page}');
-              })
-            });
-      }
+        _futureModel = mockProductList as Future?; 
+
+        print(_futureModel)
+        //     server_we_build + 'm/Product/readProductHot',
+        //     // {"per_page": "${_limit.toString()}"}
+        //     {});
+        // _futureModel!.then((value) async => {
+        //       setState(() {
+        //         // total_page = value[0]['total_pages'];
+        //         _listModelMore = [...value];
+        //         _listModelMore.length == 0 ? loadProduct = false : true;
+        //       })
+        //     });
+      // } else {
+      //   _futureModel =
+      //       postProductData(server_we_build + 'm/Product/readProduct', {});
+      //   _futureModel!.then((value) async => {
+      //         setState(() {
+      //           total_page = value[0]['total_pages'];
+      //           _listModelMore = [...value];
+      //           _listModelMore.length == 0 ? loadProduct = false : true;
+      //           print('total_page ========== ${total_page}');
+      //         })
+      //       });
+      // }
 
       // Timer(
       //   Duration(seconds: 1),
@@ -121,6 +123,64 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       // );
     });
   }
+
+  final List<Map<String, dynamic>> mockProductList = [
+    {
+      'id': 1,
+      'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
+      'type': '1', // พรรณพืช
+      'price': 120.0,
+      'description':
+          'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
+      'image':
+          'https://www.doae.go.th/wp-content/uploads/2021/03/rice-seed.jpg',
+      'stock': 10,
+    },
+    {
+      'id': 2,
+      'name': 'เครื่องพ่นยาแบตเตอรี่ 20 ลิตร',
+      'type': '2', // เครื่องมือ
+      'price': 890.0,
+      'description':
+          'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
+      'image':
+          'https://www.sprayerthai.com/wp-content/uploads/2021/07/sprayer-20L.jpg',
+      'stock': 10,
+    },
+    {
+      'id': 3,
+      'name': 'อาหารไก่เนื้อเบอร์ 910',
+      'type': '3', // อาหารสัตว์
+      'price': 250.0,
+      'description':
+          'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
+      'image':
+          'https://www.cpffeed.com/wp-content/uploads/2019/12/910-181x300.png',
+      'stock': 10,
+    },
+    {
+      'id': 4,
+      'name': 'ปุ๋ยเคมีสูตร 15-15-15',
+      'type': '4', // เคมีภัณฑ์
+      'price': 450.0,
+      'description':
+          'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
+      'image':
+          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+      'stock': 10,
+    },
+    {
+      'id': 5,
+      'name': 'ยาฆ่าแมลงตราช้างแดง',
+      'type': '4', // เคมีภัณฑ์
+      'price': 195.0,
+      'description':
+          'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
+      'image':
+          'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
+      'stock': 0,
+    },
+  ];
 
   _hotSale() {
     setState(() {
@@ -543,7 +603,9 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                     children: [
                       GestureDetector(
                         onTap: () => {
-                          setState(() => {_filterSelected = 'เกี่ยวข้อง'}),
+                          setState(() {
+                            _filterSelected = 'เกี่ยวข้อง';
+                          }),
                           _onRefresh(),
                         },
                         child: Text(
@@ -562,13 +624,13 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                       SizedBox(width: 20),
                       GestureDetector(
                         onTap: () => {
-                          setState(() => {
-                                _filterSelected = 'ขายดี',
-                                orderBy = '',
-                                loadProduct = true,
-                                changOrderKey = true,
-                                page = 0,
-                              }),
+                          setState(() {
+                            _filterSelected = 'ขายดี';
+                            orderBy = '';
+                            loadProduct = true;
+                            changOrderKey = true;
+                            page = 0;
+                          }),
                           _hotSale(),
                         },
                         child: Text(
@@ -588,14 +650,14 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                       GestureDetector(
                         onTap: () => {
                           setState(
-                            () => {
-                              _filterSelected = 'ราคา',
-                              orderKey = 'min_price',
-                              filterType = 'minPrice',
-                              orderBy = '',
-                              loadProduct = true,
-                              changOrderKey = true,
-                              page = 0,
+                            () {
+                              _filterSelected = 'ราคา';
+                              orderKey = 'min_price';
+                              filterType = 'minPrice';
+                              orderBy = '';
+                              loadProduct = true;
+                              changOrderKey = true;
+                              page = 0;
                             },
                           ),
                           _onLoading(),
