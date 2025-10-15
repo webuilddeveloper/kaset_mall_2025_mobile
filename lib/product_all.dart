@@ -85,9 +85,9 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       // emailProfile = dataValue['email'].toString() ?? "";
       // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
       if (widget.mode) {
-        _futureModel = mockProductList as Future?; 
-
-        print(_futureModel)
+        _futureModel = mockProductList as Future;
+        print('=======>>>$_futureModel ');
+        // postProductHotSale(
         //     server_we_build + 'm/Product/readProductHot',
         //     // {"per_page": "${_limit.toString()}"}
         //     {});
@@ -98,18 +98,18 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
         //         _listModelMore.length == 0 ? loadProduct = false : true;
         //       })
         //     });
-      // } else {
-      //   _futureModel =
-      //       postProductData(server_we_build + 'm/Product/readProduct', {});
-      //   _futureModel!.then((value) async => {
-      //         setState(() {
-      //           total_page = value[0]['total_pages'];
-      //           _listModelMore = [...value];
-      //           _listModelMore.length == 0 ? loadProduct = false : true;
-      //           print('total_page ========== ${total_page}');
-      //         })
-      //       });
-      // }
+        // } else {
+        // _futureModel =
+        //     postProductData(server_we_build + 'm/Product/readProduct', {});
+        // _futureModel!.then((value) async => {
+        //       setState(() {
+        //         total_page = value[0]['total_pages'];
+        //         _listModelMore = [...value];
+        //         _listModelMore.length == 0 ? loadProduct = false : true;
+        //         print('total_page ========== ${total_page}');
+        //       })
+        //     // });
+      }
 
       // Timer(
       //   Duration(seconds: 1),
