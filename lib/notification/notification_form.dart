@@ -60,7 +60,7 @@ class _NotificationFormPage extends State<NotificationFormPage> {
               children: [
                 widget.model['imageUrl'] != "" &&
                         widget.model['imageUrl'] != null
-                    ? Image.network(
+                    ? Image.asset(
                         widget.model['imageUrl'],
                         height: MediaQuery.of(context).size.width,
                         width: MediaQuery.of(context).size.width,
@@ -109,7 +109,7 @@ class _NotificationFormPage extends State<NotificationFormPage> {
               ],
             ),
           ),
-          widget.model['textButton'] != ""
+          (widget.model['textButton'] ?? "") != ""
               ? Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: GestureDetector(
@@ -275,17 +275,20 @@ class _NotificationFormPage extends State<NotificationFormPage> {
   }
 
   _buildDelete(reference) {
-    postDio(
-      server_we_build + 'notificationV2/m/deleteNoti',
-      {
-        'reference': reference,
-        'profileCode': widget.profileCode,
-        'code': widget.model['notiItemCode'] ?? ""
-      },
-    ).then((value) => {
-          print('============ ${value}'),
-          Navigator.pop(context),
-          Navigator.pop(context),
-        });
+    // postDio(
+    //   server_we_build + 'notificationV2/m/deleteNoti',
+    //   {
+    //     'reference': reference,
+    //     'profileCode': widget.profileCode,
+    //     'code': widget.model['notiItemCode'] ?? ""
+    //   },
+    // ).then((value) => {
+    //       print('============ ${value}'),
+    //       Navigator.pop(context),
+    //       Navigator.pop(context),
+    //     });
+
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 }

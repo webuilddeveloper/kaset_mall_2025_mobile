@@ -23,6 +23,30 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
   late Future<dynamic> futureNotification;
   String profileCode = "";
 
+  List<dynamic> notiList = [
+    {
+      "code": "0",
+      "title": "ลดทันที 30 บาท",
+      "description": "พิเศษสำหรับลูกค้าใหม่!!! เมื่อสั่งซื้อครั้งแรก ลดทันที 30 บาท",
+      "imageUrl": "assets/images/kaset/logo_kaset.png",
+      "status": "A",
+    },
+    {
+      "code": "1",
+      "title": "ของแถมทุกออเดอร์",
+      "description": "ฟรี!! ของแถมทุกออเดอร์ พร้อมส่วนลดลูกค้าใหม่ ด่วน!! ของมีจำนวนจำกัด",
+      "imageUrl": "assets/images/kaset/logo_kaset.png",
+      "status": "A",
+    },
+    {
+      "code": "2",
+      "title": "มาร่วมเป็นร้านค้ากับเราสิ",
+      "description": "มาสมัครเป็นร้านค้าพันธมิตรกับเรา เพื่อการกระจายสินค้าสู่แอพช็อปปิ้งออนไลน์ และส่งตรงถึงมือลูกค้าทันที ตั้งแต่วันนี้เป็นต้นไป",
+      "imageUrl": "assets/images/kaset/logo_kaset.png",
+      "status": "A",
+    }
+  ];
+
   @override
   void initState() {
     _refreshController = new RefreshController();
@@ -65,30 +89,38 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
           controller: _refreshController,
           onRefresh: _onRefresh,
           onLoading: _onLoading,
-          child: FutureBuilder(
-            future: futureNotification,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data.length > 0) {
-                  return ListView.builder(
+          child: ListView.builder(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
-                    itemCount: snapshot.data.length,
+                    itemCount: notiList.length,
                     itemBuilder: (context, index) =>
-                        card(context, snapshot.data[index], index),
-                  );
-                } else {
-                  return Center(
-                    child: Text('ไม่มีการแจ้งเตือน'),
-                  );
-                }
-              } else {
-                return Center(
-                  child: Text('ไม่มีการแจ้งเตือน'),
-                );
-              }
-            },
-          ),
+                        card(context, notiList[index], index),
+                  ),
+          // FutureBuilder(
+          //   future: futureNotification,
+          //   builder: (context, snapshot) {
+          //     if (snapshot.hasData) {
+          //       if (snapshot.data.length > 0) {
+          //         return ListView.builder(
+          //           shrinkWrap: true,
+          //           physics: ScrollPhysics(),
+          //           itemCount: snapshot.data.length,
+          //           itemBuilder: (context, index) =>
+          //               card(context, snapshot.data[index], index),
+          //         );
+          //       } else {
+          //         return Center(
+          //           child: Text('ไม่มีการแจ้งเตือน'),
+          //         );
+          //       }
+          //     } else {
+          //       return Center(
+          //         child: Text('ไม่มีการแจ้งเตือน'),
+          //       );
+          //     }
+          //   },
+          // ),
+        
         ));
   }
 
@@ -96,20 +128,20 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
     double height = MediaQuery.of(context).size.height;
     return InkWell(
       onTap: () async {
-        if (model['status'] != 'N') {
-          postDio(
-            server_we_build + 'notificationV2/m/readNoti',
-            {
-              'reference': model['code'],
-              'profileCode': _email,
-            },
-          );
-          futureNotification.then((value) => {
-                setState(() {
-                  value[index]['status'] = 'N';
-                })
-              });
-        }
+        // if (model['status'] != 'N') {
+        //   postDio(
+        //     server_we_build + 'notificationV2/m/readNoti',
+        //     {
+        //       'reference': model['code'],
+        //       'profileCode': _email,
+        //     },
+        //   );
+        //   futureNotification.then((value) => {
+        //         setState(() {
+        //           value[index]['status'] = 'N';
+        //         })
+        //       });
+        // }
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -153,7 +185,7 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
                 model['imageUrl'] != "" && model['imageUrl'] != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(100),
-                        child: Image.network(
+                        child: Image.asset(
                           model['imageUrl'],
                           height: (height * 7) / 100,
                           width: (height * 7) / 100,

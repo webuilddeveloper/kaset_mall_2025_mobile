@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:kasetmall/commercial_organization.dart';
@@ -41,6 +42,7 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
   var home;
   bool hiddenMainPopUp = false;
   late DateTime currentBackPressTime;
+  int notiCount = 3;
 
   @override
   void initState() {
@@ -205,7 +207,8 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
                         _buttonBottomBar(
                             'assets/images/kaset/basket.png', '', 1),
                         _buttonBottomBar(
-                            'assets/images/kaset/notification.png', '', 2),
+                            'assets/images/kaset/notification.png', '', 2,
+                            isNoti: true, notiCount: notiCount),
                         _buttonBottomBar(
                             (profile['imageUrl'] ?? "") == ''
                                 ? 'assets/images/kaset/user.png'
@@ -241,53 +244,107 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     return Future.value(true);
   }
 
-  _buttonBottomBar(String image, String title, int index,
-      {bool network = false}) {
+  // _buttonBottomBar(String image, String title, int index,
+  //     {bool network = false, bool isNoti = false, int notiCount = 0}) {
+  //   bool hasSelected = _currentPage == index;
+  //   return
+  //       // Expanded(
+  //       //   flex: 1,
+  //       //   child:
+  //       InkWell(
+  //     onTap: () => _onItemTapped(index),
+  //     child: Padding(
+  //       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+  //       // padding: EdgeInsets.symmetric(vertical: 25),
+  //       child: Container(
+  //         child: Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Stack(
+  //               children: [
+  //                 if (network)
+  //                   ClipRRect(
+  //                     borderRadius: BorderRadius.circular(40),
+  //                     child: loadingImageNetwork(
+  //                       image,
+  //                       height:
+  //                           AdaptiveTextSize().getadaptiveTextSize(context, 20),
+  //                       width:
+  //                           AdaptiveTextSize().getadaptiveTextSize(context, 20),
+  //                     ),
+  //                   ),
+  //                 if (!network)
+  //                   Image.asset(
+  //                     image,
+  //                     height:
+  //                         AdaptiveTextSize().getadaptiveTextSize(context, 30),
+  //                     width:
+  //                         AdaptiveTextSize().getadaptiveTextSize(context, 30),
+  //                     color:
+  //                         hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
+  //                   ),
+  //                 isNoti && notiCount > 0 ? Positioned(
+  //                   top: 0,
+  //                   right: 0,
+  //                   child: AnimatedContainer(
+  //                     duration: const Duration(milliseconds: 300),
+  //                     decoration: BoxDecoration(
+  //                       shape: BoxShape.circle,
+  //                       color: Color(0xFFa7141c),
+  //                     ),
+  //                     width: 16.0,
+  //                     height: 16.0,
+  //                     child: Center(
+  //                       child: Text(
+  //                         '${notiCount}',
+  //                         style: TextStyle().copyWith(
+  //                           color: Colors.white,
+  //                           fontSize: 10.0,
+  //                           fontFamily: 'Sarabun',
+  //                           fontWeight: FontWeight.normal,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ) : Container()
+  //               ],
+  //             ),
+  //             Text(
+  //               title,
+  //               style: TextStyle(
+  //                 fontSize: 11,
+  //                 color: hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
+  //                 fontWeight: hasSelected ? FontWeight.bold : FontWeight.normal,
+  //               ),
+  //               textScaleFactor: ScaleSize.textScaleFactor(context),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  //   // );
+  // }
+
+  _buttonBottomBar(
+    String image,
+    String title,
+    int index, {
+    bool network = false,
+    bool isNoti = false,
+    int notiCount = 0,
+  }) {
     bool hasSelected = _currentPage == index;
-    return
-        // Expanded(
-        //   flex: 1,
-        //   child:
-        InkWell(
+    return _ShakeButton(
+      image: image,
+      title: title,
+      index: index,
+      network: network,
+      isNoti: isNoti,
+      notiCount: notiCount,
+      hasSelected: hasSelected,
       onTap: () => _onItemTapped(index),
-      child: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-        // padding: EdgeInsets.symmetric(vertical: 25),
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (network)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
-                  child: loadingImageNetwork(
-                    image,
-                    height: AdaptiveTextSize().getadaptiveTextSize(context, 20),
-                    width: AdaptiveTextSize().getadaptiveTextSize(context, 20),
-                  ),
-                ),
-              if (!network)
-                Image.asset(
-                  image,
-                  height: AdaptiveTextSize().getadaptiveTextSize(context, 30),
-                  width: AdaptiveTextSize().getadaptiveTextSize(context, 30),
-                  color: hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
-                ),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
-                  fontWeight: hasSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-                textScaleFactor: ScaleSize.textScaleFactor(context),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
-    // );
   }
 
   _buildMainPopUp() async {
@@ -361,3 +418,156 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     }
   }
 }
+
+class _ShakeButton extends StatefulWidget {
+  final String image;
+  final String title;
+  final int index;
+  final bool network;
+  final bool isNoti;
+  final int notiCount;
+  final bool hasSelected;
+  final VoidCallback onTap;
+
+  const _ShakeButton({
+    Key? key,
+    required this.image,
+    required this.title,
+    required this.index,
+    required this.onTap,
+    this.network = false,
+    this.isNoti = false,
+    this.notiCount = 0,
+    this.hasSelected = false,
+  }) : super(key: key);
+
+  @override
+  State<_ShakeButton> createState() => _ShakeButtonState();
+}
+
+class _ShakeButtonState extends State<_ShakeButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _offsetAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 350),
+      vsync: this,
+    );
+
+    _offsetAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0, end: -6), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -6, end: 6), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 6, end: -3), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -3, end: 0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  void _onTap() {
+    HapticFeedback.mediumImpact(); // สั่นเครื่องเบาๆ
+    _controller.forward(from: 0); // สั่นเฉพาะปุ่มนี้
+    widget.onTap(); // เปลี่ยนหน้า
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _onTap,
+      child: AnimatedBuilder(
+        animation: _offsetAnimation,
+        builder: (context, child) {
+          return Transform.translate(
+            offset: Offset(_offsetAnimation.value, 0),
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // รูปภาพ
+                      widget.network
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(40),
+                              child: loadingImageNetwork(
+                                widget.image,
+                                height: AdaptiveTextSize()
+                                    .getadaptiveTextSize(context, 20),
+                                width: AdaptiveTextSize()
+                                    .getadaptiveTextSize(context, 20),
+                              ),
+                            )
+                          : Image.asset(
+                              widget.image,
+                              height: AdaptiveTextSize()
+                                  .getadaptiveTextSize(context, 30),
+                              width: AdaptiveTextSize()
+                                  .getadaptiveTextSize(context, 30),
+                              color: widget.hasSelected
+                                  ? const Color(0xFF09665a)
+                                  : const Color(0xFFA89F9D),
+                            ),
+
+                      // 🔴 Badge แจ้งเตือน
+                      if (widget.isNoti && widget.notiCount > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFFa7141c),
+                            ),
+                            width: 16.0,
+                            height: 16.0,
+                            child: Center(
+                              child: Text(
+                                '${widget.notiCount}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10.0,
+                                  fontFamily: 'Sarabun',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  // ชื่อด้านล่าง
+                  Text(
+                    widget.title,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: widget.hasSelected
+                          ? const Color(0xFF09665a)
+                          : const Color(0xFFA89F9D),
+                      fontWeight: widget.hasSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                    textScaleFactor: ScaleSize.textScaleFactor(context),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
