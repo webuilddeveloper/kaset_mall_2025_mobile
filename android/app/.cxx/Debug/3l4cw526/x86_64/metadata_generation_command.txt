@@ -9,10 +9,10 @@
 -DCMAKE_ANDROID_NDK=/Users/ratchanon.k/Library/Android/sdk/ndk/27.0.12077973
 -DCMAKE_TOOLCHAIN_FILE=/Users/ratchanon.k/Library/Android/sdk/ndk/27.0.12077973/build/cmake/android.toolchain.cmake
 -DCMAKE_MAKE_PROGRAM=/Users/ratchanon.k/Library/Android/sdk/cmake/3.22.1/bin/ninja
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/build/app/intermediates/cxx/Debug/3l4cw526/obj/x86_64
--DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/build/app/intermediates/cxx/Debug/3l4cw526/obj/x86_64
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/build/app/intermediates/cxx/Debug/3l4cw526/obj/x86_64
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/build/app/intermediates/cxx/Debug/3l4cw526/obj/x86_64
 -DCMAKE_BUILD_TYPE=Debug
--B/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86_64
+-B/Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86_64
 -GNinja
 -Wno-dev
 --no-warn-unused-cli

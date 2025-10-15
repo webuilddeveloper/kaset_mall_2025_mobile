@@ -39,13 +39,13 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = /Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86/
+cmake_ninja_workdir = /Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86/
 
 #############################################
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86 && /Users/ratchanon.k/Library/Android/sdk/cmake/3.22.1/bin/ccmake -S/Users/ratchanon.k/development/flutter_3.29.2/packages/flutter_tools/gradle/src/main/groovy -B/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86
+  COMMAND = cd /Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86 && /Users/ratchanon.k/Library/Android/sdk/cmake/3.22.1/bin/ccmake -S/Users/ratchanon.k/development/flutter_3.29.2/packages/flutter_tools/gradle/src/main/groovy -B/Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -57,7 +57,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86 && /Users/ratchanon.k/Library/Android/sdk/cmake/3.22.1/bin/cmake --regenerate-during-build -S/Users/ratchanon.k/development/flutter_3.29.2/packages/flutter_tools/gradle/src/main/groovy -B/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86
+  COMMAND = cd /Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86 && /Users/ratchanon.k/Library/Android/sdk/cmake/3.22.1/bin/cmake --regenerate-during-build -S/Users/ratchanon.k/development/flutter_3.29.2/packages/flutter_tools/gradle/src/main/groovy -B/Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -73,7 +73,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 
 #############################################
-# Folder: /Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86
+# Folder: /Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86
 
 build all: phony
 

@@ -1,2 +1,0 @@
-/Users/webuild/Sources/SSP/kasetmall_real/android/app/.cxx/Debug/8366044l/armeabi-v7a/CMakeFiles/edit_cache.dir
-/Users/webuild/Sources/SSP/kasetmall_real/android/app/.cxx/Debug/8366044l/armeabi-v7a/CMakeFiles/rebuild_cache.dir

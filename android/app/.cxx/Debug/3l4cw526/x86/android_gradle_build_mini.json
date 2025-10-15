@@ -6,14 +6,14 @@
     [
       "/Users/ratchanon.k/Library/Android/sdk/cmake/3.22.1/bin/ninja",
       "-C",
-      "/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86",
+      "/Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86",
       "clean"
     ]
   ],
   "buildTargetsCommandComponents": [
     "/Users/ratchanon.k/Library/Android/sdk/cmake/3.22.1/bin/ninja",
     "-C",
-    "/Users/ratchanon.k/Documents/GitHub/kasetmall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86",
+    "/Users/ratchanon.k/Documents/GitHub/kaset_mall_2025_mobile/android/app/.cxx/Debug/3l4cw526/x86",
     "{LIST_OF_TARGETS_TO_BUILD}"
   ],
   "libraries": {}

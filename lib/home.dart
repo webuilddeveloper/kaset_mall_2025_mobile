@@ -9,9 +9,12 @@ import 'package:kasetmall/component/carousel_banner.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/component/toast_fail.dart';
+import 'package:kasetmall/event_calendar_form.dart';
 import 'package:kasetmall/event_calendar_main.dart';
 import 'package:kasetmall/news_all.dart';
+import 'package:kasetmall/news_form.dart';
 import 'package:kasetmall/privilege_all.dart';
+import 'package:kasetmall/privilege_form.dart';
 import 'package:kasetmall/product_all.dart';
 import 'package:kasetmall/product_from.dart';
 import 'package:kasetmall/purchase_menu.dart';
@@ -739,7 +742,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   ? Row(
                       children: [
                         Text(
-                          'ดูทั้งหมด',
+                          'ดูทั้งหมด   ',
                           style:
                               TextStyle(fontSize: 13, color: Color(0xFFfd3131)),
                           textAlign: TextAlign.center,
@@ -842,7 +845,15 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                         snapshot.data.length > 10 ? 10 : snapshot.data.length,
                     separatorBuilder: (_, __) => SizedBox(width: 14),
                     itemBuilder: (context, index) => GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                NewsForm(model: snapshot.data[index]),
+                          ),
+                        );
+                      },
                       child: Stack(
                         children: [
                           Container(
@@ -934,7 +945,16 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                         snapshot.data.length > 10 ? 10 : snapshot.data.length,
                     separatorBuilder: (_, __) => SizedBox(width: 14),
                     itemBuilder: (context, index) => GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventCalendarFormPage(
+                              model: snapshot.data[index],
+                            ),
+                          ),
+                        );
+                      },
                       child: Stack(
                         children: [
                           Container(
@@ -1029,6 +1049,13 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     itemBuilder: (context, index) => GestureDetector(
                       onTap: () {
                         // Foryou
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                PrivilegeForm(model: snapshot.data[index]),
+                          ),
+                        );
                       },
                       child: Stack(
                         children: [

@@ -199,7 +199,7 @@ class _CarouselBanner extends State<CarouselBanner>
                           borderRadius: BorderRadius.circular(10),
                           child: loadingImageNetwork(
                             document['imageUrl'],
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fitWidth,
                             height: double.infinity,
                             width: double.infinity,
                           ),
