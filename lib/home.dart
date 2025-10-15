@@ -640,7 +640,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   ),
                   _buildForYou(),
 
-                  _buildTitle(title: 'สินค้า', showAll: true),
+                  _buildTitle(
+                    code: 'product',
+                    title: 'สินค้า',
+                    showAll: true,
+                  ),
                   SizedBox(height: 5),
                   _buildTrending(),
                 ],
@@ -723,16 +727,20 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            PrivilegeAllPage(title: title, mode: showAll),
+                        builder: (_) => PrivilegeAllPage(
+                          title: title,
+                          mode: showAll,
+                        ),
                       ),
                     );
                   } else {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            ProductAllCentralPage(title: title, mode: showAll),
+                        builder: (_) => ProductAllCentralPage(
+                          title: title,
+                          mode: showAll,
+                        ),
                       ),
                     ).then((value) => _getCountItemInCart());
                   }

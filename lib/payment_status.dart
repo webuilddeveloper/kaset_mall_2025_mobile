@@ -32,15 +32,15 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
 
   @override
   void initState() {
-    print('=======initState=========');
-    print(widget.model);
-    print(widget.model['payment_type']);
-    print(widget.model['order_id']);
-    print('=======initState=========');
-    if (widget.model['payment_type'] == '3') {
-      _getQRCode();
-    }
-    _checkOrder();
+    // print('=======initState=========');
+    // print(widget.model);
+    // print(widget.model['payment_type']);
+    // print(widget.model['order_id']);
+    // print('=======initState=========');
+    // if (widget.model['payment_type'] == '3') {
+    //   _getQRCode();
+    // }
+    // _checkOrder();
     animationController = AnimationController(
       value: 0.25,
       duration: Duration(milliseconds: 500),
@@ -170,9 +170,13 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
         // ),
         body: SafeArea(
           child: Center(
-              child: widget.model['payment_type'] == '3'
-                  ? _qrCodePage()
-                  : _successToPayPage()),
+              child:
+                  //  widget.model['payment_type'] == '3'
+                  // ?
+                  _qrCodePage()
+              // :
+              // _successToPayPage(),
+              ),
         ),
       ),
       // ignore: missing_return
@@ -253,117 +257,120 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
   }
 
   _qrCodePage() {
-    return success
-        ? _successToPayPage()
-        : Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Opacity(
-                opacity: animationController.value,
-                child: Icon(
-                  Icons.payments_rounded,
-                  size: animationController.value * 100,
-                  color: Color(0xFF09665a),
-                ),
-              ),
-              SizedBox(height: 5),
-              Opacity(
-                opacity: animationController.value,
-                child: Text(
-                  'ชำระเงิน',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF09665a),
-                  ),
-                ),
-              ),
-              Text(
-                'กรุณาสแกน QR Code เพื่อทำการชำระเงิน',
-                style: TextStyle(
-                  fontSize: 13,
-                ),
-              ),
-              SizedBox(height: 15),
-              Container(
-                child: Icon(
-                  Icons.qr_code_2,
-                  size: 400,
-                ),
-              ),
-              // gen Qr Code
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   children: [
-              //     Container(
-              //         width: 300,
-              //         height: 350,
-              //         // alignment: Alignment.center,
-              //         // padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-              //         child: loadingSuccess == false
-              //             ? Center(
-              //                 child: CircularProgressIndicator(
-              //                 strokeWidth: 2,
-              //               ))
-              //             :
-              //             //       Text(
-              //             //   qrCode,
-              //             //   style: TextStyle(
-              //             //     fontSize: 15,
-              //             //     fontWeight: FontWeight.w500,
-              //             //     color: Color(0xFFDF0B24),
-              //             //   ),
-              //             // ),
-              //             SvgPicture.string(qrCode, width: 200, height: 200)
-              //         // Html(
-              //         //     data: qrCode ?? '',
-              //         //     onLinkTap: (url, attributes, element) {
-              //         //       if (url != null) {
-              //         //         launchInWebViewWithJavaScript(url);
-              //         //       }
-              //         //     },
-              //         //   ),
-              //         ),
-              //   ],
-              // ),
+    return
+        // success
+        // ? _successToPayPage()
 
-              SizedBox(height: 25),
-              GestureDetector(
-                onTap: () {
-                  // _getQRCode();
-                  setState(() {
-                    myTimerCheck.cancel();
-                  });
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => MenuCentralPage(),
-                    ),
-                    (Route<dynamic> route) => false,
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      width: 1,
-                      color: Color(0xFFDF0B24),
-                    ),
-                  ),
-                  child: Text(
-                    'กลับหน้าหลัก',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFFDF0B24),
-                    ),
-                  ),
-                ),
-              )
-            ],
-          );
+        // :
+        Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Opacity(
+          opacity: animationController.value,
+          child: Icon(
+            Icons.payments_rounded,
+            size: animationController.value * 100,
+            color: Color(0xFF09665a),
+          ),
+        ),
+        SizedBox(height: 5),
+        Opacity(
+          opacity: animationController.value,
+          child: Text(
+            'ชำระเงิน',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF09665a),
+            ),
+          ),
+        ),
+        Text(
+          'กรุณาสแกน QR Code เพื่อทำการชำระเงิน',
+          style: TextStyle(
+            fontSize: 13,
+          ),
+        ),
+        SizedBox(height: 15),
+        Container(
+          child: Icon(
+            Icons.qr_code_2,
+            size: 400,
+          ),
+        ),
+        // gen Qr Code
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   crossAxisAlignment: CrossAxisAlignment.center,
+        //   children: [
+        //     Container(
+        //         width: 300,
+        //         height: 350,
+        //         // alignment: Alignment.center,
+        //         // padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+        //         child: loadingSuccess == false
+        //             ? Center(
+        //                 child: CircularProgressIndicator(
+        //                 strokeWidth: 2,
+        //               ))
+        //             :
+        //             //       Text(
+        //             //   qrCode,
+        //             //   style: TextStyle(
+        //             //     fontSize: 15,
+        //             //     fontWeight: FontWeight.w500,
+        //             //     color: Color(0xFFDF0B24),
+        //             //   ),
+        //             // ),
+        //             SvgPicture.string(qrCode, width: 200, height: 200)
+        //         // Html(
+        //         //     data: qrCode ?? '',
+        //         //     onLinkTap: (url, attributes, element) {
+        //         //       if (url != null) {
+        //         //         launchInWebViewWithJavaScript(url);
+        //         //       }
+        //         //     },
+        //         //   ),
+        //         ),
+        //   ],
+        // ),
+
+        SizedBox(height: 25),
+        GestureDetector(
+          onTap: () {
+            // _getQRCode();
+            // setState(() {
+            //   myTimerCheck.cancel();
+            // });
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => MenuCentralPage(),
+              ),
+              (Route<dynamic> route) => false,
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                width: 1,
+                color: Color(0xFFDF0B24),
+              ),
+            ),
+            child: Text(
+              'กลับหน้าหลัก',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFFDF0B24),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
   }
 
   void _showFromDialog() {
