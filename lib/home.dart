@@ -169,8 +169,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
 
     setState(() {
       _futureCategory = Future.value(mockCategories);
-      // _futureCategory = mockCategories as Future?;
-      // logWTF(_futureCategory);
     });
   }
 
@@ -750,6 +748,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                         builder: (_) => ProductAllCentralPage(
                           title: title,
                           mode: showAll,
+                          typeelect: '0',
                         ),
                       ),
                     ).then((value) => _getCountItemInCart());
@@ -796,18 +795,32 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           );
         }
 
-        final categories = snapshot.data;
+        final categories = snapshot.data as List<dynamic>;
 
         return Container(
-            height: 100,
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 16,
-              runSpacing: 12,
-              children: List.generate(categories.length, (i) {
-                final item = categories[i];
-                return Column(
+          height: 100,
+          width: double.infinity,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 12,
+            children: List.generate(categories.length, (i) {
+              final item = categories[i];
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProductAllCentralPage(
+                        title: 'สินค้า',
+                        mode: true,
+                        typeelect: item['id'], // ส่งค่า id ของหมวดหมู่ที่เลือก
+                      ),
+                    ),
+                  );
+                },
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircleAvatar(
@@ -834,9 +847,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       ),
                     ),
                   ],
-                );
-              }),
-            ));
+                ),
+              );
+            }),
+          ),
+        );
       },
     );
   }

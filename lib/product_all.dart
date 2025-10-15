@@ -17,11 +17,15 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'login.dart';
 
 class ProductAllCentralPage extends StatefulWidget {
-  ProductAllCentralPage({Key? key, @required this.title, required this.mode})
+  ProductAllCentralPage(
+      {Key? key,
+      @required this.title,
+      required this.mode,
+      required this.typeelect})
       : super(key: key);
   final String? title;
   late bool mode;
-
+  final String typeelect;
   @override
   State<ProductAllCentralPage> createState() => _ProductAllCentralPageState();
 }
@@ -35,7 +39,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   TextEditingController? _searchController;
   TextEditingController txtPriceMin = TextEditingController();
   TextEditingController txtPriceMax = TextEditingController();
-  String _filterSelected = 'เกี่ยวข้อง';
+  String _filterSelected = '0';
   int _limit = 20;
   bool changeToListView = false;
   int amountItemInCart = 0;
@@ -59,6 +63,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     txtPriceMin.text = '';
     txtPriceMax.text = '';
     super.initState();
+    print('------typeelect------>>${widget.typeelect}');
   }
 
   @override
@@ -68,63 +73,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     super.dispose();
   }
 
-  _callRead() async {
-    // dashboard/readTop20
-    // postProductData(
-    //       server_we_build + 'dashboard/readTop20',
-    //       {"per_page": "${_limit.toString()}"}).then((value) => {
-    //         print('value >>> ${value}'),
-    //       });
-
-    // profileCode = await storage.read(key: 'profileCode10');
-    // dynamic valueStorage = await storage.read(key: 'dataUserLoginDDPM');
-    // dynamic dataValue = valueStorage == null ? {'email': ''} : json.decode(valueStorage);
-
-    setState(() {
-      loadProduct = true;
-      // emailProfile = dataValue['email'].toString() ?? "";
-      // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
-      if (widget.mode) {
-        _futureModel = mockProductList as Future;
-        print('=======>>>$_futureModel ');
-        // postProductHotSale(
-        //     server_we_build + 'm/Product/readProductHot',
-        //     // {"per_page": "${_limit.toString()}"}
-        //     {});
-        // _futureModel!.then((value) async => {
-        //       setState(() {
-        //         // total_page = value[0]['total_pages'];
-        //         _listModelMore = [...value];
-        //         _listModelMore.length == 0 ? loadProduct = false : true;
-        //       })
-        //     });
-        // } else {
-        // _futureModel =
-        //     postProductData(server_we_build + 'm/Product/readProduct', {});
-        // _futureModel!.then((value) async => {
-        //       setState(() {
-        //         total_page = value[0]['total_pages'];
-        //         _listModelMore = [...value];
-        //         _listModelMore.length == 0 ? loadProduct = false : true;
-        //         print('total_page ========== ${total_page}');
-        //       })
-        //     // });
-      }
-
-      // Timer(
-      //   Duration(seconds: 1),
-      //   () => {
-      //     setState(
-      //       () {
-      //         _listModelMore.length == 0 ? loadProduct = false : true;
-      //       },
-      //     ),
-      //   },
-      // );
-    });
-  }
-
-  final List<Map<String, dynamic>> mockProductList = [
+  final List<dynamic> mockProductList = [
     {
       'id': 1,
       'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
@@ -182,9 +131,125 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     },
   ];
 
-  _hotSale() {
+  _callRead() async {
+    // dashboard/readTop20
+    // postProductData(
+    //       server_we_build + 'dashboard/readTop20',
+    //       {"per_page": "${_limit.toString()}"}).then((value) => {
+    //         print('value >>> ${value}'),
+    //       });
+
+    // profileCode = await storage.read(key: 'profileCode10');
+    // dynamic valueStorage = await storage.read(key: 'dataUserLoginDDPM');
+    // dynamic dataValue = valueStorage == null ? {'email': ''} : json.decode(valueStorage);
+
     setState(() {
       loadProduct = true;
+
+      _filterSelected = widget.typeelect;
+
+      // emailProfile = dataValue['email'].toString() ?? "";
+      // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
+      if (_filterSelected == '0') {
+        print('==> ${widget.mode}');
+
+        setState(() {
+          _listModelMore = [...mockProductList];
+          loadProduct = _listModelMore.isNotEmpty;
+        });
+      } else {
+        if (_filterSelected != '0') {
+          _applyFilter();
+        }
+      }
+      // else {
+      // _futureModel =
+      //     postProductData(server_we_build + 'm/Product/readProduct', {});
+      // _futureModel!.then((value) async => {
+      //       setState(() {
+      //         total_page = value[0]['total_pages'];
+      //         _listModelMore = [...value];
+      //         _listModelMore.length == 0 ? loadProduct = false : true;
+      //         print('total_page ========== ${total_page}');
+      //       })
+      //     });
+    }
+
+        // Timer(
+        //   Duration(seconds: 1),
+        //   () => {
+        //     setState(
+        //       () {
+        //         _listModelMore.length == 0 ? loadProduct = false : true;
+        //       },
+        //     ),
+        //   },
+        // );
+        // }
+        );
+  }
+
+  _applyFilter() {
+    setState(() {
+      loadProduct = true;
+
+      // เริ่มต้นจากข้อมูลทั้งหมด
+      List<dynamic> filteredList = [...mockProductList];
+
+      // กรองตาม type
+      if (_filterSelected != '0') {
+        filteredList = filteredList
+            .where((item) => item['type'] == _filterSelected)
+            .toList();
+      }
+
+      // กรองตามราคา (ถ้ามี)
+      if (txtPriceMin.text.isNotEmpty) {
+        double minPrice = double.tryParse(txtPriceMin.text) ?? 0;
+        filteredList = filteredList
+            .where((item) => (item['price'] as num) >= minPrice)
+            .toList();
+      }
+
+      if (txtPriceMax.text.isNotEmpty) {
+        double maxPrice = double.tryParse(txtPriceMax.text) ?? double.infinity;
+        filteredList = filteredList
+            .where((item) => (item['price'] as num) <= maxPrice)
+            .toList();
+      }
+
+      // เรียงลำดับข้อมูล
+      if (orderKey == 'min_price') {
+        // เรียงราคาน้อย -> มาก
+        filteredList
+            .sort((a, b) => (a['price'] as num).compareTo(b['price'] as num));
+      } else if (orderKey == 'max_price') {
+        // เรียงราคามาก -> น้อย
+        filteredList
+            .sort((a, b) => (b['price'] as num).compareTo(a['price'] as num));
+      } else if (orderKey == 'name') {
+        if (orderBy == 'asc') {
+          // เรียง ก-ฮ หรือ a-z
+          filteredList.sort(
+              (a, b) => (a['name'] as String).compareTo(b['name'] as String));
+        } else if (orderBy == 'desc') {
+          // เรียง ฮ-ก หรือ z-a
+          filteredList.sort(
+              (a, b) => (b['name'] as String).compareTo(a['name'] as String));
+        }
+      }
+
+      _listModelMore = filteredList;
+      loadProduct = _listModelMore.isNotEmpty;
+    });
+  }
+
+  _hotSale() {
+    _applyFilter();
+  }
+
+  void _onRefresh() async {
+    setState(() {
       _limit = 20;
       orderKey = '';
       orderBy = '';
@@ -193,34 +258,81 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       loadProduct = true;
       _listModelMore = [];
       _futureModel = null;
-
-      // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
-      _futureModel = postProductHotSale(
-          // server_we_build + 'm/Product/readProduct',
-          server_we_build + 'm/Product/readProductHot',
-          // {"per_page": "${_limit.toString()}"}
-          {});
-
-      _futureModel!.then((value) async => {
-            setState(() {
-              // total_page = value[0]['total_pages'];
-              _listModelMore = [...value];
-              _listModelMore.shuffle();
-              _listModelMore.length == 0 ? loadProduct = false : true;
-            })
-          });
-      // Timer(
-      //   Duration(seconds: 1),
-      //   () => {
-      //     setState(
-      //       () {
-      //         _listModelMore.length == 0 ? loadProduct = false : true;
-      //       },
-      //     ),
-      //   },
-      // );
     });
+
+    // เรียกใช้ตามประเภทที่เลือก
+    if (_filterSelected == '0') {
+      _callRead();
+    } else {
+      _applyFilter();
+    }
+
+    _getCountItemInCart();
+    _refreshController?.refreshCompleted();
   }
+
+  // _hotSale() {
+  //   setState(() {
+  //     loadProduct = true;
+  //     _limit = 20;
+  //     orderKey = '';
+  //     orderBy = '';
+  //     txtPriceMin.text = '';
+  //     txtPriceMax.text = '';
+  //     loadProduct = true;
+  //     _listModelMore = [];
+  //     _futureModel = [...mockProductList] as Future?;
+
+  //     _futureModel!.then((value) async {
+  //       setState(() {
+  //         // ดึงข้อมูลทั้งหมดก่อน
+  //         _listModelMore = [...value];
+
+  //         // 🔹 กรองข้อมูลตาม _filterSelected
+  //         if (_filterSelected != null &&
+  //             _filterSelected.toString().isNotEmpty) {
+  //           _listModelMore = _listModelMore
+  //               .where((item) =>
+  //                   item['category'] ==
+  //                       _filterSelected || // ตัวอย่างเงื่อนไขที่ใช้เทียบ
+  //                   item['type'] == _filterSelected)
+  //               .toList();
+  //         }
+
+  //         // สุ่มข้อมูล
+  //         _listModelMore.shuffle();
+
+  //         // ตรวจสอบว่ามีข้อมูลหรือไม่
+  //         loadProduct = _listModelMore.isNotEmpty;
+  //       });
+  //     });
+  //     // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
+  //     // _futureModel = postProductHotSale(
+  //     //     // server_we_build + 'm/Product/readProduct',
+  //     //     server_we_build + 'm/Product/readProductHot',
+  //     //     // {"per_page": "${_limit.toString()}"}
+  //     //     {});
+
+  //     // _futureModel!.then((value) async => {
+  //     //       setState(() {
+  //     //         // total_page = value[0]['total_pages'];
+  //     //         _listModelMore = [...value];
+  //     //         _listModelMore.shuffle();
+  //     //         _listModelMore.length == 0 ? loadProduct = false : true;
+  //     //       })
+  //     //     });
+  //     // Timer(
+  //     //   Duration(seconds: 1),
+  //     //   () => {
+  //     //     setState(
+  //     //       () {
+  //     //         _listModelMore.length == 0 ? loadProduct = false : true;
+  //     //       },
+  //     //     ),
+  //     //   },
+  //     // );
+  //   });
+  // }
 
   _getCountItemInCart() async {
     //get amount item in cart.
@@ -233,21 +345,21 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   }
 
   // business logic.
-  void _onRefresh() async {
-    setState(() {
-      _limit = 20;
-      orderKey = '';
-      orderBy = '';
-      txtPriceMin.text = '';
-      txtPriceMax.text = '';
-      loadProduct = true;
-      _listModelMore = [];
-      _futureModel = null;
-    });
-    _filterSelected == 'เกี่ยวข้อง' ? _callRead() : _hotSale;
-    _getCountItemInCart();
-    _refreshController?.refreshCompleted();
-  }
+  // void _onRefresh() async {
+  //   setState(() {
+  //     _limit = 20;
+  //     orderKey = '';
+  //     orderBy = '';
+  //     txtPriceMin.text = '';
+  //     txtPriceMax.text = '';
+  //     loadProduct = true;
+  //     _listModelMore = [];
+  //     _futureModel = null;
+  //   });
+  //   _filterSelected == '0' ? _callRead() : _hotSale;
+  //   _getCountItemInCart();
+  //   _refreshController?.refreshCompleted();
+  // }
 
   void _onLoading() async {
     setState(() {
@@ -271,7 +383,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
         //         // total_page = value[0]['total_pages'],
         //         // _listModelMore = [..._listModelMore, ...value],
         //         _listModelMore = [...value];
-        //         _filterSelected == 'เกี่ยวข้อง'
+        //         _filterSelected == 'ทั้งหมด'
         //             ? null
         //             : _listModelMore.shuffle();
         //         _listModelMore.length == 0 ? loadProduct = false : true;
@@ -318,7 +430,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                   total_page = value[0]['total_pages'];
                   _listModelMore = [..._listModelMore, ...value];
                   // _listModelMore = [...value];
-                  // _filterSelected == 'เกี่ยวข้อง' ? null : _listModelMore.shuffle();
+                  // _filterSelected == 'ทั้งหมด' ? null : _listModelMore.shuffle();
                   _listModelMore.length == 0 ? loadProduct = false : true;
                   print('total_page ========== ${total_page}');
                 })
@@ -397,21 +509,21 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     // }
   }
 
-  _addLog(param) async {
-    await postObjectData(server_we_build + 'log/logGoods/create', {
-      "username": emailProfile ?? "",
-      "profileCode": profileCode ?? "",
-      "platform": Platform.isAndroid
-          ? "android"
-          : Platform.isIOS
-              ? "ios"
-              : "other",
-      "prodjctId": param['id'] ?? "",
-      "title": param['name'] ?? "",
-      "categoryId": param['category']['data']['id'] ?? "",
-      "category": param['category']['data']['name'] ?? "",
-    });
-  }
+  // _addLog(param) async {
+  //   await postObjectData(server_we_build + 'log/logGoods/create', {
+  //     "username": emailProfile ?? "",
+  //     "profileCode": profileCode ?? "",
+  //     "platform": Platform.isAndroid
+  //         ? "android"
+  //         : Platform.isIOS
+  //             ? "ios"
+  //             : "other",
+  //     "prodjctId": param['id'] ?? "",
+  //     "title": param['name'] ?? "",
+  //     "categoryId": param['category']['data']['id'] ?? "",
+  //     "category": param['category']['data']['name'] ?? "",
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -599,110 +711,163 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 5),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => {
-                          setState(() {
-                            _filterSelected = 'เกี่ยวข้อง';
-                          }),
-                          _onRefresh(),
-                        },
-                        child: Text(
-                          'เกี่ยวข้อง',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: _filterSelected == 'เกี่ยวข้อง'
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: _filterSelected == 'เกี่ยวข้อง'
-                                ? Color(0xFF0B24FB)
-                                : Colors.black,
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => {
+                            setState(() {
+                              _filterSelected = '0';
+                            }),
+                            _onRefresh(),
+                          },
+                          child: Text(
+                            'ทั้งหมด',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: _filterSelected == '0'
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: _filterSelected == '0'
+                                  ? Color(0xFF0B24FB)
+                                  : Colors.black,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () => {
-                          setState(() {
-                            _filterSelected = 'ขายดี';
-                            orderBy = '';
-                            loadProduct = true;
-                            changOrderKey = true;
-                            page = 0;
-                          }),
-                          _hotSale(),
-                        },
-                        child: Text(
-                          'ขายดี',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: _filterSelected == 'ขายดี'
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: _filterSelected == 'ขายดี'
-                                ? Color(0xFF0B24FB)
-                                : Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () => {
-                          setState(
-                            () {
-                              _filterSelected = 'ราคา';
-                              orderKey = 'min_price';
-                              filterType = 'minPrice';
+                        SizedBox(width: 20),
+                        GestureDetector(
+                          onTap: () => {
+                            setState(() {
+                              _filterSelected = '1';
                               orderBy = '';
                               loadProduct = true;
                               changOrderKey = true;
                               page = 0;
-                            },
-                          ),
-                          _onLoading(),
-                        },
-                        child: Text(
-                          'ราคา',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: _filterSelected == 'ราคา'
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: _filterSelected == 'ราคา'
-                                ? Color(0xFF0B24FB)
-                                : Colors.black,
+                            }),
+                            _hotSale(),
+                          },
+                          child: Text(
+                            'พรรณพืช',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: _filterSelected == '1'
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: _filterSelected == '1'
+                                  ? Color(0xFF0B24FB)
+                                  : Colors.black,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: SizedBox(),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _key.currentState!.openEndDrawer();
-                        },
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/filter.png',
-                              height: 15,
-                              width: 15,
+                        SizedBox(width: 20),
+                        GestureDetector(
+                          onTap: () => {
+                            setState(
+                              () {
+                                _filterSelected = '2';
+                                orderKey = 'min_price';
+                                filterType = 'minPrice';
+                                orderBy = '';
+                                loadProduct = true;
+                                changOrderKey = true;
+                                page = 0;
+                              },
                             ),
-                            SizedBox(width: 5),
-                            Text(
-                              'ขั้นสูง',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black,
+                            _onLoading(),
+                          },
+                          child: Text(
+                            'เครื่องมือ',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: _filterSelected == '2'
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: _filterSelected == '2'
+                                  ? Color(0xFF0B24FB)
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        GestureDetector(
+                          onTap: () => {
+                            setState(() {
+                              _filterSelected = '3';
+                              orderBy = '';
+                              loadProduct = true;
+                              changOrderKey = true;
+                              page = 0;
+                            }),
+                            _hotSale(),
+                          },
+                          child: Text(
+                            'อาหารสัตว์',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: _filterSelected == '3'
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: _filterSelected == '3'
+                                  ? Color(0xFF0B24FB)
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        GestureDetector(
+                          onTap: () => {
+                            setState(() {
+                              _filterSelected = '4';
+                              orderBy = '';
+                              loadProduct = true;
+                              changOrderKey = true;
+                              page = 0;
+                            }),
+                            _hotSale(),
+                          },
+                          child: Text(
+                            'อาหารสัตว์',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: _filterSelected == '4'
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: _filterSelected == '4'
+                                  ? Color(0xFF0B24FB)
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        // Expanded(
+                        //   child: SizedBox(),
+                        // ),
+                        GestureDetector(
+                          onTap: () {
+                            _key.currentState!.openEndDrawer();
+                          },
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/filter.png',
+                                height: 15,
+                                width: 15,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 5),
+                              Text(
+                                'ขั้นสูง',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -1242,10 +1407,9 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     );
   }
 
-  _buildCardGrid(dynamic param) {
+  Widget _buildCardGrid(dynamic param) {
     return GestureDetector(
       onTap: () {
-        _addLog(param);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -1253,225 +1417,72 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
           ),
         );
       },
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                // height: 200,
-                width: MediaQuery.of(context).size.width,
-                // padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(9),
-                  color: Colors.white,
-                ),
-                // alignment: Alignment.center,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(9),
-                  child: param['media']['data'].length > 0
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(9),
-                          child: loadingImageNetwork(
-                            // snapshot.data[index]['imageUrl'],
-                            param['media']['data'][0]['url'],
-                            fit: BoxFit.cover,
-                          ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // รูปภาพ
+            ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+              child:
+                  param['image'] != null && param['image'].toString().isNotEmpty
+                      ? loadingImageNetwork(
+                          param['image'],
+                          fit: BoxFit.cover,
+                          height: 160,
+                          width: double.infinity,
                         )
-                      : Container(
-                          decoration: BoxDecoration(
-                            // color: Color(0XFF0B24FB),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Image.asset(
-                            'assets/images/kaset/no-img.png',
-                            fit: BoxFit.contain,
-                            // color: Colors.white,
-                          ),
+                      : Image.asset(
+                          'assets/images/kaset/no-img.png',
+                          fit: BoxFit.contain,
+                          height: 160,
+                          width: double.infinity,
                         ),
-                ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                param['name'],
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              param['description'] != 'null'
-                  ? Expanded(
-                      child: Text(
-                        parseHtmlString(param['description'] ?? ''),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                  : Expanded(child: SizedBox()),
-              // Expanded(
-              //   child: SizedBox(),
-              // ),
-              param['product_variants']['data'].length > 0
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        param['product_variants']['data'][0]['promotion_active']
-                            ? Text(
-                                (moneyFormat(param['product_variants']['data']
-                                            [0]['promotion_price']
-                                        .toString()) +
-                                    " บาท"),
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFFED168B),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                // textScaleFactor: ScaleSize.textScaleFactor(context),
-                              )
-                            : Text(
-                                (moneyFormat(param['product_variants']['data']
-                                                [0]['price']
-                                            .toString()) +
-                                        " บาท") ??
-                                    '',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFFED168B),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                        param['product_variants']['data'].length > 0
-                            ? Text(
-                                (_callSumStock(param['product_variants']
-                                            ['data']) ==
-                                        0
-                                    ? 'สินค้าหมด'
-                                    : _callSumStock(param['product_variants']
-                                                ['data'])
-                                            .toString() +
-                                        " ชิ้น"),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: _callSumStock(param['product_variants']
-                                              ['data']) ==
-                                          0
-                                      ? Color(0xFFED168B)
-                                      : Colors.black,
-                                  // fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                // textScaleFactor: ScaleSize.textScaleFactor(context),
-                              )
-                            : Text(
-                                'สินค้าหมด',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFFED168B),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                // textScaleFactor: ScaleSize.textScaleFactor(context),
-                              )
-                      ],
-                    )
-                  : Text(
-                      'สินค้าหมด',
-                      style: TextStyle(
-                        fontSize: 17,
-                        color: Color(0xFFED168B),
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+            ),
+
+            // เนื้อหา
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    param['name'] ?? '',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
-            ],
-          ),
-          param['product_variants']['data'][0]['promotion_active']
-              ? Positioned(
-                  // left: 15,
-                  top: 5,
-                  right: 0,
-                  // top: MediaQuery.of(context).padding.top + 5,
-                  child: Container(
-                    // height: AdaptiveTextSize()
-                    //     .getadaptiveTextSize(context, 42),
-                    // width: AdaptiveTextSize()
-                    //     .getadaptiveTextSize(context, 20),
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.horizontal(
-                          left: Radius.circular(40),
-                        ),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFFFD45A),
-                            Color(0xFFFFD45A),
-                          ],
-                        )),
-                    child: Text(
-                      'โปรโมชั่น',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0XFFee4d2d),
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textScaleFactor: ScaleSize.textScaleFactor(context),
-                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  // child: snapshot.data[index]
-                  //                 ['product_variants']['data']
-                  //             [0]['promotions']['data'] >
-                  //         0
-                  //     ? Container(
-                  //         // height: AdaptiveTextSize()
-                  //         //     .getadaptiveTextSize(context, 42),
-                  //         // width: AdaptiveTextSize()
-                  //         //     .getadaptiveTextSize(context, 20),
-                  //         padding: EdgeInsets.symmetric(
-                  //             horizontal: 10),
-                  //         alignment: Alignment.center,
-                  //         decoration: BoxDecoration(
-                  //             borderRadius:
-                  //                 BorderRadius.horizontal(
-                  //               left: Radius.circular(40),
-                  //             ),
-                  //             gradient: LinearGradient(
-                  //               begin: Alignment.topLeft,
-                  //               end: Alignment.bottomRight,
-                  //               colors: [
-                  //                 Color(0xFFFFD45A),
-                  //                 Color(0xFFFFD45A),
-                  //               ],
-                  //             )),
-                  //         child: Text(
-                  //           'โปรโมชั่น',
-                  //           style: TextStyle(
-                  //             fontSize: 11,
-                  //             color: Color(0XFFee4d2d),
-                  //             fontWeight: FontWeight.bold,
-                  //           ),
-                  //           textScaleFactor:
-                  //               ScaleSize.textScaleFactor(
-                  //                   context),
-                  //         ),
-                  //       )
-                  //     : Container(),
-                )
-              : Container(),
-        ],
+                  const SizedBox(height: 4),
+                  if (param['description'] != null &&
+                      param['description'].toString().trim().isNotEmpty)
+                    Text(
+                      parseHtmlString(param['description'] ?? ''),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1490,7 +1501,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   _buildCardList(dynamic param) {
     return GestureDetector(
       onTap: () {
-        _addLog(param);
+        // _addLog(param);
         Navigator.push(
           context,
           MaterialPageRoute(
