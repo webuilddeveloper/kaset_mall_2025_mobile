@@ -63,7 +63,6 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     txtPriceMin.text = '';
     txtPriceMax.text = '';
     super.initState();
-    print('------typeelect------>>${widget.typeelect}');
   }
 
   @override
@@ -72,64 +71,6 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     _refreshController?.dispose();
     super.dispose();
   }
-
-  // final List<dynamic> mockProductList = [
-  //   {
-  //     'id': 1,
-  //     'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
-  //     'type': '1', // พรรณพืช
-  //     'price': 120.0,
-  //     'description':
-  //         'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
-  //     'image':
-  //         'https://www.doae.go.th/wp-content/uploads/2021/03/rice-seed.jpg',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 2,
-  //     'name': 'เครื่องพ่นยาแบตเตอรี่ 20 ลิตร',
-  //     'type': '2', // เครื่องมือ
-  //     'price': 890.0,
-  //     'description':
-  //         'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
-  //     'image':
-  //         'https://www.sprayerthai.com/wp-content/uploads/2021/07/sprayer-20L.jpg',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 3,
-  //     'name': 'อาหารไก่เนื้อเบอร์ 910',
-  //     'type': '3', // อาหารสัตว์
-  //     'price': 250.0,
-  //     'description':
-  //         'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
-  //     'image':
-  //         'https://www.cpffeed.com/wp-content/uploads/2019/12/910-181x300.png',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 4,
-  //     'name': 'ปุ๋ยเคมีสูตร 15-15-15',
-  //     'type': '4', // เคมีภัณฑ์
-  //     'price': 450.0,
-  //     'description':
-  //         'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
-  //     'image':
-  //         'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 5,
-  //     'name': 'ยาฆ่าแมลงตราช้างแดง',
-  //     'type': '4', // เคมีภัณฑ์
-  //     'price': 195.0,
-  //     'description':
-  //         'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
-  //     'image':
-  //         'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
-  //     'stock': 0,
-  //   },
-  // ];
 
   final List<Map<String, dynamic>> mockProductList = [
     // พรรณพืช
@@ -581,13 +522,10 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     setState(() {
       loadProduct = true;
 
-      _filterSelected = widget.typeelect;
-
       // emailProfile = dataValue['email'].toString() ?? "";
       // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
+      _filterSelected = widget.typeelect;
       if (_filterSelected == '0') {
-        print('==> ${widget.mode}');
-
         setState(() {
           _listModelMore = [...mockProductList];
           loadProduct = _listModelMore.isNotEmpty;
@@ -1791,10 +1729,11 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                       physics: ClampingScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 300,
-                              childAspectRatio: 9 / 14,
-                              crossAxisSpacing: 15,
-                              mainAxisSpacing: 20),
+                        maxCrossAxisExtent: 300,
+                        childAspectRatio: 9 / 14,
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15,
+                      ),
                       itemCount: 6,
                       itemBuilder: (context, index) => Column(
                         children: [
@@ -1833,7 +1772,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       padding: EdgeInsets.all(12),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 200,
-          childAspectRatio: 0.75,
+          childAspectRatio: 0.65,
           // 9/15,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10),

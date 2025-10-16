@@ -553,11 +553,6 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
           await new FlutterSecureStorage()
               .write(key: 'lastName', value: 'ศักดิ์สม');
 
-          // mock
-          print('===============================');
-          print('selectedAgency :$selectedAgency');
-          print('selectedAgency  title:${selectedAgency?['title']}');
-
           await new FlutterSecureStorage()
               .write(key: 'Agency', value: '${selectedAgency?['title']}');
 

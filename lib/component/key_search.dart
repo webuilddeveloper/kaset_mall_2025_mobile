@@ -62,7 +62,7 @@ class _SearchBox extends State<KeySearch> {
           color: Theme.of(context).primaryColor,
         ),
         decoration: InputDecoration(
-          hintText: 'ค้นหาสถานที่ท่องเที่ยว...',
+          hintText: 'ค้นหาสิทธิประโยชน์...',
           hintStyle: TextStyle(
             fontFamily: 'Kanit',
             color: Colors.grey,

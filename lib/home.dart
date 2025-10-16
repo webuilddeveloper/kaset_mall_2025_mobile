@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +17,6 @@ import 'package:kasetmall/privilege_all.dart';
 import 'package:kasetmall/privilege_form.dart';
 import 'package:kasetmall/product_all.dart';
 import 'package:kasetmall/product_from.dart';
-import 'package:kasetmall/purchase_menu.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
 import 'package:kasetmall/shared/notification_service.dart';
@@ -139,21 +137,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     String? value = await storage.read(key: 'cartItems');
 
     if (value != null) {
-      // แปลง JSON เป็น List
       List<dynamic> items = jsonDecode(value);
 
       setState(() {
         amountItemInCart = items.length;
-        print('------->>_getCountItemInCart  ');
-        print(amountItemInCart);
       });
-
-      // ถ้าต้องการทำ logic กับ notification
-      // if (amountItemInCart > 0) {
-      //   NotificationService.subscribeToAllTopic('suksapan-item');
-      // } else {
-      //   NotificationService.subscribeToAllTopic('suksapan-mall');
-      // }
     } else {
       setState(() {
         amountItemInCart = 0;
@@ -162,12 +150,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _getCategory() async {
-    // List<dynamic> model = await getData(server + 'categories');
-    // model.sort((a, b) => a['description'].compareTo(b['description']));
-    print('-------mockCategories---------');
-    print(mockCategories);
-    print('----------------');
-
     setState(() {
       _futureCategory = Future.value(mockCategories);
     });
@@ -222,8 +204,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           {"per_page": "${page.toString()}"},
           _limit,
         );
-
-        // อัปเดตค่าที่ได้จาก API
         setState(() {
           _futureModelTrending = [..._futureModelTrending, ...productData];
           total_page = productData[0]['total_pages'];
@@ -264,50 +244,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     var element2 = "";
     var element3 = "";
 
-    // var value = await postProductData(
-    //   server_we_build + 'm/Product/readProduct',
-    //   {
-    //     "search": "$element3",
-    //     "per_page": _limit.toString(),
-    //   },
-    // );
-
-    // setState(() {
-    //   _futureModelTrending = value;
-    //   total_page = value[0]['total_pages'];
-    // });
-
-    // var value2 = await postProductHot(
-    //   server_we_build + 'm/Product/readProductHot',
-    //   {"per_page": "${page.toString()}"},
-    //   _limit,
-    // );
-
-    // setState(() {
-    //   _futureProductHot = value2;
-    // });
-
-    // value = await postProductHotSale(
-    //   server_we_build + 'm/Product/readProduct',
-    //   {
-    //     "search": "$element3",
-    //     "per_page": _limit.toString(),
-    //   },
-    // );
-
-    // setState(() {
-    //   if (value != null && value.isNotEmpty) {
-    //     total_page = value[0]['total_pages'];
-    //   } else {
-    //     total_page = 0;
-    //   }
-    // });
-
-    // postProductHotSale(server_we_build + 'm/Product/readProductHot', {});
-
-    // _futureModelForYou = postProductData(
-    //     server_we_build + 'm/Product/readProduct', {"search": "$element1"});
-
     if (profileCode == '') {
       NotificationService.subscribeToAllTopic('suksapan-general');
     } else {
@@ -321,22 +257,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       _futureListVideo = value;
     });
   }
-
-  // _addLog(param) async {
-  //   await postObjectData(server_we_build + 'log/logGoods/create', {
-  //     "username": emailProfile ?? "",
-  //     "profileCode": profileCode,
-  //     "platform": Platform.isAndroid
-  //         ? "android"
-  //         : Platform.isIOS
-  //             ? "ios"
-  //             : "other",
-  //     "prodjctId": param['id'] ?? "",
-  //     "title": param['name'] ?? "",
-  //     "categoryId": param['category']['data']['id'] ?? "",
-  //     "category": param['category']['data']['name'] ?? "",
-  //   });
-  // }
 
   _callReadAll() async {
     _callReadBanner();
@@ -401,14 +321,14 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
 
                         // if (savedCardId != null && savedCardId.isNotEmpty) {
                         // User has logged in before, navigate directly to PurchaseMenuPage
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PurchaseMenuPage(
-                              cardid: savedCardId,
-                            ),
-                          ),
-                        );
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => PurchaseMenuPage(
+                        //       cardid: savedCardId,
+                        //     ),
+                        //   ),
+                        // );
                         // }
                         // else {
                         // First time login, go to verification screen
@@ -1243,14 +1163,12 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   Widget _buildProductGrid() {
-    final random = Random();
-
     final products = _filterSelected == '0'
-        ? (List<Map<String, dynamic>>.from(mockProductList)..shuffle(random))
-        : (mockProductList
+        ? mockProductList
+        : mockProductList
             .where((item) => item['type'] == _filterSelected)
-            .toList()
-          ..shuffle(random));
+            .toList();
+    ;
 
     if (products.isEmpty) {
       return Center(
@@ -1267,11 +1185,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 200,
-        childAspectRatio: 0.9,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+        childAspectRatio: 0.7,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 15,
       ),
-      itemCount: products.length > 100 ? 100 : products.length,
+      itemCount: products.length > 10 ? 10 : products.length,
       itemBuilder: (context, index) =>
           _buildProductCard(products[index], index),
     );
@@ -1726,14 +1644,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _callSumStock(param) {
-    // print(param.toString());
     int qty = 0;
     for (var item in param) {
-      // print("stock ${item['stock'].toString()}");
       qty += int.parse(item['stock'].toString());
     }
 
-    // print(qty);
     return qty;
   }
 
@@ -1751,63 +1666,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'img': "assets/images/kaset/fertilizer.png"
     },
   ];
-  // final List<Map<String, dynamic>> mockProductList = [
-  //   {
-  //     'id': 1,
-  //     'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
-  //     'type': '1', // พรรณพืช
-  //     'price': 120.0,
-  //     'description':
-  //         'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
-  //     'image':
-  //         'https://www.doae.go.th/wp-content/uploads/2021/03/rice-seed.jpg',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 2,
-  //     'name': 'เครื่องพ่นยาแบตเตอรี่ 20 ลิตร',
-  //     'type': '2', // เครื่องมือ
-  //     'price': 890.0,
-  //     'description':
-  //         'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
-  //     'image':
-  //         'https://www.sprayerthai.com/wp-content/uploads/2021/07/sprayer-20L.jpg',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 3,
-  //     'name': 'อาหารไก่เนื้อเบอร์ 910',
-  //     'type': '3', // อาหารสัตว์
-  //     'price': 250.0,
-  //     'description':
-  //         'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
-  //     'image':
-  //         'https://www.cpffeed.com/wp-content/uploads/2019/12/910-181x300.png',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 4,
-  //     'name': 'ปุ๋ยเคมีสูตร 15-15-15',
-  //     'type': '4', // เคมีภัณฑ์
-  //     'price': 450.0,
-  //     'description':
-  //         'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
-  //     'image':
-  //         'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
-  //     'stock': 10,
-  //   },
-  //   {
-  //     'id': 5,
-  //     'name': 'ยาฆ่าแมลงตราช้างแดง',
-  //     'type': '4', // เคมีภัณฑ์
-  //     'price': 195.0,
-  //     'description':
-  //         'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
-  //     'image':
-  //         'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
-  //     'stock': 0,
-  //   },
-  // ];
   final List<Map<String, dynamic>> mockProductList = [
     // พรรณพืช
     {

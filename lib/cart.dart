@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -114,12 +115,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
       setState(() {
         model = cartList;
         loading = false;
-        print('==========_readLocalCart===========');
-        print('model : $model');
-        // print('price0 : ${model[0]['price']}');
-        // print('price1 : ${model[1]['price']}');
-        // print('qty1 : ${model[0]['qty']}');
-        // print('qty0 : ${model[1]['qty']}');
       });
     } else {
       setState(() {
@@ -232,7 +227,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
       }
     }
 
-    return '${totalPrice.round().toString()} บาท';
+    return '${formatPrice(totalPrice.round().toString())} บาท';
   }
   // _priceAll() {
   //   num totalPrice = 0;
@@ -249,7 +244,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
   //   // แปลงเป็น int ก่อนแสดง
   //   int totalInt = totalPrice.round(); // ปัดเป็นจำนวนเต็ม
 
-  //   print('totalPrice ------------->> $totalInt');
   //   return totalInt.toString() + ' บาท';
   // }
 
@@ -259,6 +253,12 @@ class _CartCentralPageState extends State<CartCentralPage> {
     num total = price * qty;
 
     return total.round().toString();
+  }
+
+  String formatPrice(dynamic price) {
+    if (price == null) return '0';
+    final number = num.tryParse(price.toString()) ?? 0;
+    return NumberFormat('#,###').format(number);
   }
 
   _changeCarts(action, param) async {
@@ -570,11 +570,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
                         });
 
                         if (data.length > 0) {
-                          print(
-                              '================ ข้อมูลที่เลือก ================');
-                          print('จำนวนรายการ: ${data.length}');
-                          print('ข้อมูล: $data');
-
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -839,8 +834,8 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                 //         true
                                 //     ? '${moneyFormat(param['product_variant']['data']['promotion_price'].toString())} บาท'
                                 // :
-                                '${_calculateItemPrice(param)} บาท',
-                                // 'TEST',
+                                '${formatPrice(_calculateItemPrice(param))} บาท',
+
                                 style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,

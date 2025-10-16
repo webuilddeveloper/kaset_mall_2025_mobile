@@ -50,7 +50,7 @@ class _NotificationCentralPage extends State<NotificationCentralPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'การแจ้งเตือน',
+                    'การแจ้งเตือน ',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 20,

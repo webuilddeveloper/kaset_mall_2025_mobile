@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -110,9 +111,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   }
 
   read() async {
-    print('model ============ ${widget.model}');
-    print('img : ${widget.model['image']}');
-    print(widget.model['image'].runtimeType);
+  
     _getUserData();
     profilePhone = (await storage.read(key: 'profilePhone'));
     verifyPhone = (await storage.read(key: 'phoneVerified'));
@@ -134,7 +133,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
         ...widget.model
       };
 
-      print('================= tempData =================');
+ 
       print(tempData);
     });
   }
@@ -766,6 +765,12 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     );
   }
 
+  String formatPrice(dynamic price) {
+    if (price == null) return '0';
+    final number = num.tryParse(price.toString()) ?? 0;
+    return NumberFormat('#,###').format(number);
+  }
+
   buildDetail(dynamic model) {
     List<dynamic> images = [];
 
@@ -810,7 +815,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                           text: new TextSpan(
                             children: <TextSpan>[
                               new TextSpan(
-                                text: '${model?['price']} บาท',
+                                text: '${formatPrice(model?['price'])} บาท',
                                 style: TextStyle(
                                   fontSize: 25,
                                   fontFamily: 'Kanit',
@@ -1456,7 +1461,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                         TextOverflow.ellipsis,
                                                   ),
                                                   Text(
-                                                    "${model['price']} บาท",
+                                                    '${formatPrice(model?['price'])} บาท',
                                                     style: TextStyle(
                                                       fontSize: 23,
                                                       fontFamily: 'Kanit',

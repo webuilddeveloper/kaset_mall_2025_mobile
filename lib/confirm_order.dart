@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -45,6 +46,11 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   int shippingcost = 0;
 
 //=============================//
+  String formatPrice(dynamic price) {
+    if (price == null) return '0';
+    final number = num.tryParse(price.toString()) ?? 0;
+    return NumberFormat('#,###').format(number);
+  }
 
   int totalPrice = 0;
   int total = 0;
@@ -105,17 +111,8 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   //   super.initState();
   //   setState(() {
   //     modelCode = widget.modelCode!;
-  //     type = widget.type!;
-  //     print('----------- initState ---------');
-  //     print(widget.modelCode);
-  //     print(modelCode[0]['price'].toString());
-  //     print(modelCode[0]['qty']);
-  //     print(model.length);
-  //     // ค่าส่ง 30
-  //     // คููปองไม่มี
-  //     print('----------------------------');
+
   //   });
-  //   print('===----==== $modelCode');
 
   //   _callRead();
   //   _calculate();
@@ -127,9 +124,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
     setState(() {
       modelCode = widget.modelCode!;
       type = widget.type!;
-      print('----------- initState ---------');
-      print('modelCode: $modelCode');
-      print('----------------------------');
+
     });
 
     _callRead(); // ตรวจสอบว่าฟังก์ชันนี้ทำงานจริง
@@ -148,8 +143,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
         loading = false;
       });
 
-      print('model length: ${model.length}');
-      print('model data: $model');
+   
     } catch (e) {
       print('Error in _callRead: $e');
       setState(() {
@@ -593,63 +587,37 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
     sum = 0;
     qty = 0;
 
-    print('========== เริ่มคำนวณ ==========');
-    print('type: $type');
-    print('จำนวนรายการ: ${modelCode.length}');
-
-    // วนลูปคำนวณทุกรายการ
     for (int i = 0; i < modelCode.length; i++) {
       var item = modelCode[i];
 
-      // ดึงค่า qty และ price จากแต่ละรายการ
       int itemQty = 0;
       int itemPrice = 0;
 
       if (type == 'cart') {
-        // จาก cart ใช้ 'quantity' และ 'price'
         itemQty = _toInt(item['quantity'] ?? 1);
         itemPrice = _toInt(item['price'] ?? 0);
       } else if (type == 'buy') {
-        // จาก buy now ใช้ 'qty' และ 'price'
         itemQty = _toInt(item['qty'] ?? 1);
         itemPrice = _toInt(item['price'] ?? 0);
       }
 
       int itemTotal = itemQty * itemPrice;
 
-      // รวมค่า
       qty += itemQty;
       sum += itemTotal;
-
-      print('รายการที่ ${i + 1}: ${item['product_name'] ?? item['name']}');
-      print('  - จำนวน: $itemQty');
-      print('  - ราคาต่อชิ้น: $itemPrice บาท');
-      print('  - รวม: $itemTotal บาท');
     }
 
-    // กำหนดค่าขนส่ง
     shippingcost = 30;
 
-    // รวมทั้งหมด (ยังไม่รวมส่วนลด)
     pricesum = sum + shippingcost;
 
-    // ถ้ามีส่วนลด ให้หักออก
     if (discountAll > 0) {
       pricesum = pricesum - discountAll;
     }
 
-    print('========== สรุปการคำนวณ ==========');
-    print('จำนวนสินค้าทั้งหมด: $qty ชิ้น');
-    print('รวมราคาสินค้า (sum): $sum บาท');
-    print('ค่าขนส่ง (shippingcost): $shippingcost บาท');
-    print('ส่วนลด (discountAll): $discountAll บาท');
-    print('รวมทั้งหมด (pricesum): $pricesum บาท');
-    print('===================================');
-
     setState(() {});
   }
 
-// เพิ่ม helper function สำหรับแปลงค่าเป็น int อย่างปลอดภัย
   int _toInt(dynamic value) {
     if (value == null) return 0;
     if (value is int) return value;
@@ -2099,7 +2067,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           fontWeight: FontWeight.w500,
                         ),
                         textScaleFactor: ScaleSize.textScaleFactor(context)),
-                    Text(sum.toString() + ' บาท',
+                    Text(formatPrice(sum.toString()) + ' บาท',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -2154,7 +2122,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                         textScaleFactor: ScaleSize.textScaleFactor(context)),
                     Text(
                         // moneyFormat(totalPrice.toString())
-                        pricesum.toString() + ' บาท',
+                        formatPrice(pricesum.toString()) + ' บาท',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
@@ -2200,7 +2168,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                   SizedBox(width: 10),
                   Text(
                     // moneyFormat(totalPrice.toString())
-                    pricesum.toString() + ' บาท',
+                    formatPrice(pricesum.toString()) + ' บาท',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -2379,7 +2347,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${_toInt(param['price']).toString()} บาท',
+                              '${formatPrice(_toInt(param['price']).toString())} บาท',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -2392,7 +2360,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                             if (param['promotion_price'] != null &&
                                 _toInt(param['promotion_price']) > 0)
                               Text(
-                                '${_toInt(param['price']).toString()} บาท',
+                                '${formatPrice(_toInt(param['price']).toString())} บาท',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Color(0xFF707070),
@@ -2451,7 +2419,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                         textScaleFactor: ScaleSize.textScaleFactor(context),
                       ),
                       Text(
-                        '${(_toInt(param['price']) * _toInt(param['quantity'] ?? param['qty'] ?? 1)).toString()} บาท',
+                        '${formatPrice((_toInt(param['price']) * _toInt(param['quantity'] ?? param['qty'] ?? 1)).toString())} บาท',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
