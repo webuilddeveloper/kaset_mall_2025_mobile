@@ -27,22 +27,25 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
     {
       "code": "0",
       "title": "ลดทันที 30 บาท",
-      "description": "พิเศษสำหรับลูกค้าใหม่!!! เมื่อสั่งซื้อครั้งแรก ลดทันที 30 บาท",
-      "imageUrl": "assets/images/kaset/logo_kaset.png",
+      "description":
+          "พิเศษสำหรับลูกค้าใหม่!!! เมื่อสั่งซื้อครั้งแรก ลดทันที 30 บาท",
+      "imageUrl": "assets/images/kaset/logo.png",
       "status": "A",
     },
     {
       "code": "1",
       "title": "ของแถมทุกออเดอร์",
-      "description": "ฟรี!! ของแถมทุกออเดอร์ พร้อมส่วนลดลูกค้าใหม่ ด่วน!! ของมีจำนวนจำกัด",
-      "imageUrl": "assets/images/kaset/logo_kaset.png",
+      "description":
+          "ฟรี!! ของแถมทุกออเดอร์ พร้อมส่วนลดลูกค้าใหม่ ด่วน!! ของมีจำนวนจำกัด",
+      "imageUrl": "assets/images/kaset/logo.png",
       "status": "A",
     },
     {
       "code": "2",
       "title": "มาร่วมเป็นร้านค้ากับเราสิ",
-      "description": "มาสมัครเป็นร้านค้าพันธมิตรกับเรา เพื่อการกระจายสินค้าสู่แอพช็อปปิ้งออนไลน์ และส่งตรงถึงมือลูกค้าทันที ตั้งแต่วันนี้เป็นต้นไป",
-      "imageUrl": "assets/images/kaset/logo_kaset.png",
+      "description":
+          "มาสมัครเป็นร้านค้าพันธมิตรกับเรา เพื่อการกระจายสินค้าสู่แอพช็อปปิ้งออนไลน์ และส่งตรงถึงมือลูกค้าทันที ตั้งแต่วันนี้เป็นต้นไป",
+      "imageUrl": "assets/images/kaset/logo.png",
       "status": "A",
     }
   ];
@@ -90,12 +93,12 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
           onRefresh: _onRefresh,
           onLoading: _onLoading,
           child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    itemCount: notiList.length,
-                    itemBuilder: (context, index) =>
-                        card(context, notiList[index], index),
-                  ),
+            shrinkWrap: true,
+            physics: ScrollPhysics(),
+            itemCount: notiList.length,
+            itemBuilder: (context, index) =>
+                card(context, notiList[index], index),
+          ),
           // FutureBuilder(
           //   future: futureNotification,
           //   builder: (context, snapshot) {
@@ -120,7 +123,6 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
           //     }
           //   },
           // ),
-        
         ));
   }
 

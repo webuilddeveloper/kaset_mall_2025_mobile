@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1242,12 +1243,14 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   Widget _buildProductGrid() {
+    final random = Random();
+
     final products = _filterSelected == '0'
-        ? mockProductList
-        : mockProductList
+        ? (List<Map<String, dynamic>>.from(mockProductList)..shuffle(random))
+        : (mockProductList
             .where((item) => item['type'] == _filterSelected)
-            .toList();
-    ;
+            .toList()
+          ..shuffle(random));
 
     if (products.isEmpty) {
       return Center(
@@ -1264,11 +1267,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 200,
-        childAspectRatio: 0.7,
-        crossAxisSpacing: 15,
-        mainAxisSpacing: 15,
+        childAspectRatio: 0.9,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
-      itemCount: products.length > 10 ? 10 : products.length,
+      itemCount: products.length > 100 ? 100 : products.length,
       itemBuilder: (context, index) =>
           _buildProductCard(products[index], index),
     );
@@ -1815,7 +1818,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'description':
           'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
       'image':
-          'https://www.doae.go.th/wp-content/uploads/2021/03/rice-seed.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254112971.png',
       'stock': 10,
     },
     {
@@ -1826,7 +1829,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'description':
           'เมล็ดพันธุ์ผักบุ้งจีน ปลูกง่าย โตเร็ว เหมาะสำหรับปลูกในฤดูฝน',
       'image':
-          'https://www.doae.go.th/wp-content/uploads/2021/03/vegetable-seed.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254112971.png',
       'stock': 50,
     },
     {
@@ -1836,7 +1839,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 40.0,
       'description': 'เมล็ดถั่วฝักยาวพันธุ์ดี ให้ผลผลิตสูง ทนโรคและแมลง',
       'image':
-          'https://www.doae.go.th/wp-content/uploads/2021/03/longbean-seed.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254112971.png',
       'stock': 30,
     },
     {
@@ -1846,7 +1849,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 50.0,
       'description': 'มะเขือเทศพันธุ์คุณภาพ ให้ผลผลิตลูกใหญ่ สีแดงสด',
       'image':
-          'https://www.doae.go.th/wp-content/uploads/2021/03/tomato-seed.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254112971.png',
       'stock': 25,
     },
     {
@@ -1856,7 +1859,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 60.0,
       'description': 'ข้าวโพดหวานพันธุ์ดี รสหวาน ปลูกง่าย ผลผลิตสูง',
       'image':
-          'https://www.doae.go.th/wp-content/uploads/2021/03/corn-seed.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254112971.png',
       'stock': 40,
     },
 
@@ -1869,7 +1872,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'description':
           'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
       'image':
-          'https://www.sprayerthai.com/wp-content/uploads/2021/07/sprayer-20L.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254704897.png',
       'stock': 10,
     },
     {
@@ -1879,29 +1882,29 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 150.0,
       'description': 'กรรไกรคุณภาพสูง ตัดแต่งกิ่งไม้และพืชสวนได้สะดวก',
       'image':
-          'https://www.sprayerthai.com/wp-content/uploads/2021/07/pruner.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255345172.png',
       'stock': 20,
     },
-    {
-      'id': 11,
-      'name': 'จอบขุดดิน',
-      'type': '2',
-      'price': 200.0,
-      'description': 'จอบขุดดินคุณภาพ แข็งแรง ใช้งานได้นาน',
-      'image':
-          'https://www.sprayerthai.com/wp-content/uploads/2021/07/shovel.jpg',
-      'stock': 15,
-    },
-    {
-      'id': 12,
-      'name': 'สายยางรดน้ำ 20 ม.',
-      'type': '2',
-      'price': 350.0,
-      'description': 'สายยางคุณภาพสูง ยาว 20 เมตร เหมาะสำหรับรดน้ำสวน',
-      'image':
-          'https://www.sprayerthai.com/wp-content/uploads/2021/07/hose.jpg',
-      'stock': 30,
-    },
+    // {
+    //   'id': 11,
+    //   'name': 'จอบขุดดิน',
+    //   'type': '2',
+    //   'price': 200.0,
+    //   'description': 'จอบขุดดินคุณภาพ แข็งแรง ใช้งานได้นาน',
+    //   'image':
+    //       'https://www.sprayerthai.com/wp-content/uploads/2021/07/shovel.jpg',
+    //   'stock': 15,
+    // },
+    // {
+    //   'id': 12,
+    //   'name': 'สายยางรดน้ำ 20 ม.',
+    //   'type': '2',
+    //   'price': 350.0,
+    //   'description': 'สายยางคุณภาพสูง ยาว 20 เมตร เหมาะสำหรับรดน้ำสวน',
+    //   'image':
+    //       'https://www.sprayerthai.com/wp-content/uploads/2021/07/hose.jpg',
+    //   'stock': 30,
+    // },
     {
       'id': 13,
       'name': 'เครื่องตัดหญ้าไฟฟ้า',
@@ -1909,7 +1912,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 2500.0,
       'description': 'เครื่องตัดหญ้าไฟฟ้า ประสิทธิภาพสูง ใช้งานง่าย',
       'image':
-          'https://www.sprayerthai.com/wp-content/uploads/2021/07/grasscutter.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255345172.png',
       'stock': 5,
     },
 
@@ -1922,7 +1925,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'description':
           'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
       'image':
-          'https://www.cpffeed.com/wp-content/uploads/2019/12/910-181x300.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254715516.png',
       'stock': 10,
     },
     {
@@ -1932,7 +1935,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 300.0,
       'description': 'อาหารหมูลูกพันธุ์ สำหรับลูกหมูอายุ 0-8 สัปดาห์ โปรตีนสูง',
       'image':
-          'https://www.cpffeed.com/wp-content/uploads/2019/12/pig-feed.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254715516.png',
       'stock': 20,
     },
     {
@@ -1942,7 +1945,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 220.0,
       'description': 'อาหารปลานิลเม็ดคุณภาพดี ช่วยเร่งการเจริญเติบโตของปลา',
       'image':
-          'https://www.cpffeed.com/wp-content/uploads/2019/12/fish-feed.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254715516.png',
       'stock': 25,
     },
     {
@@ -1952,7 +1955,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 400.0,
       'description': 'อาหารวัวชนิดเม็ด เสริมโปรตีนและแร่ธาตุสำหรับวัวเนื้อ',
       'image':
-          'https://www.cpffeed.com/wp-content/uploads/2019/12/cow-feed.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254715516.png',
       'stock': 15,
     },
     {
@@ -1962,7 +1965,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 280.0,
       'description': 'อาหารไก่ไข่ เสริมโปรตีนและแคลเซียม ให้ไข่มีคุณภาพ',
       'image':
-          'https://www.cpffeed.com/wp-content/uploads/2019/12/layer-feed.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254715516.png',
       'stock': 20,
     },
 
@@ -1975,7 +1978,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'description':
           'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
       'image':
-          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png',
       'stock': 10,
     },
     {
@@ -1986,7 +1989,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'description':
           'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
       'image':
-          'https://cache-igetweb-v2.mt108.info/uploads/images-cache/7290/product/b654e0d438dd11dea08713efa34e6386_full.jpg',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png',
       'stock': 0,
     },
     {
@@ -1996,7 +1999,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 220.0,
       'description': 'ปุ๋ยยูเรียเสริมไนโตรเจน สำหรับพืชผลผลิตสูง',
       'image':
-          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png',
       'stock': 30,
     },
     {
@@ -2006,7 +2009,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 180.0,
       'description': 'ยาฆ่าแมลงสูตรเข้มข้น กำจัดเพลี้ยและแมลงศัตรูพืชได้ดี',
       'image':
-          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png',
       'stock': 20,
     },
     {
@@ -2016,7 +2019,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'price': 350.0,
       'description': 'ปุ๋ยฟอสฟอรัสสูง เพิ่มการเจริญเติบโตของรากพืช',
       'image':
-          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png',
       'stock': 25,
     },
     {
@@ -2027,8 +2030,216 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'description':
           'สารปรับสภาพดิน ช่วยให้ดินร่วนซุย เพิ่มประสิทธิภาพการใช้ปุ๋ย',
       'image':
-          'https://www.chiataigroup.com/imgadmins/product_photo/pro20220214154701.png',
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png',
       'stock': 15,
+    },
+
+    // ========= 🚜 สินค้าใหม่ที่เด่น ๆ =========
+    {
+      'id': 22,
+      'name': 'โดรนพ่นยาเกษตร DJI Agras T40',
+      'type': '2', // จัดเป็นอุปกรณ์เครื่องมือ
+      'price': 580000.0,
+      'description':
+          'โดรนพ่นยา/ปุ๋ย รุ่นล่าสุด DJI Agras T40 ความจุถัง 40 ลิตร พ่นได้รวดเร็ว ประหยัดแรงงาน เหมาะกับไร่ข้าวโพด นาข้าว และพืชเศรษฐกิจ',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252119760.png',
+      'stock': 2,
+    },
+    {
+      'id': 23,
+      'name': 'รถไถเดินตาม Kubota รุ่น RT140',
+      'type': '2',
+      'price': 120000.0,
+      'description':
+          'รถไถเดินตามขนาดกลาง ใช้งานง่าย เหมาะกับเกษตรกรรายย่อย สามารถติดตั้งอุปกรณ์เสริมได้หลายชนิด',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255759883.png',
+      'stock': 3,
+    },
+    {
+      'id': 24,
+      'name': 'รถแทรกเตอร์ Kubota MU5501',
+      'type': '2',
+      'price': 750000.0,
+      'description':
+          'แทรกเตอร์ขนาดใหญ่ 55 แรงม้า เหมาะสำหรับการเพาะปลูกขนาดกลางถึงใหญ่ รองรับงานไถ พรวน ยกร่อง และลากพ่วง',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_250611616.png',
+      'stock': 5,
+    },
+    {
+      'id': 25,
+      'name': 'ปุ๋ยอินทรีย์ชีวภาพ Premium',
+      'type': '4',
+      'price': 500.0,
+      'description':
+          'ปุ๋ยอินทรีย์ผสมจุลินทรีย์ธรรมชาติ เพิ่มความสมบูรณ์ของดิน กระตุ้นการเจริญเติบโตของพืชแบบยั่งยืน',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png',
+      'stock': 50,
+    },
+    {
+      'id': 26,
+      'name': 'ระบบ Smart Sensor เกษตร IoT',
+      'type': '2',
+      'price': 25000.0,
+      'description':
+          'เซ็นเซอร์ IoT ตรวจวัดความชื้นในดิน อุณหภูมิ และค่า pH ส่งข้อมูลผ่านแอปมือถือ ช่วยเกษตรกรวิเคราะห์และจัดการแปลงเพาะปลูก',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_250621859.png',
+      'stock': 10,
+    },
+    // {
+    //   'id': 27,
+    //   'name': 'เครื่องเก็บเกี่ยวข้าว Combine Harvester',
+    //   'type': '2',
+    //   'price': 950000.0,
+    //   'description':
+    //       'เครื่องเก็บเกี่ยวข้าวอัตโนมัติ ทำงานได้รวดเร็ว ลดแรงงาน ประหยัดเวลา เหมาะกับไร่นาขนาดใหญ่',
+    //   'image': 'https://www.agriculture.com/images/harvester.png',
+    //   'stock': 2,
+    // },
+    {
+      'id': 28,
+      'name': 'ระบบน้ำหยดอัตโนมัติ Smart Drip',
+      'type': '2',
+      'price': 18000.0,
+      'description':
+          'ระบบน้ำหยดควบคุมด้วยมือถือ ตั้งเวลาอัตโนมัติ ประหยัดน้ำ เหมาะสำหรับสวนผลไม้และแปลงผัก',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_251239328.png',
+      'stock': 8,
+    },
+    {
+      'id': 29,
+      'name': 'โรงเรือนอัจฉริยะ Smart Greenhouse',
+      'type': '2',
+      'price': 350000.0,
+      'description':
+          'โรงเรือนสำเร็จรูปพร้อมระบบควบคุมอุณหภูมิ ความชื้น และการให้น้ำอัตโนมัติ ผ่านแอปมือถือ',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253545227.png',
+      'stock': 1,
+    },
+    {
+      'id': 30,
+      'name': 'โดรนสำรวจพื้นที่การเกษตร Mavic Agro',
+      'type': '2',
+      'price': 250000.0,
+      'description':
+          'โดรนสำรวจไร่นา พร้อมกล้องความละเอียดสูงและเซ็นเซอร์ NDVI สำหรับวิเคราะห์สุขภาพพืช',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252540513.png',
+      'stock': 3,
+    },
+    // {
+    //   'id': 31,
+    //   'name': 'ปุ๋ยชีวภาพเสริมจุลินทรีย์',
+    //   'type': '4',
+    //   'price': 380.0,
+    //   'description':
+    //       'ปุ๋ยชีวภาพพิเศษเสริมจุลินทรีย์ละลายฟอสเฟต เพิ่มธาตุอาหารให้ดินและลดการใช้สารเคมี',
+    //   'image': 'https://www.organicfertilizer.com/images/biofert.png',
+    //   'stock': 40,
+    // },
+    {
+      'id': 32,
+      'name': 'รถไถเล็กอเนกประสงค์ Mini Tractor',
+      'type': '2',
+      'price': 185000.0,
+      'description':
+          'รถไถเล็กสำหรับสวนผลไม้ ใช้งานคล่องตัว ประหยัดน้ำมัน เหมาะกับพื้นที่ขนาดเล็กถึงกลาง',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_250611616.png',
+      'stock': 6,
+    },
+    {
+      'id': 33,
+      'name': 'เครื่องเพาะกล้าอัตโนมัติ',
+      'type': '2',
+      'price': 45000.0,
+      'description':
+          'เครื่องเพาะกล้ารุ่นใหม่ สามารถหยอดเมล็ด รดน้ำ และควบคุมสภาพแวดล้อมได้อัตโนมัติ',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253640982.png',
+      'stock': 4,
+    },
+    // {
+    //   'id': 34,
+    //   'name': 'สารชีวภัณฑ์กำจัดหนอนกอข้าว',
+    //   'type': '4',
+    //   'price': 250.0,
+    //   'description':
+    //       'สารชีวภัณฑ์จากแบคทีเรีย Bacillus thuringiensis (BT) ใช้กำจัดหนอนศัตรูพืชโดยไม่กระทบสิ่งแวดล้อม',
+    //   'image': 'https://www.bioagro.com/images/bt-bio.png',
+    //   'stock': 25,
+    // },
+    {
+      'id': 35,
+      'name': 'เครื่องคัดแยกเมล็ดพันธุ์อัตโนมัติ',
+      'type': '2',
+      'price': 65000.0,
+      'description':
+          'เครื่องคัดแยกเมล็ดพันธุ์ตามขนาดและน้ำหนัก ลดแรงงาน เพิ่มคุณภาพเมล็ดพันธุ์',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254142264.png',
+      'stock': 7,
+    },
+    {
+      'id': 36,
+      'name': 'เครื่องอบข้าวโพดพลังงานแสงอาทิตย์',
+      'type': '2',
+      'price': 98000.0,
+      'description':
+          'เครื่องอบเมล็ดข้าวโพดด้วยพลังงานแสงอาทิตย์ ลดต้นทุนค่าไฟฟ้าและเป็นมิตรต่อสิ่งแวดล้อม',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253640982.png',
+      'stock': 3,
+    },
+    {
+      'id': 37,
+      'name': 'เครื่องบรรจุเมล็ดพืชอัตโนมัติ',
+      'type': '2',
+      'price': 120000.0,
+      'description':
+          'เครื่องบรรจุเมล็ดหรือธัญพืชลงถุงแบบอัตโนมัติ ปรับขนาดบรรจุได้ ประหยัดแรงงานและเวลา',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253229765.png',
+      'stock': 4,
+    },
+    {
+      'id': 38,
+      'name': 'ระบบพลังงานแสงอาทิตย์สำหรับเกษตร',
+      'type': '2',
+      'price': 150000.0,
+      'description':
+          'แผงโซลาร์เซ็ตพร้อมระบบแบตเตอรี่ สำหรับปั๊มน้ำและระบบชลประทานในไร่นา',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252146409.png',
+      'stock': 5,
+    },
+    {
+      'id': 39,
+      'name': 'เครื่องย่อยเศษพืช',
+      'type': '2',
+      'price': 32000.0,
+      'description':
+          'เครื่องย่อยเศษพืชหลังการเก็บเกี่ยว เปลี่ยนเป็นปุ๋ยหมักหรือนำกลับใช้ในไร่นา',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252653005.png',
+      'stock': 10,
+    },
+    {
+      'id': 40,
+      'name': 'หุ่นยนต์เก็บผลไม้ Smart Picker',
+      'type': '2',
+      'price': 480000.0,
+      'description':
+          'หุ่นยนต์เก็บผลไม้ เช่น มะม่วง ทุเรียน มะเขือเทศ ลดแรงงานและความเสียหายของผลผลิต',
+      'image':
+          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_251733990.png',
+      'stock': 2,
     },
   ];
 }
