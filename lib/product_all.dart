@@ -574,6 +574,8 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
         filteredList = filteredList
             .where((item) => item['type'] == _filterSelected)
             .toList();
+      } else {
+        filteredList = [...mockProductList];
       }
 
       // กรองตามราคา (ถ้ามี)
@@ -634,11 +636,11 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     });
 
     // เรียกใช้ตามประเภทที่เลือก
-    if (_filterSelected == '0') {
-      _callRead();
-    } else {
-      _applyFilter();
-    }
+    // if (_filterSelected == '0') {
+    //   _callRead();
+    // } else {
+    _applyFilter();
+    // }
 
     _getCountItemInCart();
     _refreshController?.refreshCompleted();

@@ -229,23 +229,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
 
     return '${formatPrice(totalPrice.round().toString())} บาท';
   }
-  // _priceAll() {
-  //   num totalPrice = 0;
-
-  //   // model.forEach((c) {
-  //   //   if (c['selected'] == true) {
-  //   //     num price = num.tryParse(c['price'].toString()) ?? 0;
-  //   //     num qty = num.tryParse(c['qty'].toString()) ?? 0;
-
-  //   //     totalPrice += price * qty;
-  //   //   }
-  //   // });
-
-  //   // แปลงเป็น int ก่อนแสดง
-  //   int totalInt = totalPrice.round(); // ปัดเป็นจำนวนเต็ม
-
-  //   return totalInt.toString() + ' บาท';
-  // }
 
   String _calculateItemPrice(dynamic item) {
     num price = num.tryParse(item['price'].toString()) ?? 0;
