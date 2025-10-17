@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/cart.dart';
@@ -22,7 +24,6 @@ class _ReadBookListState extends State<ReadBookList> {
   RefreshController? _refreshController;
   ScrollController? _scrollController;
   int _limit = 30;
-  Future<dynamic>? _futureBanner;
   Future<dynamic>? _futureknowledge;
   int selectedIndex = 0;
   String displayType = '1';
@@ -97,7 +98,6 @@ class _ReadBookListState extends State<ReadBookList> {
   }
 
   _callReadBanner() {
-    _futureBanner = postDio('${mainBannerApi}read', {'limit': 10});
   }
 
   _callReadKnowledge() {
@@ -164,10 +164,10 @@ class _ReadBookListState extends State<ReadBookList> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Image.asset(
-                                'assets/images/search.png',
+                                'assets/images/kaset/search.png',
                                 height: 15,
                                 width: 15,
-                                color: Color(0xFF0B24FB).withOpacity(0.6),
+                                color: Color(0xFF09665a).withOpacity(0.6),
                               ),
                               SizedBox(width: 10),
                               Expanded(
@@ -238,12 +238,12 @@ class _ReadBookListState extends State<ReadBookList> {
                         ),
                         child: changeToListView
                             ? Image.asset(
-                                'assets/images/grid.png',
-                                color: Color(0xFF0B24FB),
+                                'assets/images/kaset/grid.png',
+                                color: Color(0xFF09665a),
                               )
                             : Image.asset(
-                                'assets/images/list.png',
-                                color: Color(0xFF0B24FB),
+                                'assets/images/kaset/list.png',
+                                color: Color(0xFF09665a),
                               ),
                       ),
                     ),

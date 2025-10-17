@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class ExpirationFormField extends StatefulWidget {
-  //TODO make controller optional
   ExpirationFormField({
     this.key,
     required this.controller,

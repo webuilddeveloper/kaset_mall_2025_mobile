@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:convert';
 // import 'package:camera/camera.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -134,7 +136,6 @@ const privilegeSpecialCategoryReadApi =
     'http://122.155.223.63/td-we-mart-api/m/privilege/category/read';
 
 Future<dynamic> postCategory(String url, dynamic criteria) async {
-  final storage = new FlutterSecureStorage();
   // var value = await storage.read(key: 'dataUserLoginDDPM');
   // var dataUser = json.decode(value!);
   List<dynamic> dataOrganization = [];
@@ -194,7 +195,6 @@ Future<dynamic> get(String url) async {
 }
 
 Future<dynamic> getQuestion(String url) async {
-  final storage = await new FlutterSecureStorage().read(key: 'token') ?? "";
   var response = await http.get(Uri.parse(url), headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
@@ -300,8 +300,6 @@ Future<dynamic> getCarts(String url) async {
 }
 
 Future<dynamic> post(String url, dynamic criteria) async {
-  final storage = new FlutterSecureStorage();
-  var value = await storage.read(key: 'dataUserLoginDDPM');
   // var dataUser = json.decode(value!);
   List<dynamic> dataOrganization = [];
   // dataOrganization =
@@ -481,7 +479,6 @@ Future<dynamic> postQuestion(String url, dynamic criteria) async {
 }
 
 Future<dynamic> postProductData(String url, dynamic criteria) async {
-  final token = await new FlutterSecureStorage().read(key: 'token');
   var body = json.encode(criteria);
   // print(url);
   // print('criteria ===== ${body}');
@@ -549,7 +546,6 @@ Future<dynamic> postProductHotSale(String url, dynamic criteria) async {
   var data = jsonDecode(utf8.decode(response.bodyBytes));
   if (response.statusCode == 200) {
     data['status2'] = 'S';
-    var result = data['objectData'];
     return Future.value(data['objectData']);
   } else {
     data['status2'] = 'F';
@@ -846,7 +842,7 @@ Future<dynamic> postDioWithOutProfileCode(String url, dynamic criteria) async {
 
 Future<dynamic> postDioCategory(String url, dynamic criteria) async {
   final storage = new FlutterSecureStorage();
-  var platform = Platform.operatingSystem.toString();
+  Platform.operatingSystem.toString();
   final profileCode = await storage.read(key: 'profileCode10');
 
   if (profileCode != '' && profileCode != null) {

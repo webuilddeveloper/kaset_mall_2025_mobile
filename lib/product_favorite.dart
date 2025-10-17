@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -68,7 +70,7 @@ class _ProductFavoriteCentralPageState
         valueStorage == null ? {'email': ''} : json.decode(valueStorage);
 
     setState(() {
-      emailProfile = dataValue['email'].toString() ?? "";
+      emailProfile = dataValue['email'].toString();
       // _futureModel =
       //     postDio(server + 'm/goods/isPopular/false/read', {'limit': _limit});
       _futureModel = get(server + 'users/me/favorite-products');
@@ -78,12 +80,12 @@ class _ProductFavoriteCentralPageState
             }),
             Timer(
               Duration(seconds: 1),
-              () => {
+              () {
                 setState(
                   () {
                     value.length == 0 ? loadProduct = false : true;
                   },
-                ),
+                );
               },
             ),
           });
@@ -112,12 +114,12 @@ class _ProductFavoriteCentralPageState
             _listModelMore = [...value],
             Timer(
               Duration(seconds: 1),
-              () => {
+              () {
                 setState(
                   () {
                     _listModelMore.length == 0 ? loadProduct = false : true;
                   },
-                ),
+                );
               },
             ),
           });
@@ -128,7 +130,7 @@ class _ProductFavoriteCentralPageState
   _addLog(param) async {
     await postObjectData(server_we_build + 'log/logGoods/create', {
       "username": emailProfile ?? "",
-      "profileCode": profileCode ?? "",
+      "profileCode": profileCode,
       "platform": Platform.isAndroid
           ? "android"
           : Platform.isIOS
@@ -195,8 +197,8 @@ class _ProductFavoriteCentralPageState
                         color: Color(0xFFE3E6FE).withOpacity(0.2),
                       ),
                       child: Image.asset(
-                        'assets/images/search.png',
-                        color: Color(0xFF0B24FB),
+                        'assets/images/kaset/search.png',
+                        color: Color(0xFF09665a),
                       ),
                     ),
                   ),
@@ -214,12 +216,12 @@ class _ProductFavoriteCentralPageState
                       ),
                       child: changeToListView
                           ? Image.asset(
-                              'assets/images/grid.png',
-                              color: Color(0xFF0B24FB),
+                              'assets/images/kaset/grid.png',
+                              color: Color(0xFF09665a),
                             )
                           : Image.asset(
-                              'assets/images/list.png',
-                              color: Color(0xFF0B24FB),
+                              'assets/images/kaset/list.png',
+                              color: Color(0xFF09665a),
                             ),
                     ),
                   ),
@@ -238,8 +240,8 @@ class _ProductFavoriteCentralPageState
                   //       color: Color(0xFFE3E6FE).withOpacity(0.2),
                   //     ),
                   //     child: Image.asset(
-                  //       'assets/images/cart.png',
-                  //       color: Color(0xFF0B24FB),
+                  //       'assets/images/kaset/basket.png',
+                  //       color: Color(0xFF09665a),
                   //     ),
                   //   ),
                   // )
@@ -263,8 +265,8 @@ class _ProductFavoriteCentralPageState
                             color: Color(0xFFE3E6FE).withOpacity(0.2),
                           ),
                           child: Image.asset(
-                            'assets/images/cart.png',
-                            color: Color(0xFF0B24FB),
+                            'assets/images/kaset/basket.png',
+                            color: Color(0xFF09665a),
                           ),
                         ),
                         Positioned(
@@ -317,7 +319,7 @@ class _ProductFavoriteCentralPageState
             //                     ? FontWeight.bold
             //                     : FontWeight.normal,
             //                 color: _filterSelected == 'เกี่ยวข้อง'
-            //                     ? Color(0xFF0B24FB)
+            //                     ? Color(0xFF09665a)
             //                     : Colors.black,
             //               ),
             //             ),
@@ -333,7 +335,7 @@ class _ProductFavoriteCentralPageState
             //                     ? FontWeight.bold
             //                     : FontWeight.normal,
             //                 color: _filterSelected == 'ขายดี'
-            //                     ? Color(0xFF0B24FB)
+            //                     ? Color(0xFF09665a)
             //                     : Colors.black,
             //               ),
             //             ),
@@ -349,7 +351,7 @@ class _ProductFavoriteCentralPageState
             //                     ? FontWeight.bold
             //                     : FontWeight.normal,
             //                 color: _filterSelected == 'ราคา'
-            //                     ? Color(0xFF0B24FB)
+            //                     ? Color(0xFF09665a)
             //                     : Colors.black,
             //               ),
             //             ),
@@ -363,7 +365,7 @@ class _ProductFavoriteCentralPageState
             //             child: Row(
             //               children: [
             //                 Image.asset(
-            //                   'assets/images/filter.png',
+            //                   'assets/images/kaset/filter_new.png',
             //                   height: 15,
             //                   width: 15,
             //                 ),
@@ -531,7 +533,7 @@ class _ProductFavoriteCentralPageState
                     )
                   : Container(
                       decoration: BoxDecoration(
-                        // color: Color(0XFF0B24FB),
+                        // color: Color(0xFF09665a),
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Image.asset(
@@ -642,7 +644,7 @@ class _ProductFavoriteCentralPageState
                           )
                         : Container(
                             decoration: BoxDecoration(
-                              // color: Color(0XFF0B24FB),
+                              // color: Color(0xFF09665a),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: Image.asset(

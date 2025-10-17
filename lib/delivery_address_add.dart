@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, unnecessary_null_comparison, duplicate_ignore, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/widget/data_error.dart';
@@ -39,7 +41,6 @@ class _DeliveryAddressAddCentralPageState
   late Future<dynamic> _futureShopLv1;
   late Future<dynamic> _futureShopLv2;
   late Future<dynamic> _futureShopLv3;
-  late Future<dynamic> _futureShopLv4;
   dynamic lv1 = [];
   bool main = false;
 
@@ -178,13 +179,13 @@ class _DeliveryAddressAddCentralPageState
                         alignment: Alignment.centerLeft,
                         child: Text(
                           titleCategoryLv1 != ""
-                              ? (titleCategoryLv1 ?? "") +
+                              ? (titleCategoryLv1) +
                                   " / " +
-                                  (titleCategoryLv2 ?? "") +
+                                  (titleCategoryLv2) +
                                   " / " +
-                                  (titleCategoryLv3 ?? "") +
+                                  (titleCategoryLv3) +
                                   " / " +
-                                  (selectedCodeLv4 ?? "")
+                                  (selectedCodeLv4)
                               : 'จังหวัด / อำเภอ/เขต / ตำบล/แขวง / รหัสไปรษณีย์',
                           style: TextStyle(
                             color: Color(0xFF000000).withOpacity(0.9),
@@ -254,17 +255,17 @@ class _DeliveryAddressAddCentralPageState
           fontWeight: FontWeight.w300,
           color: Colors.black,
         ),
-        cursorColor: Color(0xFF0B24FB),
+        cursorColor: Color(0xFF09665a),
         decoration: InputDecoration(
           fillColor: Colors.white,
           filled: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Color(0xFF0B24FB)),
+            borderSide: BorderSide(color: Color(0xFF09665a)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Color(0xFF0B24FB)),
+            borderSide: BorderSide(color: Color(0xFF09665a)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
@@ -317,7 +318,7 @@ class _DeliveryAddressAddCentralPageState
               type
                   ? Icon(
                       Icons.check_circle,
-                      color: type ? Color(0XFF0B24FB) : Colors.black,
+                      color: type ? Color(0xFF09665a) : Colors.black,
                       size: 15,
                     )
                   : Container(),
@@ -328,7 +329,7 @@ class _DeliveryAddressAddCentralPageState
                   fontFamily: 'Kanit',
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: type ? Color(0XFF0B24FB) : Colors.black,
+                  color: type ? Color(0xFF09665a) : Colors.black,
                 ),
               ),
             ],
@@ -562,25 +563,25 @@ class _DeliveryAddressAddCentralPageState
           },
         if (page == 2)
           {
-            setStateModal(() => {
-                  selectedCodeLv2 = item['id'].toString(),
-                  selectedCodeLv3 = '',
-                  selectedCodeLv4 = '',
-                  titleCategoryLv2 = item['name_th'],
-                  getCategory(page, setStateModal),
+            setStateModal(() {
+                  selectedCodeLv2 = item['id'].toString();
+                  selectedCodeLv3 = '';
+                  selectedCodeLv4 = '';
+                  titleCategoryLv2 = item['name_th'];
+                  getCategory(page, setStateModal);
                   pageController.animateToPage(page,
                       duration: Duration(milliseconds: 500),
-                      curve: Curves.ease),
+                      curve: Curves.ease);
                 })
           },
         if (page == 3)
           {
-            setStateModal(() => {
-                  selectedCodeLv3 = item['id'].toString(),
-                  titleCategoryLv3 = item['name_th'],
-                  selectedCodeLv4 = item['zip'],
-                  titleCategoryLv4 = item['zip'],
-                  getCategory(page, setStateModal),
+            setStateModal(() {
+                  selectedCodeLv3 = item['id'].toString();
+                  titleCategoryLv3 = item['name_th'];
+                  selectedCodeLv4 = item['zip'];
+                  titleCategoryLv4 = item['zip'];
+                  getCategory(page, setStateModal);
                   // pageController.animateToPage(page,
                   //     duration: Duration(milliseconds: 500), curve: Curves.ease)
                 }),
@@ -742,6 +743,7 @@ class _DeliveryAddressAddCentralPageState
         'address': addressController.text,
         'building': buildingController.text,
         'phone': phoneController.text,
+        // ignore: unnecessary_null_comparison
         'province_id': selectedCodeLv1 == null
             ? categoryModel["provinceCode"]
             : selectedCodeLv1,

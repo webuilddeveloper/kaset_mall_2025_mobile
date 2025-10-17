@@ -7,7 +7,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/component/key_search.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/material/loading_tween.dart';
-import 'package:kasetmall/news_form.dart';
 import 'package:kasetmall/privilege_form.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
@@ -28,13 +27,10 @@ class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   final storage = new FlutterSecureStorage();
   Future<dynamic>? _futureModel;
-  List<dynamic> _listModelMore = [];
   RefreshController? _refreshController;
   TextEditingController? _searchController;
   TextEditingController txtPriceMin = TextEditingController();
   TextEditingController txtPriceMax = TextEditingController();
-  String _filterSelected = 'เกี่ยวข้อง';
-  int _limit = 20;
   bool changeToListView = false;
   int amountItemInCart = 0;
   String profileCode = "";
@@ -93,13 +89,11 @@ class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
   // business logic.
   void _onRefresh() async {
     setState(() {
-      _limit = 20;
       orderKey = '';
       orderBy = '';
       txtPriceMin.text = '';
       txtPriceMax.text = '';
       loadProduct = true;
-      _listModelMore = [];
       _futureModel = null;
     });
     _callRead();
@@ -140,7 +134,6 @@ class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
           if (page < total_page) {
             page += 1;
             if (changOrderKey) {
-              _listModelMore = [];
               page = 0;
               // itemProductCount = 0;
             }
@@ -164,7 +157,7 @@ class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
   _addLog(param) async {
     await postObjectData(server_we_build + 'log/logGoods/create', {
       "username": emailProfile ?? "",
-      "profileCode": profileCode ?? "",
+      "profileCode": profileCode,
       "platform": Platform.isAndroid
           ? "android"
           : Platform.isIOS

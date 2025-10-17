@@ -1,18 +1,15 @@
-import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/menu.dart';
 import 'package:kasetmall/register_shop.dart';
-import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/verify_phone.dart';
+
 import 'package:kasetmall/widget/header.dart';
 import 'package:kasetmall/widget/input.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'home.dart';
 
 class RegisterCentralPage extends StatefulWidget {
   RegisterCentralPage({Key? key}) : super(key: key);
@@ -40,15 +37,15 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 
   final _futureOccupationModel = [
     {'code': 0, 'title': 'กรุณาเลือกอาชีพ'},
-    {'code': 10, 'title': 'ครู'},
-    {'code': 20, 'title': 'นักเรียน'},
-    {'code': 30, 'title': 'ผู้ปกครอง'},
-    {'code': 40, 'title': 'เจ้าหน้าที่รัฐ'},
-    {'code': 50, 'title': 'โรงเรียน/หน่วยงานรัฐ'},
-    {'code': 60, 'title': 'ร้านค้า/บริษัท'},
-    {'code': 70, 'title': 'อื่นๆ'},
+    {'code': 10, 'title': 'เกษตรกร'},
+    {'code': 20, 'title': 'เจ้าของร้านค้าเกษตร'},
+    {'code': 30, 'title': 'พนักงานร้านค้าเกษตร'},
+    {'code': 40, 'title': 'ตัวแทนจำหน่ายสินค้าเกษตร'},
+    {'code': 50, 'title': 'ผู้ประกอบการแปรรูปสินค้าเกษตร'},
+    {'code': 60, 'title': 'เจ้าหน้าที่เกษตร/เจ้าหน้าที่รัฐ'},
+    {'code': 70, 'title': 'ประชาชนทั่วไป'},
+    {'code': 80, 'title': 'อื่นๆ'},
   ];
-
   final _futureAgencyModel = [
     {'code': 0, 'title': 'กรุณาเลือกหน่วยงาน'},
     {'code': 10, 'title': 'กรมส่งเสริมการเกษตร'},
@@ -73,7 +70,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
   bool showConfirmPassword = true;
   bool showPassword = true;
 
-  String _categorySelected = '';
 
   @override
   void initState() {
@@ -520,72 +516,33 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
     );
   }
 
-  _buildCategory(String title) {
-    bool value = _categorySelected == title;
-    Color bg = value ? Color(0xFFFBE3E6) : Colors.white;
-    Color br = value ? Color(0xFFFBE3E6) : Color(0xFFE4E4E4);
-    Color txt = value ? Color(0xFFDF0B24) : Colors.black;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _categorySelected = title;
-        });
-      },
-      child: Container(
-        height: 33,
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-          color: bg,
-          border: Border.all(
-            width: 1,
-            color: br,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            if (value)
-              Icon(
-                Icons.check_circle,
-                color: Color(0xFFDF0B24),
-                size: 15,
-              ),
-            SizedBox(width: 3),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                color: txt,
-                fontWeight: value ? FontWeight.w500 : FontWeight.w300,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  submitRegister() async {
-    final result = await postRegister(server + 'register', {
-      // 'username': txtEmail.text,
-      'password': txtPassword.text,
-      'password_confirmation': txtConPassword.text,
-      // 'facebookID': "",
-      // 'appleID': "",
-      // 'googleID': "",
-      // 'lineID': "",
-      'email': txtEmail.text,
-      // 'imageUrl': "",
-      'name': txtFirstName.text + " " + txtLastName.text,
-      'phone': txtPhone.text,
-      'gender': selectedSexIndex + 1,
-      'occupation': selectOccupation,
-
-      // 'memberType': _categorySelected
-    });
-
-// showDialog(
+//   submitRegister() async {
+//     final result = await postRegister(server + 'register', {
+//       'password': txtPassword.text,
+//       'password_confirmation': txtConPassword.text,
+//       'email': txtEmail.text,
+//       'name': txtFirstName.text + " " + txtLastName.text,
+//       'phone': txtPhone.text,
+//       'gender': selectedSexIndex + 1,
+//       'occupation': selectOccupation,
+//     });
+//     if (result['statusCode'] == 200) {
+//       final response = await postLogin(server + 'token', {
+//         'email': txtEmail.text,
+//         'password': txtPassword.text,
+//         'device_name': "mobile"
+//       });
+//       await new FlutterSecureStorage()
+//           .write(key: 'token', value: response['token']);
+//       final result = await get(server + 'users/me');
+//       await new FlutterSecureStorage().write(
+//           key: 'phoneVerified', value: result['phone_verified'].toString());
+//       createStorageApp(
+//           model: result, category: 'guest', token: response['token']);
+//       _updateToken(result['id']);
+//       if (result['phone_verified'] == false) {
+//         return showDialog(
 //           barrierDismissible: false,
 //           context: context,
 //           builder: (BuildContext context) {
@@ -595,7 +552,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 //               },
 //               child: CupertinoAlertDialog(
 //                 title: new Text(
-//                   'ลงทะเบียนเรียบร้อยแล้ว\nกรุณาเข้าสู่ระบบ\nเพื่อยืนยันเบอร์โทรศัพท์',
+//                   'ลงทะเบียนเรียบร้อยแล้ว\nกรุณายืนยันเบอร์โทรศัพท์',
 //                   style: TextStyle(
 //                     fontSize: 16,
 //                     fontFamily: 'Kanit',
@@ -620,152 +577,91 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 //                       Navigator.push(
 //                         context,
 //                         MaterialPageRoute(
-//                           builder: (_) => LoginCentralPage(),
+//                           builder: (_) => VerifyPhonePage(
+//                             sendOtp: false,
+//                           ),
 //                         ),
 //                       );
+//                     },
+//                   ),
+//                   CupertinoDialogAction(
+//                     isDefaultAction: false,
+//                     child: new Text(
+//                       "ไม่ใช่ตอนนี้",
+//                       style: TextStyle(
+//                         fontSize: 13,
+//                         fontFamily: 'Kanit',
+//                         color: Color(0xFFFF7514),
+//                         fontWeight: FontWeight.normal,
+//                       ),
+//                     ),
+//                     onPressed: () {
+//                       Navigator.pushAndRemoveUntil(
+//                           context,
+//                           MaterialPageRoute(
+//                               builder: (context) => MenuCentralPage()),
+//                           (route) => false);
+//                     },
+//                   ),
+//                 ],
+//               ),
+//             );
+//           },
+//         );
+//       }
+//     } else {
+//       print('return register >>>>>>>> $result');
+//       return showDialog(
+//           barrierDismissible: false,
+//           context: context,
+//           builder: (BuildContext context) {
+//             return WillPopScope(
+//               onWillPop: () {
+//                 return Future.value(false);
+//               },
+//               child: CupertinoAlertDialog(
+//                 title: new Text(
+//                   result['message'],
+
+//                   style: TextStyle(
+//                     fontSize: 16,
+//                     fontFamily: 'Kanit',
+//                     color: Colors.black,
+//                     fontWeight: FontWeight.normal,
+//                   ),
+//                 ),
+//                 content: Text(" "),
+//                 actions: [
+//                   CupertinoDialogAction(
+//                     isDefaultAction: true,
+//                     child: new Text(
+//                       "ตกลง",
+//                       style: TextStyle(
+//                         fontSize: 13,
+//                         fontFamily: 'Kanit',
+//                         color: Color(0xFFFF7514),
+//                         fontWeight: FontWeight.normal,
+//                       ),
+//                     ),
+//                     onPressed: () {
+//                       Navigator.of(context).pop();
 //                     },
 //                   ),
 //                 ],
 //               ),
 //             );
 //           });
+//     }
+//   }
 
-    if (result['statusCode'] == 200) {
-      final response = await postLogin(server + 'token', {
-        'email': txtEmail.text,
-        'password': txtPassword.text,
-        'device_name': "mobile"
-      });
-      await new FlutterSecureStorage()
-          .write(key: 'token', value: response['token']);
-
-      final result = await get(server + 'users/me');
-      await new FlutterSecureStorage().write(
-          key: 'phoneVerified', value: result['phone_verified'].toString());
-      createStorageApp(
-          model: result, category: 'guest', token: response['token']);
-      _updateToken(result['id']);
-      if (result['phone_verified'] == false) {
-        return showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return WillPopScope(
-              onWillPop: () {
-                return Future.value(false);
-              },
-              child: CupertinoAlertDialog(
-                title: new Text(
-                  'ลงทะเบียนเรียบร้อยแล้ว\nกรุณายืนยันเบอร์โทรศัพท์',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Kanit',
-                    color: Colors.black,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                content: Text(" "),
-                actions: [
-                  CupertinoDialogAction(
-                    isDefaultAction: true,
-                    child: new Text(
-                      "ตกลง",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Kanit',
-                        color: Color(0xFFFF7514),
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => VerifyPhonePage(
-                            sendOtp: false,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  CupertinoDialogAction(
-                    isDefaultAction: false,
-                    child: new Text(
-                      "ไม่ใช่ตอนนี้",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Kanit',
-                        color: Color(0xFFFF7514),
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MenuCentralPage()),
-                          (route) => false);
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      }
-    } else {
-      print('return register >>>>>>>> $result');
-      return showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return WillPopScope(
-              onWillPop: () {
-                return Future.value(false);
-              },
-              child: CupertinoAlertDialog(
-                title: new Text(
-                  result['message'],
-                  // '',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Kanit',
-                    color: Colors.black,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                content: Text(" "),
-                actions: [
-                  CupertinoDialogAction(
-                    isDefaultAction: true,
-                    child: new Text(
-                      "ตกลง",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Kanit',
-                        color: Color(0xFFFF7514),
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            );
-          });
-    }
-  }
-
-  _updateToken(profileCode) async {
-    FirebaseMessaging.instance.getToken().then(
-      (token) {
-        postDio(server_we_build + 'notificationV2/m/updateTokenDevice',
-            {"token": token, "profileCode": profileCode});
-      },
-    );
-  }
+  // _updateToken(profileCode) async {
+  //   FirebaseMessaging.instance.getToken().then(
+  //     (token) {
+  //       postDio(server_we_build + 'notificationV2/m/updateTokenDevice',
+  //           {"token": token, "profileCode": profileCode});
+  //     },
+  //   );
+  // }
 
   _buildDialogSuccess() {
     return showDialog(
@@ -895,7 +791,7 @@ class TextRegisterWidget extends StatelessWidget {
             return null;
           },
           obscureText: obscureText,
-          cursorColor: Color(0xFF0B24FB),
+          cursorColor: Color(0xFF09665a),
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w400,

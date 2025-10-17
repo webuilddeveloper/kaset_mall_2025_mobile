@@ -1,8 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
-
-import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +8,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/confirm_order.dart';
-import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/home.dart';
 import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/shared/extension.dart';
 import 'package:kasetmall/widget/show_loading.dart';
-import 'package:uuid/uuid.dart';
 
 class CartCentralPage extends StatefulWidget {
   const CartCentralPage({Key? key}) : super(key: key);
@@ -28,7 +23,6 @@ class AdaptiveTextSize {
   const AdaptiveTextSize();
 
   getadaptiveTextSize(BuildContext context, dynamic value) {
-    // 720 is medium screen height
     return (value / 720) *
         ((MediaQuery.of(context).size.height +
                 MediaQuery.of(context).size.width) /
@@ -64,36 +58,10 @@ class _CartCentralPageState extends State<CartCentralPage> {
   @override
   initState() {
     super.initState();
-    _readProfile();
-    // _callRead();
+
     setState(() {});
 
     _readLocalCart();
-  }
-
-  _readProfile() async {
-    final result = await getUser(server + 'users/me');
-    setState(() {
-      // verifyPhonePage = result['phone_verified'].toString();
-      // emailProfile = result['email'].toString();
-      // profilePhone = result['id'].toString();
-    });
-    await _readLocalCart();
-    // await _callRead();
-    // profileCode = await storage.read(key: 'profileCode10');
-    // dynamic valueStorage = await storage.read(key: 'dataUserLoginDDPM');
-    // dynamic dataValue = valueStorage == null ? {'email': ''} : json.decode(valueStorage);
-    // String phoneStorage = await storage.read(key: 'profilePhone');
-    // verifyPhone = await storage.read(key: 'phoneVerified');
-    // await storage.read(key: 'phoneVerified').then(((value) async {
-    //   await setState(() {
-    //     profilePhone = phoneStorage;
-    //     emailProfile = dataValue['email'].toString() ?? "";
-    //     verifyPhonePage = value;
-    //     // loading = false;
-    //   });
-    // _callRead();
-    // }));
   }
 
   _readLocalCart() async {
@@ -107,7 +75,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
     if (cartData != null && cartData.isNotEmpty) {
       List<dynamic> cartList = jsonDecode(cartData);
 
-      // เพิ่ม property 'selected' ให้ทุก item
       for (var e in cartList) {
         e['selected'] = false;
       }
@@ -123,50 +90,12 @@ class _CartCentralPageState extends State<CartCentralPage> {
       });
     }
   }
-  // _callRead() async {
-  //   var newMap = {};
-  //   var arr = [];
-  //   model = [];
-  //   if (verifyPhonePage == 'true') {
-  //     var response = await get('${server}carts');
-  //     arr = response;
-
-  //     arr.forEach((element) async {
-  //       element['selected'] = false;
-  //       if (element['media'] == null) {
-  //         element['media'] = null;
-  //       }
-  //     });
-  //     setState(() {
-  //       model = arr;
-  //       loading = false;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       model = arr;
-  //       loading = false;
-  //     });
-  //   }
-
-  //   //  arr.add({'selected' : false});
-  //   // arr.map((e) {
-  //   //   var selected = false;
-
-  //   //     // e['selected'] = e['selected'] = false;
-  //   //     return e;
-  //   //   });
-
-  //   // newMap = groupBy(response, (obj) => obj['id'] = 1);
-  // }
 
   checkItem(int indexItem) {
-    var currentShopChecked;
-    var arr = {};
-    var a;
     if (model[indexItem]['stock'] > 0) {
       setState(
-        () => {
-          model[indexItem]['selected'] = !model[indexItem]['selected'],
+        () {
+          model[indexItem]['selected'] = !model[indexItem]['selected'];
         },
       );
     }
@@ -178,44 +107,17 @@ class _CartCentralPageState extends State<CartCentralPage> {
       () {
         buyAll = !buyAll;
         model.forEach(
-          (e) => {
-            if (e['stock'] > 0)
-              {
-                e['selected'] = buyAll,
-              }
-            // if (e['selected'] == true) {}
+          (e) {
+            if (e['stock'] > 0) {
+              e['selected'] = buyAll;
+            }
+            ;
           },
         );
       },
     );
   }
 
-  // deleteAll() {
-  //   setState(
-  //     () {
-  //       Dio dio = new Dio();
-  //       loading = true;
-  //       model.forEach(
-  //         (c) async => {
-  //           if (c['selected'])
-  //             {
-  //               // await delete(server + 'carts/' + c['id']).then(
-  //               //   (res) async {
-  //               //     if (res['success'] == true) {
-  //               //       // _callRead();
-  //               //       setState(() {
-  //               //         loading = false;
-  //               //       });
-  //               //     }
-  //               //   },
-  //               // )
-  //             }
-  //         },
-  //       );
-  //     },
-  //   );
-  //   Navigator.pop(context);
-  // }
   String _priceAll() {
     num totalPrice = 0;
 
@@ -253,11 +155,10 @@ class _CartCentralPageState extends State<CartCentralPage> {
         setState(() {
           param['qty']--;
         });
-        await _saveCartToStorage(); // บันทึกลง storage
+        await _saveCartToStorage();
       }
     } else {
-      // เพิ่มจำนวน
-      int stock = param['stock'] ?? 999; // ถ้าไม่มีข้อมูล stock ให้ใช้ค่าสูงๆ
+      int stock = param['stock'] ?? 999;
 
       if (param['qty'] >= stock) {
         toastFail(context, text: 'สินค้าเหลือเพียง $stock ชิ้น เท่านั้น');
@@ -266,7 +167,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
         setState(() {
           param['qty']++;
         });
-        await _saveCartToStorage(); // บันทึกลง storage
+        await _saveCartToStorage();
       }
     }
   }
@@ -281,11 +182,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
     setState(() {
       loading = true;
     });
-
-    // ลบเฉพาะรายการที่เลือก
     model.removeWhere((item) => item['selected'] == true);
-
-    // บันทึกกลับลง storage
     await _saveCartToStorage();
 
     setState(() {
@@ -295,42 +192,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
 
     Navigator.pop(context);
   }
-  // void deleteItem(int index, String id) async {
-  //   setState(() {
-  //     loading = true;
-  //   });
-
-  //   // ลบออกจาก model
-  //   setState(() {
-  //     model.removeAt(index);
-  //   });
-
-  //   // บันทึกกลับลง storage
-  //   await _saveCartToStorage();
-
-  //   setState(() {
-  //     loading = false;
-  //   });
-
-  //   Navigator.pop(context);
-  // }
-
-  // void deleteItem(int index, String id) async {
-  //   setState(() {
-  //     loading = true;
-  //   });
-  //   Dio dio = new Dio();
-  //   await delete(server + 'carts/' + id).then((res) async {
-  //     if (res['success'] == true) {
-  //       setState(() => model.removeAt(index));
-  //       // if (model[index]['items'].length == 0) model.removeAt(index);
-  //       setState(() {
-  //         loading = false;
-  //       });
-  //     }
-  //     Navigator.pop(context);
-  //   });
-  // }
 
   readProduct(param) async {
     var result;
@@ -342,24 +203,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
           )
         });
     return result;
-  }
-
-  _addLog(param) async {
-    try {
-      await postObjectData(server_we_build + 'log/logGoods/create', {
-        "username": emailProfile ?? "",
-        "profileCode": profileCode ?? "",
-        "platform": Platform.isAndroid
-            ? "android"
-            : Platform.isIOS
-                ? "ios"
-                : "other",
-        "prodjctId": param['id'] ?? "",
-        "title": param['name'] ?? "",
-        "categoryId": param['category']['data']['id'] ?? "",
-        "category": param['category']['data']['name'] ?? "",
-      });
-    } catch (e) {}
   }
 
   @override
@@ -382,7 +225,10 @@ class _CartCentralPageState extends State<CartCentralPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HomeCentralPage()));
                   },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -429,29 +275,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
       body: ShowLoadingWidget(
         loading: loading,
         children: [
-          if (model.length == 0 && profilePhone == null ||
-              profilePhone == '' ||
-              profilePhone == 'false')
-            _cartNoAddPhone(),
-          if (model.length == 0 &&
-              verifyPhonePage == 'false' &&
-              profilePhone != null)
-            _cartNoVerify(),
-          if (model.length == 0 && verifyPhonePage == 'true' && !loading)
-            _cartEmpty(),
           if (model.length > 0)
-            // SizedBox(
-            //     height: double.infinity,
-            //     child: ListView.separated(
-            //       shrinkWrap: true,
-            //       physics: ClampingScrollPhysics(),
-            //       padding: EdgeInsets.only(
-            //         bottom: MediaQuery.of(context).padding.bottom + 70,
-            //       ),
-            //       itemCount: 1,
-            //       separatorBuilder: (_, __) => SizedBox(height: 20),
-            //       itemBuilder: (context, index) => _buildGroup(model, index),
-            //     )),
             SizedBox(
               height: double.infinity,
               child: Container(
@@ -478,7 +302,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
               left: 0,
               right: 0,
               child: Container(
-                // height: 50 + MediaQuery.of(context).padding.bottom,
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom),
                 decoration: BoxDecoration(
@@ -913,150 +736,104 @@ class _CartCentralPageState extends State<CartCentralPage> {
     );
   }
 
-  _cartEmpty() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'รถเข็นยังว่างอยู่ ต้องหาอะไรมาเพิ่มหน่อยแล้ว!',
-            style: TextStyle(fontFamily: 'Kanit', fontSize: 15),
-          ),
-          SizedBox(height: 15),
-          Image.asset(
-            'assets/images/cart.png',
-            height: 50,
-            width: 50,
-            color: Color(0xFF09665a),
-          ),
-          SizedBox(height: 15),
-          InkWell(
-            onTap: () => Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => MenuCentralPage()),
-                (route) => false),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                border: Border.all(
-                  width: 1,
-                  color: Color(0xFFDF0B24),
-                ),
-              ),
-              child: Text(
-                'ช้อปตอนนี้',
-                style: TextStyle(
-                  fontFamily: 'Kanit',
-                  fontSize: 15,
-                  color: Color(0xFFDF0B24),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
+  // _cartNoVerify() {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Text(
+  //           'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์',
+  //           style: TextStyle(fontFamily: 'Kanit', fontSize: 18),
+  //         ),
+  //         SizedBox(height: 15),
+  //         Icon(Icons.perm_device_info, size: 70, color: Color(0xFFDF0B24)),
+  //         // Image.asset(
+  //         //   'assets/images/kaset/basket.png',
+  //         //   height: 50,
+  //         //   width: 50,
+  //         //   color: Color(0xFF09665a),
+  //         // ),
+  //         SizedBox(height: 15),
+  //         InkWell(
+  //           onTap: () {},
+  //           // Navigator.pushAndRemoveUntil(
+  //           //     context,
+  //           //     MaterialPageRoute(builder: (context) => VerifyPhonePage()),
+  //           //     (route) => false),
+  //           child: Container(
+  //             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(3),
+  //               border: Border.all(
+  //                 width: 1,
+  //                 color: Color(0xFFDF0B24),
+  //               ),
+  //             ),
+  //             child: Text(
+  //               'ยืนยันเบอร์โทรศัพท์',
+  //               style: TextStyle(
+  //                 fontFamily: 'Kanit',
+  //                 fontSize: 15,
+  //                 color: Color(0xFFDF0B24),
+  //               ),
+  //             ),
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  _cartNoVerify() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์',
-            style: TextStyle(fontFamily: 'Kanit', fontSize: 18),
-          ),
-          SizedBox(height: 15),
-          Icon(Icons.perm_device_info, size: 70, color: Color(0xFFDF0B24)),
-          // Image.asset(
-          //   'assets/images/cart.png',
-          //   height: 50,
-          //   width: 50,
-          //   color: Color(0xFF0B24FB),
-          // ),
-          SizedBox(height: 15),
-          InkWell(
-            onTap: () {},
-            // Navigator.pushAndRemoveUntil(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => VerifyPhonePage()),
-            //     (route) => false),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                border: Border.all(
-                  width: 1,
-                  color: Color(0xFFDF0B24),
-                ),
-              ),
-              child: Text(
-                'ยืนยันเบอร์โทรศัพท์',
-                style: TextStyle(
-                  fontFamily: 'Kanit',
-                  fontSize: 15,
-                  color: Color(0xFFDF0B24),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  _cartNoAddPhone() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'บัญชีนี้ยังไม่ได้เพิ่มเบอร์โทรศัพท์',
-            style: TextStyle(fontFamily: 'Kanit', fontSize: 18),
-          ),
-          SizedBox(height: 15),
-          Icon(Icons.add_call, size: 70, color: Color(0xFFDF0B24)),
-          // Image.asset(
-          //   'assets/images/cart.png',
-          //   height: 50,
-          //   width: 50,
-          //   color: Color(0xFF0B24FB),
-          // ),
-          SizedBox(height: 15),
-          InkWell(
-            onTap: () => {
-              // Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (BuildContext context) =>
-              //           UserProfileForm(mode: "addPhone"),
-              //     )).then((value) => {_readProfile()})
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                border: Border.all(
-                  width: 1,
-                  color: Color(0xFFDF0B24),
-                ),
-              ),
-              child: Text(
-                'เพิ่มเบอร์โทรศัพท์',
-                style: TextStyle(
-                  fontFamily: 'Kanit',
-                  fontSize: 15,
-                  color: Color(0xFFDF0B24),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
+  // _cartNoAddPhone() {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Text(
+  //           'บัญชีนี้ยังไม่ได้เพิ่มเบอร์โทรศัพท์',
+  //           style: TextStyle(fontFamily: 'Kanit', fontSize: 18),
+  //         ),
+  //         SizedBox(height: 15),
+  //         Icon(Icons.add_call, size: 70, color: Color(0xFFDF0B24)),
+  //         // Image.asset(
+  //         //   'assets/images/kaset/basket.png',
+  //         //   height: 50,
+  //         //   width: 50,
+  //         //   color: Color(0xFF09665a),
+  //         // ),
+  //         SizedBox(height: 15),
+  //         InkWell(
+  //           onTap: () => {
+  //             // Navigator.push(
+  //             //     context,
+  //             //     MaterialPageRoute(
+  //             //       builder: (BuildContext context) =>
+  //             //           UserProfileForm(mode: "addPhone"),
+  //             //     )).then((value) => {_readProfile()})
+  //           },
+  //           child: Container(
+  //             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(3),
+  //               border: Border.all(
+  //                 width: 1,
+  //                 color: Color(0xFFDF0B24),
+  //               ),
+  //             ),
+  //             child: Text(
+  //               'เพิ่มเบอร์โทรศัพท์',
+  //               style: TextStyle(
+  //                 fontFamily: 'Kanit',
+  //                 fontSize: 15,
+  //                 color: Color(0xFFDF0B24),
+  //               ),
+  //             ),
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
   _buildDialogDelete(index, id) {
     return showDialog(

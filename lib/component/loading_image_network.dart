@@ -9,7 +9,6 @@ Widget loadingImageNetwork(
   Color? color,
   bool isProfile = false,
 }) {
-  if (url == null) url = '';
   if (url == '' && isProfile)
     return Container(
       height: 30,
@@ -57,10 +56,7 @@ Widget loadingImageNetwork(
         );
       },
       onEnd: () {
-        // Loop animation
-        Future.delayed(Duration(milliseconds: 500), () {
-          // Trigger rebuild to repeat animation
-        });
+        Future.delayed(Duration(milliseconds: 500), () {});
       },
     ),
     errorWidget: (_, __, ___) => Container(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:kasetmall/shared/api_provider.dart';
+
 
 headerCustom(BuildContext context,
     {String title = '',
@@ -24,7 +23,7 @@ headerCustom(BuildContext context,
               alignment: Alignment.center,
               onPressed: () {
                 if (customBack && func != null) {
-                  func!();
+                  func();
                 } else {
                   Navigator.pop(context);
                 }
@@ -67,7 +66,7 @@ headerCentral(BuildContext context,
             alignment: Alignment.center,
             onPressed: () {
               if (customBack && func != null) {
-                func!();
+                func();
               } else {
                 Navigator.pop(context);
               }

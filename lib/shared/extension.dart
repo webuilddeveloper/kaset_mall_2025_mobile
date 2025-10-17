@@ -23,7 +23,7 @@ dateStringToDate(String date) {
   var year = date.substring(0, 4);
   var month = date.substring(4, 6);
   var day = date.substring(6, 8);
-  DateTime todayDate = DateTime.parse(year + '-' + month + '-' + day);
+  DateTime.parse(year + '-' + month + '-' + day);
   // fixflutter2 var onlyBuddhistYear = todayDate.yearInBuddhistCalendar;
   // var formatter = DateFormat.yMMMMd();
   // var dateInBuddhistCalendarFormat =
@@ -44,7 +44,7 @@ dateStringToDateBirthDay(String date) {
 
 dateStringToMonthTH(String date) {
   //20201010 to 2020-10-10T00:00:00
-  String year = date.substring(0, 4);
+  date.substring(0, 4);
   String month = date.substring(4, 6);
   String day = date.substring(6, 8);
 
@@ -151,32 +151,28 @@ dateThai(int? date) {
 }
 
 dateTimeThai(int date) {
-  if (date == null) {
-    return '-';
-  } else {
-    String newDate = date.toString();
-    if (newDate.length <= 10) {
-      newDate += '000';
-    }
-    var dateForm = (DateFormat("ddMMyyyyHHmmss", "th").format(
-            DateTime.fromMillisecondsSinceEpoch(int.parse(newDate),
-                isUtc: false)))
-        .toString();
-
-    var y = (int.tryParse(
-                dateForm.substring(dateForm.length - 10, dateForm.length - 6))! +
-            543)
-        .toString();
-    var m = dateForm.substring(dateForm.length - 12, dateForm.length - 10);
-    var d = dateForm.substring(dateForm.length - 14, dateForm.length - 12);
-
-    var hh = dateForm.substring(dateForm.length - 6, dateForm.length - 4);
-    var mm = dateForm.substring(dateForm.length - 4, dateForm.length - 2);
-    var ss = dateForm.substring(dateForm.length - 2, dateForm.length);
-
-    var dateResult = '$d/$m/$y $hh:$mm:$ss';
-    return dateResult;
+  String newDate = date.toString();
+  if (newDate.length <= 10) {
+    newDate += '000';
   }
+  var dateForm = (DateFormat("ddMMyyyyHHmmss", "th").format(
+          DateTime.fromMillisecondsSinceEpoch(int.parse(newDate),
+              isUtc: false)))
+      .toString();
+
+  var y = (int.tryParse(
+              dateForm.substring(dateForm.length - 10, dateForm.length - 6))! +
+          543)
+      .toString();
+  var m = dateForm.substring(dateForm.length - 12, dateForm.length - 10);
+  var d = dateForm.substring(dateForm.length - 14, dateForm.length - 12);
+
+  var hh = dateForm.substring(dateForm.length - 6, dateForm.length - 4);
+  var mm = dateForm.substring(dateForm.length - 4, dateForm.length - 2);
+  var ss = dateForm.substring(dateForm.length - 2, dateForm.length);
+
+  var dateResult = '$d/$m/$y $hh:$mm:$ss';
+  return dateResult;
 }
 
 dateUnixTimeThaiShort(int date) {

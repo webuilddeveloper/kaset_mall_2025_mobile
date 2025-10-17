@@ -25,7 +25,6 @@ class _DeliveryAddressCentralPageState
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
-  // var tempData = List<dynamic>();
   bool latestCard = false;
 
   @override
@@ -222,7 +221,7 @@ class _DeliveryAddressCentralPageState
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: model['main'] ? Color(0XFF0B24FB) : Color(0XFFE4E4E4),
+              color: model['main'] ? Color(0xFF09665a) : Color(0XFFE4E4E4),
               // color: Color(0XFFE4E4E4),
             ),
           ),
@@ -312,7 +311,7 @@ class _DeliveryAddressCentralPageState
               //     borderRadius: BorderRadius.circular(25.0),
               //     border: Border.all(
               //       color: model['isDefault']
-              //           ? Color(0XFF0B24FB)
+              //           ? Color(0xFF09665a)
               //           : Color(0XFFE4E4E4),
               //       // color: Color(0XFF707070),
               //     ),
@@ -327,7 +326,7 @@ class _DeliveryAddressCentralPageState
               //       fontFamily: 'Kanit',
               //       fontSize: 15,
               //       color: model['isDefault']
-              //           ? Color(0XFF0B24FB)
+              //           ? Color(0xFF09665a)
               //           : Color(0XFF707070),
               //     ),
               //   ),

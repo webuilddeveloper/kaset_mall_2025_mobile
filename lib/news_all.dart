@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +7,10 @@ import 'package:kasetmall/component/key_search.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/news_form.dart';
-import 'package:kasetmall/product_from.dart';
+
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
-import 'package:kasetmall/verify_phone.dart';
+
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 // ignore: must_be_immutable
@@ -29,13 +28,10 @@ class _NewsAllPageState extends State<NewsAllPage> {
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   final storage = new FlutterSecureStorage();
   Future<dynamic>? _futureModel;
-  List<dynamic> _listModelMore = [];
   RefreshController? _refreshController;
   TextEditingController? _searchController;
   TextEditingController txtPriceMin = TextEditingController();
   TextEditingController txtPriceMax = TextEditingController();
-  String _filterSelected = 'เกี่ยวข้อง';
-  int _limit = 20;
   bool changeToListView = false;
   int amountItemInCart = 0;
   String profileCode = "";
@@ -131,26 +127,14 @@ class _NewsAllPageState extends State<NewsAllPage> {
   //   });
   // }
 
-  _getCountItemInCart() async {
-    //get amount item in cart.
-    await get(server + 'carts').then((value) async {
-      if (value != null)
-        setState(() {
-          amountItemInCart = value.length;
-        });
-    });
-  }
-
   // business logic.
   void _onRefresh() async {
     setState(() {
-      _limit = 20;
       orderKey = '';
       orderBy = '';
       txtPriceMin.text = '';
       txtPriceMax.text = '';
       loadProduct = true;
-      _listModelMore = [];
       _futureModel = null;
     });
     // _filterSelected == 'เกี่ยวข้อง' ? _callRead() : _hotSale;
@@ -193,7 +177,6 @@ class _NewsAllPageState extends State<NewsAllPage> {
           if (page < total_page) {
             page += 1;
             if (changOrderKey) {
-              _listModelMore = [];
               page = 0;
               // itemProductCount = 0;
             }
@@ -212,22 +195,6 @@ class _NewsAllPageState extends State<NewsAllPage> {
         }
       },
     );
-  }
-
-  _addLog(param) async {
-    await postObjectData(server_we_build + 'log/logGoods/create', {
-      "username": emailProfile ?? "",
-      "profileCode": profileCode ?? "",
-      "platform": Platform.isAndroid
-          ? "android"
-          : Platform.isIOS
-              ? "ios"
-              : "other",
-      "prodjctId": param['id'] ?? "",
-      "title": param['name'] ?? "",
-      "categoryId": param['category']['data']['id'] ?? "",
-      "category": param['category']['data']['name'] ?? "",
-    });
   }
 
   @override
@@ -382,7 +349,6 @@ class _NewsAllPageState extends State<NewsAllPage> {
   _buildCardList(dynamic param) {
     return GestureDetector(
       onTap: () {
-        _addLog(param);
         Navigator.push(
           context,
           MaterialPageRoute(

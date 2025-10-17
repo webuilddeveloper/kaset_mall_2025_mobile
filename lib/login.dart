@@ -1,11 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kasetmall/forgot_password.dart';
 import 'package:kasetmall/menu.dart';
 import 'package:kasetmall/register.dart';
 import 'package:kasetmall/shared/api_provider.dart';
@@ -13,7 +12,6 @@ import 'package:kasetmall/shared/apple.dart';
 import 'package:kasetmall/shared/facebook_firebase.dart';
 import 'package:kasetmall/shared/google.dart';
 import 'package:kasetmall/shared/line.dart';
-import 'package:kasetmall/verify_phone.dart';
 import 'package:kasetmall/widget/text_field.dart';
 
 DateTime now = new DateTime.now();
@@ -32,9 +30,6 @@ class LoginCentralPage extends StatefulWidget {
 class _LoginCentralPageState extends State<LoginCentralPage> {
   final storage = new FlutterSecureStorage();
 
-  late String _username;
-  late String _password;
-  late String _category;
 
   final txtUsername = TextEditingController();
   final txtPassword = TextEditingController();
@@ -44,9 +39,6 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
   @override
   void initState() {
     setState(() {
-      _username = "";
-      _password = "";
-      _category = "";
     });
 
     final random = Random();
@@ -110,7 +102,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                   children: [
                     Center(
                       child: Image.asset(
-                        "assets/logo.png",
+                        "assets/images/kaset/logo_kaset.png",
                         // fit: BoxFit.contain,
                         // height: 150,
                         width: 150,
@@ -476,7 +468,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
                                 }
                               },
                               icon: new Image.asset(
-                                "assets/images/apple_circle.png",
+                                "assets/images/kaset/apple_circle.png",
                               ),
                               padding: new EdgeInsets.all(5.0),
                             ),
@@ -575,299 +567,208 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
   }
 
   //login username / password
-  Future<dynamic> login() async {
-    if ((_username == null || _username == '') && _category == 'guest') {
-      return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) => new CupertinoAlertDialog(
-          title: new Text(
-            'กรุณากรอกอีเมล',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Kanit',
-              color: Colors.black,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-          content: Text(" "),
-          actions: [
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              child: new Text(
-                "ตกลง",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'Kanit',
-                  color: Color(0xFF000070),
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-    } else if ((_password == null || _password == '') && _category == 'guest') {
-      return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) => new CupertinoAlertDialog(
-          title: new Text(
-            'กรุณากรอกรหัสผ่าน',
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'Kanit',
-              color: Colors.black,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-          content: Text(" "),
-          actions: [
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              child: new Text(
-                "ตกลง",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'Kanit',
-                  color: Color(0xFF000070),
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Dio dio = new Dio();
-      // var response = await dio.post(
-      //   '${server}token',
-      //   data: {
-      //     'email': _username.toString(),
-      //     'password': _password.toString(),
-      //     'device_name': "mobile"
-      //   },
-      // );
+  // Future<dynamic> login() async {
+  //   if ((_username == null || _username == '') && _category == 'guest') {
+  //     return showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (BuildContext context) => new CupertinoAlertDialog(
+  //         title: new Text(
+  //           'กรุณากรอกอีเมล',
+  //           style: TextStyle(
+  //             fontSize: 16,
+  //             fontFamily: 'Kanit',
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.normal,
+  //           ),
+  //         ),
+  //         content: Text(" "),
+  //         actions: [
+  //           CupertinoDialogAction(
+  //             isDefaultAction: true,
+  //             child: new Text(
+  //               "ตกลง",
+  //               style: TextStyle(
+  //                 fontSize: 13,
+  //                 fontFamily: 'Kanit',
+  //                 color: Color(0xFF000070),
+  //                 fontWeight: FontWeight.normal,
+  //               ),
+  //             ),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   } else if ((_password == null || _password == '') && _category == 'guest') {
+  //     return showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (BuildContext context) => new CupertinoAlertDialog(
+  //         title: new Text(
+  //           'กรุณากรอกรหัสผ่าน',
+  //           style: TextStyle(
+  //             fontSize: 16,
+  //             fontFamily: 'Kanit',
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.normal,
+  //           ),
+  //         ),
+  //         content: Text(" "),
+  //         actions: [
+  //           CupertinoDialogAction(
+  //             isDefaultAction: true,
+  //             child: new Text(
+  //               "ตกลง",
+  //               style: TextStyle(
+  //                 fontSize: 13,
+  //                 fontFamily: 'Kanit',
+  //                 color: Color(0xFF000070),
+  //                 fontWeight: FontWeight.normal,
+  //               ),
+  //             ),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   } else {
+  //     final response = await postLogin(server + 'token', {
+  //       'email': _username.toString(),
+  //       'password': _password.toString(),
+  //       'device_name': "mobile"
+  //     });
+  //     if (response['token'] != null) {
+  //       FocusScope.of(context).unfocus();
+  //       new TextEditingController().clear();
+  //       final result = await getUser(server + 'users/me');
+  //       createStorageApp(
+  //           model: result, category: 'guest', token: response['token']);
+  //       if (result['phone_verified'] == false) {
+  //         showDialog(
+  //             barrierDismissible: false,
+  //             context: context,
+  //             builder: (BuildContext context) {
+  //               return WillPopScope(
+  //                 onWillPop: () {
+  //                   return Future.value(false);
+  //                 },
+  //                 child: CupertinoAlertDialog(
+  //                   title: new Text(
+  //                     'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
+  //                     style: TextStyle(
+  //                       fontSize: 16,
+  //                       fontFamily: 'Kanit',
+  //                       color: Colors.black,
+  //                       fontWeight: FontWeight.normal,
+  //                     ),
+  //                   ),
+  //                   content: Text(" "),
+  //                   actions: [
+  //                     CupertinoDialogAction(
+  //                       isDefaultAction: true,
+  //                       child: new Text(
+  //                         "ตกลง",
+  //                         style: TextStyle(
+  //                           fontSize: 13,
+  //                           fontFamily: 'Kanit',
+  //                           color: Color(0xFFFF7514),
+  //                           fontWeight: FontWeight.normal,
+  //                         ),
+  //                       ),
+  //                       onPressed: () {
+  //                         Navigator.pushReplacement(
+  //                           context,
+  //                           MaterialPageRoute(
+  //                             builder: (context) => VerifyPhonePage(),
+  //                           ),
+  //                         );
+  //                       },
+  //                     ),
+  //                     CupertinoDialogAction(
+  //                       isDefaultAction: false,
+  //                       child: new Text(
+  //                         "ไม่ใช่ตอนนี้",
+  //                         style: TextStyle(
+  //                           fontSize: 13,
+  //                           fontFamily: 'Kanit',
+  //                           color: Color(0xFFFF7514),
+  //                           fontWeight: FontWeight.normal,
+  //                         ),
+  //                       ),
+  //                       onPressed: () {
+  //                         Navigator.pushAndRemoveUntil(
+  //                             context,
+  //                             MaterialPageRoute(
+  //                                 builder: (context) => MenuCentralPage()),
+  //                             (route) => false);
+  //                       },
+  //                     ),
+  //                   ],
+  //                 ),
+  //               );
+  //             });
+  //       } else {
+  //         _updateToken('${result['id']}');
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => MenuCentralPage(),
+  //           ),
+  //         );
+  //       }
+  //     } else {
+  //       showDialog(
+  //         barrierDismissible: false,
+  //         context: context,
+  //         builder: (BuildContext context) => new CupertinoAlertDialog(
+  //           title: new Text(
+  //             'อีเมล/รหัสผ่าน ไม่ถูกต้อง',
+  //             style: TextStyle(
+  //               fontSize: 16,
+  //               fontFamily: 'Kanit',
+  //               color: Colors.black,
+  //               fontWeight: FontWeight.normal,
+  //             ),
+  //           ),
+  //           content: Text(" "),
+  //           actions: [
+  //             CupertinoDialogAction(
+  //               isDefaultAction: true,
+  //               child: new Text(
+  //                 "ตกลง",
+  //                 style: TextStyle(
+  //                   fontSize: 13,
+  //                   fontFamily: 'Kanit',
+  //                   color: Color(0xFF000070),
+  //                   fontWeight: FontWeight.normal,
+  //                 ),
+  //               ),
+  //               onPressed: () {
+  //                 FocusScope.of(context).unfocus();
+  //                 new TextEditingController().clear();
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
-      final response = await postLogin(server + 'token', {
-        'email': _username.toString(),
-        'password': _password.toString(),
-        'device_name': "mobile"
-      });
-
-      if (response['token'] != null) {
-        FocusScope.of(context).unfocus();
-        new TextEditingController().clear();
-        // await new FlutterSecureStorage()
-        //     .write(key: 'token', value: response['token']);
-        final result = await getUser(server + 'users/me');
-        // await new FlutterSecureStorage()
-        //     .write(key: 'phoneVerified', value: result['phone_verified'].toString());
-        // await new FlutterSecureStorage()
-        //     .write(key: 'profileCode', value: result['id'].toString());
-        createStorageApp(
-            model: result, category: 'guest', token: response['token']);
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => MenuCentralPage(),
-        //   ),
-        // );
-
-        if (result['phone_verified'] == false) {
-          showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (BuildContext context) {
-                return WillPopScope(
-                  onWillPop: () {
-                    return Future.value(false);
-                  },
-                  child: CupertinoAlertDialog(
-                    title: new Text(
-                      'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Kanit',
-                        color: Colors.black,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    content: Text(" "),
-                    actions: [
-                      CupertinoDialogAction(
-                        isDefaultAction: true,
-                        child: new Text(
-                          "ตกลง",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'Kanit',
-                            color: Color(0xFFFF7514),
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VerifyPhonePage(),
-                            ),
-                          );
-                        },
-                      ),
-                      CupertinoDialogAction(
-                        isDefaultAction: false,
-                        child: new Text(
-                          "ไม่ใช่ตอนนี้",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'Kanit',
-                            color: Color(0xFFFF7514),
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MenuCentralPage()),
-                              (route) => false);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              });
-        } else {
-          _updateToken('${result['id']}');
-          // print(result['id']);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MenuCentralPage(),
-            ),
-          );
-        }
-      } else {
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) => new CupertinoAlertDialog(
-            title: new Text(
-              'อีเมล/รหัสผ่าน ไม่ถูกต้อง',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Kanit',
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-            content: Text(" "),
-            actions: [
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                child: new Text(
-                  "ตกลง",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontFamily: 'Kanit',
-                    color: Color(0xFF000070),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                onPressed: () {
-                  FocusScope.of(context).unfocus();
-                  new TextEditingController().clear();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
-      }
-
-      // if (result.status == 'S' || result.status == 's') {
-      //   createStorageApp(
-      //     model: result.objectData.code,
-      //     category: 'guest',
-      //   );
-
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => MenuCentralPage(),
-      //     ),
-      //   );
-
-      //   // await storage.write(
-      //   //   key: 'dataUserLoginDDPM',
-      //   //   value: jsonEncode(result.objectData),
-      //   // );
-
-      //   // Navigator.of(context).pushAndRemoveUntil(
-      //   //   MaterialPageRoute(
-      //   //     builder: (context) => MenuCentralPage(),
-      //   //   ),
-      //   //   (Route<dynamic> route) => false,
-      //   // );
-      // }
-
-      // else {
-      //   if (_category == 'guest') {
-      //     return showDialog(
-      //       barrierDismissible: false,
-      //       context: context,
-      //       builder: (BuildContext context) => new CupertinoAlertDialog(
-      //         title: new Text(
-      //           result.message,
-      //           style: TextStyle(
-      //             fontSize: 16,
-      //             fontFamily: 'Kanit',
-      //             color: Colors.black,
-      //             fontWeight: FontWeight.normal,
-      //           ),
-      //         ),
-      //         content: Text(" "),
-      //         actions: [
-      //           CupertinoDialogAction(
-      //             isDefaultAction: true,
-      //             child: new Text(
-      //               "ตกลง",
-      //               style: TextStyle(
-      //                 fontSize: 13,
-      //                 fontFamily: 'Kanit',
-      //                 color: Color(0xFF000070),
-      //                 fontWeight: FontWeight.normal,
-      //               ),
-      //             ),
-      //             onPressed: () {
-      //               Navigator.of(context).pop();
-      //             },
-      //           ),
-      //         ],
-      //       ),
-      //     );
-      //   } else {
-      //     register();
-      //   }
-      // }
-    }
-  }
-
-  _updateToken(profileCode) async {
-    FirebaseMessaging.instance.getToken().then(
-      (token) {
-        postDio(server_we_build + 'notificationV2/m/updateTokenDevice',
-            {"token": token, "profileCode": profileCode});
-      },
-    );
-  }
+  // _updateToken(profileCode) async {
+  //   FirebaseMessaging.instance.getToken().then(
+  //     (token) {
+  //       postDio(server_we_build + 'notificationV2/m/updateTokenDevice',
+  //           {"token": token, "profileCode": profileCode});
+  //     },
+  //   );
+  // }
 
   Future<dynamic> loginWithSsp(accessToken, String type) async {
     // final accessToken = obj.accessToken.idToken;
@@ -946,11 +847,8 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
   //login guest
   void loginWithGuest() async {
     setState(() {
-      _category = 'guest';
-      _username = txtUsername.text;
-      _password = txtPassword.text;
     });
-    login();
+    // login();
   }
 
   TextStyle style = TextStyle(
@@ -973,13 +871,11 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
     //     "lastName": '',
     //     "facebookID": obj.user.uid
     //   };
-
     //   Dio dio = new Dio();
     //   var response = await dio.post(
     //     '${server}m/v2/register/facebook/login',
     //     data: model,
     //   );
-
     //   await storage.write(
     //     key: 'categorySocial',
     //     value: 'Facebook',
@@ -989,19 +885,11 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
     //     value:
     //         obj.user.photoURL != null ? obj.user.photoURL + "?width=9999" : '',
     //   );
-
     //   createStorageApp(
     //     model: response.data['objectData'],
     //     category: 'facebook',
     //   );
-
     //   if (obj != null) {
-    //     // Navigator.pushReplacement(
-    //     //   context,
-    //     //   MaterialPageRoute(
-    //     //     builder: (context) => MenuCentralPage(),
-    //     //   ),
-    //     // );
     //     Navigator.pushReplacement(
     //       context,
     //       MaterialPageRoute(

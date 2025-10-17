@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:app_links/app_links.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -85,9 +84,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         await themeChangeProvider.darkThemePreference.getTheme();
   }
 
-  late StreamSubscription _sub;
   final navigatorKey = GlobalKey<NavigatorState>();
-  late Future<dynamic> _futureModel;
 
   final stopwatch = Stopwatch();
   Duration elapsed = Duration();
@@ -125,11 +122,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void _setupFirebaseMessaging() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
     if (Platform.isIOS) {
       NotificationSettings settings =
           await FirebaseMessaging.instance.requestPermission(
@@ -160,46 +152,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     });
   }
 
-  void _initUriLinks() async {
-    _sub = AppLinks().uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        _navigateToPage(uri);
-      }
-    }, onError: (err) {
-      // print('Failed to receive deep link: $err');
-    });
-  }
-
-  void _navigateToPage(Uri uri) async {
-    if (uri.host == 'product' && uri.queryParameters['code'] != null) {
-      String productCode = uri.queryParameters['code']!;
-
-      dynamic model = await getData('${server}products/$productCode');
-
-      if (navigatorKey.currentState != null) {
-        //// print('Navigating to ProductFormCentralPage with code: $productCode');
-        // navigatorKey.currentState?.push(
-        //   MaterialPageRoute(
-        //     builder: (context) => ProductFormCentralPage(model: model),
-        //   ),
-        // );
-      } else {
-        // print('Navigator is not available.');
-      }
-    }
-  }
+  void _initUriLinks() async {}
 
   Future<void> _showNotification(RemoteMessage message) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'high_importance_channel', // ต้องตรงกับ channel_id ที่ใช้ส่งจาก Firebase
-      'High Importance Notifications',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
     // await flutterLocalNotificationsPlugin.show(
     //   0, // ID ของการแจ้งเตือน
     //   message.notification?.title,
@@ -314,7 +269,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             home: VersionPage(),
             builder: (context, child) {
               return MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(1.0)),
                 child: child ?? Container(),
               );
             },

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/notification/notification_form.dart';
@@ -19,7 +21,6 @@ class _NotificationMainCentralPage extends State<NotificationMainCentralPage> {
   late RefreshController _refreshController;
   int selectedIndex = 0;
   final storage = new FlutterSecureStorage();
-  String _email = '';
   late Future<dynamic> futureNotification;
   String profileCode = "";
 

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/reviews_add.dart';
 import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/widget/data_error.dart';
 import 'package:kasetmall/widget/header.dart';
 
-import 'order_details.dart';
 
 class ToRateCentralPage extends StatefulWidget {
   const ToRateCentralPage({Key? key}) : super(key: key);
@@ -15,7 +12,6 @@ class ToRateCentralPage extends StatefulWidget {
 }
 
 class _ToRateCentralPageState extends State<ToRateCentralPage> {
-  late Future<dynamic> _futureModel;
   bool loading = false;
   late List<dynamic> modelUsersMeReviews;
   bool resultOrderId = false;
@@ -31,7 +27,8 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
       "discount": 0,
       "priceTotal": 203000,
       "shipping": 5000,
-      "imageUrl": "assets/images/mock_pro_1.png",
+      "imageUrl":
+          "https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png",
       "purchaseDate": "10/10/2568 10:30:00",
       "paidDate": "10/10/2568 10:35:00",
       "destination_shipped_at": "15/10/2568",
@@ -209,7 +206,7 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
+                child: Image.network(
                   param['imageUrl'],
                   height: 80,
                   width: 80,

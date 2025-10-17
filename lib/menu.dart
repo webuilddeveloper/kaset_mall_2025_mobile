@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison, deprecated_member_use
+
 import 'dart:convert';
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -5,11 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:kasetmall/commercial_organization.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/toast_fail.dart';
-import 'package:kasetmall/coupon.dart';
-import 'package:kasetmall/game_selection_page.dart';
 import 'package:kasetmall/home.dart';
 import 'package:kasetmall/main_popup/dialog_main_popup.dart';
 import 'package:kasetmall/notification/notification.dart';
@@ -61,8 +60,8 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
       // CommercialOrganizationPage(
       //   commercialOrganization: widget.commercialOrganization,
       // ),
-      GameSelectionPage(),
-      CouponCentralPage(),
+      // GameSelectionPage(),
+      // CouponCentralPage(),
       UserInformationCentralPage(),
     ];
     pageController = new PageController(
@@ -110,7 +109,6 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
   onSetPage() {
     setState(() {
       _currentPage = widget.pageIndex != null ? widget.pageIndex : 0;
-      // currentTabIndex = pageIndex != 0 ? pageIndex : currentTabIndex;
     });
   }
 
@@ -181,14 +179,6 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
             width: double.infinity,
             child: Stack(
               children: [
-                // Positioned.fill(
-                //   child: Image.asset(
-                //     'assets/buttom_novel_bg2.jpg',
-                //     fit: BoxFit.cover,
-                //     width: double.infinity,
-                //     height: double.infinity,
-                //   ),
-                // ),
                 ClipRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 0.5, sigmaY: 0.5),
@@ -197,13 +187,6 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
                       children: [
                         _buttonBottomBar(
                             'assets/images/kaset/home-menu.png', '', 0),
-
-                        // _buttonBottomBar('assets/images/central/organize.png',
-                        //     'องค์การค้า', 2),
-                        // _buttonBottomBar(
-                        //     'assets/images/central/game.png', 'เกมส์', 3),
-                        // _buttonBottomBar(
-                        //     'assets/images/central/coupon.png', 'คูปอง', 4),
                         _buttonBottomBar(
                             'assets/images/kaset/basket.png', '', 1),
                         _buttonBottomBar(
@@ -570,4 +553,3 @@ class _ShakeButtonState extends State<_ShakeButton>
     );
   }
 }
-

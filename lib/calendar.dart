@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
@@ -19,8 +21,7 @@ class _CalendarPageState extends State<CalendarPage>
   final storage = new FlutterSecureStorage();
   late ValueNotifier<List<dynamic>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
-      .toggledOff; // Can be toggled on/off by longpressing a date
+  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode.toggledOff;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   DateTime? _rangeStart;
@@ -65,8 +66,6 @@ class _CalendarPageState extends State<CalendarPage>
 
   getMarkerEvent() async {
     var objectData = [];
-    // var value = await storage.read(key: 'dataUserLoginSOLAR');
-    // var data = json.decode(value);
     final result =
         await postDio(server_we_build + "m/EventCalendar/mark/read2", {
       "year": DateTime.now().year,

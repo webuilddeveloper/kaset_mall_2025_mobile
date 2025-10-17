@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -86,12 +88,12 @@ class _SearchResultPageState extends State<SearchResultPage> {
           });
       Timer(
         Duration(seconds: 1),
-        () => {
+        () {
           setState(
             () {
               _listModelMore.length == 0 ? loadProduct = false : true;
             },
-          ),
+          );
         },
       );
     });
@@ -155,8 +157,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
             "per_page": "$_limit",
             "order_key": "$orderKey",
             "order_by": "$orderBy",
-            "min_price": "${txtPriceMin.text ?? '0'}",
-            "max_price": "${txtPriceMax.text ?? '0'}",
+            "min_price": "${txtPriceMin.text}",
+            "max_price": "${txtPriceMax.text}",
             "page": "$page",
           },
         ).then((value) => {
@@ -170,12 +172,12 @@ class _SearchResultPageState extends State<SearchResultPage> {
             });
         Timer(
           Duration(seconds: 1),
-          () => {
+          () {
             setState(
               () {
                 _listModelMore.length == 0 ? loadProduct = false : true;
               },
-            ),
+            );
           },
         );
         changOrderKey = false;
@@ -209,12 +211,12 @@ class _SearchResultPageState extends State<SearchResultPage> {
           });
       Timer(
         Duration(seconds: 1),
-        () => {
+        () {
           setState(
             () {
               _listModelMore.length == 0 ? loadProduct = false : true;
             },
-          ),
+          );
         },
       );
     });
@@ -284,7 +286,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                             InkWell(
                               onTap: () {},
                               child: Image.asset(
-                                'assets/images/search.png',
+                                'assets/images/kaset/search.png',
                                 height: 15,
                                 width: 15,
                               ),
@@ -343,12 +345,12 @@ class _SearchResultPageState extends State<SearchResultPage> {
                       ),
                       child: changeToListView
                           ? Image.asset(
-                              'assets/images/grid.png',
-                              color: Color(0xFF0B24FB),
+                              'assets/images/kaset/grid.png',
+                              color: Color(0xFF09665a),
                             )
                           : Image.asset(
-                              'assets/images/list.png',
-                              color: Color(0xFF0B24FB),
+                              'assets/images/kaset/list.png',
+                              color: Color(0xFF09665a),
                             ),
                     ),
                   ),
@@ -369,8 +371,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
                             color: Color(0xFFE3E6FE).withOpacity(0.2),
                           ),
                           child: Image.asset(
-                            'assets/images/cart.png',
-                            color: Color(0xFF0B24FB),
+                            'assets/images/kaset/basket.png',
+                            color: Color(0xFF09665a),
                           ),
                         ),
                         Positioned(
@@ -430,7 +432,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                       children: [
                         GestureDetector(
                           onTap: () => {
-                            setState(() => {_filterSelected = 'เกี่ยวข้อง'}),
+                            setState(() {_filterSelected = 'เกี่ยวข้อง';}),
                             _onRefresh(),
                           },
                           child: Text(
@@ -441,7 +443,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == 'เกี่ยวข้อง'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
@@ -449,12 +451,12 @@ class _SearchResultPageState extends State<SearchResultPage> {
                         SizedBox(width: 20),
                         GestureDetector(
                           onTap: () => {
-                            setState(() => {
-                                  _filterSelected = 'ขายดี',
-                                  orderBy = '',
-                                  loadProduct = true,
-                                  changOrderKey = true,
-                                  page = 0,
+                            setState(() {
+                                  _filterSelected = 'ขายดี';
+                                  orderBy = '';
+                                  loadProduct = true;
+                                  changOrderKey = true;
+                                  page = 0;
                                 }),
                             _hotSale(),
                           },
@@ -466,7 +468,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == 'ขายดี'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
@@ -475,14 +477,14 @@ class _SearchResultPageState extends State<SearchResultPage> {
                         GestureDetector(
                           onTap: () => {
                             setState(
-                              () => {
-                                _filterSelected = 'ราคา',
-                                orderKey = 'min_price',
-                                filterType = 'minPrice',
-                                orderBy = '',
-                                loadProduct = true,
-                                changOrderKey = true,
-                                page = 0,
+                              () {
+                                _filterSelected = 'ราคา';
+                                orderKey = 'min_price';
+                                filterType = 'minPrice';
+                                orderBy = '';
+                                loadProduct = true;
+                                changOrderKey = true;
+                                page = 0;
                               },
                             ),
                             _onLoading(),
@@ -495,7 +497,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == 'ราคา'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
@@ -511,7 +513,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                           child: Row(
                             children: [
                               Image.asset(
-                                'assets/images/filter.png',
+                                'assets/images/kaset/filter_new.png',
                                 height: 15,
                                 width: 15,
                               ),
@@ -555,7 +557,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     child: Row(
                       children: [
                         Image.asset(
-                          'assets/images/filter.png',
+                          'assets/images/kaset/filter_new.png',
                           height: 25,
                           width: 25,
                         ),
@@ -603,19 +605,19 @@ class _SearchResultPageState extends State<SearchResultPage> {
                               fontWeight: FontWeight.w300,
                               color: Colors.black,
                             ),
-                            cursorColor: Color(0xFF0B24FB),
+                            cursorColor: Color(0xFF09665a),
                             decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
@@ -668,19 +670,19 @@ class _SearchResultPageState extends State<SearchResultPage> {
                               fontWeight: FontWeight.w300,
                               color: Colors.black,
                             ),
-                            cursorColor: Color(0xFF0B24FB),
+                            cursorColor: Color(0xFF09665a),
                             decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),

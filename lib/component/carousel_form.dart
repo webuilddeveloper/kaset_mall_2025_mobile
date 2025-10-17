@@ -16,7 +16,7 @@ class CarouselForm extends StatefulWidget {
 
   final String? url;
   final String? code;
-  final dynamic? model;
+  final dynamic model;
   final String? urlGallery;
 
   @override

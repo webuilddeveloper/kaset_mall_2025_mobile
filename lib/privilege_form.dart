@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kasetmall/component/comment.dart';
 import 'package:kasetmall/component/content.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../component/button_close_back.dart';
 import '../../shared/api_provider.dart';
@@ -29,25 +28,12 @@ class PrivilegeForm extends StatefulWidget {
 
 class _PrivilegeForm extends State<PrivilegeForm> {
   Comment? comment;
-  int? _limit;
 
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
 
-  void _onLoading() async {
-    setState(() {
-      _limit = _limit! + 10;
-    });
-
-    await Future.delayed(Duration(milliseconds: 1000));
-
-    _refreshController.loadComplete();
-  }
 
   @override
   void initState() {
     setState(() {
-      _limit = 10;
     });
 
     super.initState();

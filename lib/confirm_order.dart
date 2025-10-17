@@ -1,15 +1,11 @@
-import 'dart:async';
+// ignore_for_file: deprecated_member_use
 
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
-import 'package:kasetmall/component/toast_fail.dart';
-import 'package:kasetmall/coupons_pickup.dart';
-import 'package:kasetmall/delivery_address.dart';
-import 'package:kasetmall/my_credit_card.dart';
 import 'package:kasetmall/payment_status.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
@@ -124,7 +120,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
     setState(() {
       modelCode = widget.modelCode!;
       type = widget.type!;
-
     });
 
     _callRead(); // ตรวจสอบว่าฟังก์ชันนี้ทำงานจริง
@@ -142,8 +137,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
         model = modelCode; // หรือ logic ที่เหมาะสม
         loading = false;
       });
-
-   
     } catch (e) {
       print('Error in _callRead: $e');
       setState(() {
@@ -163,43 +156,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   //   await _callAddress();
   //   _callCarts();
   // }
-
-  _callAddress() async {
-    try {
-      final value = await get(server + 'shipping-addresses');
-
-      if (value == null || value.isEmpty) {
-        print("No shipping addresses found.");
-        return;
-      }
-
-      List<dynamic> arr = List.from(value); // ป้องกัน arr เป็น null
-      var a = arr
-          .where((x) => x['main'] == true)
-          .toList()
-          .firstOrNull; // ใช้ firstOrNull เพื่อลด error
-
-      if (a != null) {
-        setState(() {
-          name = a['name'];
-          phone = a['phone'];
-          address = {
-            'code': a['id'],
-            'address': a['address'],
-            'subDistrict': a['tambon']?['data']?['name_th'] ?? '',
-            'district': a['amphoe']?['data']?['name_th'] ?? '',
-            'province': a['province']?['data']?['name_th'] ?? '',
-            'postalCode': a['zip'] ?? '',
-          };
-          hasAddress = true;
-        });
-      } else {
-        print("No main address found.");
-      }
-    } catch (e) {
-      print("Error fetching address: $e");
-    }
-  }
 
   // _callAddress() async {
   //   await get(server + 'shipping-addresses').then((value) async {
@@ -222,141 +178,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   //       });
   //   });
   // }
-
-  _callCarts() async {
-    int price = 0;
-    String url = '';
-    Timer(
-      Duration(seconds: 1),
-      () async {
-        modelCode.forEach((e) async {
-          //(c['product_variant']['data']['promotion_active'] == true ? c['product_variant']['data']['promotion_price'] : c['product_variant']['data']['price'])
-          //(e['promotion_active'] == true ? e['promotion_price'] : e['price'])
-
-          print('----- _callCarts ' + e['promotion_active'].toString());
-          print('----- _callCarts ' + e['promotion_price'].toString());
-          print('----- _callCarts ' + e['price'].toString());
-
-          e['url'] = (e['url'] ?? '') != ''
-              ? e['url']
-              : 'assets/images/kaset/no-img.png';
-          price +=
-              ((e['promotion_price'] != 0 ? e['promotion_price'] : e['price']) *
-                  e['quantity']) as int;
-          if (url == '') {
-            url += '?carts[]=' + e['cart_id'];
-          } else if ((url != '')) {
-            url += '&carts[]=' + e['cart_id'];
-          }
-          // if (e['isPromotion'] &&
-          //     (int.parse(e['promotion_price'].toString()) > 0)) {
-          //   promoAll += (e['price'] - e['promotion_price']);
-          // }
-          setState(() {
-            cares_id.add(e['cart_id']);
-            urlCartId = url;
-            model.add(e);
-          });
-        });
-        _readCoupons();
-        setState(
-          () {
-            cartId = cares_id;
-            total = price;
-            totalPrice = (total - discountAll);
-            loadingSuccess = true;
-            _readShippingPrice(cartId);
-          },
-        );
-      },
-    );
-  }
-
-  _readShippingPrice(List<dynamic> param_cart_id) async {
-    print('-------123------${param_cart_id}');
-    var carts = '';
-    for (var i = 0; i < param_cart_id.length; i++) {
-      if (i == 0) {
-        carts = '?carts[]=' + param_cart_id[i];
-      } else {
-        carts += '&carts[]=' + param_cart_id[i];
-      }
-    }
-    print('======555 ${carts}');
-    await getShippingPrice(server + 'shipping-price/' + address['code'] + carts)
-        .then(
-      (value) => {
-        setState(
-          () {
-            deliveryPrice = value ?? 0;
-            totalPrice = (total - discountAll) + deliveryPrice;
-          },
-        )
-      },
-    );
-  }
-
-  _readCoupons() async {
-    // setState(
-    //   () {
-    //     _futureCoupons = get(server + 'users/me/coupons');
-    //   },
-    // );
-    // var ConponsMe = get(server + 'users/me/coupons').then((value) =>
-    //     [...value].where((f) => f['coupon_user_status'] == 0).toList());
-
-    var ConponsMe = get(server + 'users/me/coupons');
-
-    get('${server}orders').then((value) {
-      setState(() {
-        checkOrder = true;
-        _futureCoupons = ConponsMe.then((value) => [...value]
-            .where(
-                (f) => f['coupon_user_status'] == 0 && f['code'] != 'welcome')
-            .toList());
-      });
-    }).onError((error, stackTrace) {
-      postObjectData(server + 'coupons/apply', {'code': "welcome"})
-          .then((value) {
-        setState(() {
-          _futureCoupons = ConponsMe;
-          couponModel = value;
-          discountAll = couponModel['discount'];
-          totalPrice = (total + deliveryPrice) - discountAll;
-          couponsCode = couponModel['id'];
-        });
-      });
-    });
-
-    // get('${server}orders')
-    //     .then((value) => {
-    //           setState(
-    //             () {
-    //               // _futureCoupons = get(server + 'users/me/coupons');
-    //             },
-    //           ),
-    //         })
-    //     .onError((error, stackTrace) => {
-    //           postObjectData(server + 'coupons/apply', {'code': "welcome"})
-    //               .then((value) => {
-    //                     setState(() {
-    //                       couponModel = value;
-    //                       // totalPrice = total + deliveryPrice;
-    //                       discountAll = couponModel['discount'];
-    //                       totalPrice =
-    //                           (total + deliveryPrice) - discountAll - promoAll;
-    //                       couponsCode = couponModel['id'];
-    //                     }),
-    //                   }),
-    //         });
-  }
-
-  _getCredit() async {
-    // var res = await postDio('${server}m/manageCreditCard/read', {});
-    var first = {'code': '0'}; // ชำระเงินปลายทาง
-    var res = [{}];
-    return res.length > 0 ? [first, ...res] : [];
-  }
 
   _buy() async {
     dynamic modelData;
@@ -626,21 +447,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
       return int.tryParse(value) ?? 0;
     }
     return 0;
-  }
-
-  Future<String> _validate() async {
-    List<String> failureList = [
-      'ที่อยู่จัดส่ง',
-      'ตัวเลือกจัดส่ง',
-      'ตัวเลือกชำระเงิน',
-      'คูปอง'
-    ];
-    String status = '';
-    if (address['code'] == '') return failureList[0];
-    // if (deliveryCode == '') return failureList[1];
-    if (creditCardCode == '') return failureList[2];
-
-    return status;
   }
 
   @override
@@ -1124,40 +930,8 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                         ),
                         textScaleFactor: ScaleSize.textScaleFactor(context)),
                     GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => CouponPickUpCentralPage(
-                              // readMode: false,
-                              ),
-                        ),
-                      ).then(
-                        (value) => {
-                          if (checkOrder && value['code'] == 'welcome')
-                            toastFail(
-                              context,
-                              text: 'ไม่สามารถใช้คูปองนี้ได้',
-                              color: Colors.black,
-                              fontColor: Colors.white,
-                            )
-                          else
-                            setState(
-                              () {
-                                couponModel = value;
-                                // totalPrice = total + deliveryPrice;
-                                discountAll = couponModel['discount'];
-                                totalPrice =
-                                    (total + deliveryPrice) - discountAll;
-                                couponsCode = couponModel['id'];
-                              },
-                            ),
-                        },
-                      ),
+                      onTap: () {},
                       child: Container(
-                        // height: 25,
-                        // width: 25,
-                        // height: AdaptiveTextSize()
-                        //     .getadaptiveTextSize(context, 25),
                         padding:
                             EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                         decoration: BoxDecoration(
@@ -1211,16 +985,15 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                     ),
                   ],
                 ),
-                if (couponMessage != null)
-                  Text(
-                    couponMessage,
-                    style: TextStyle(
-                      color: couponMessage.contains("ใช้ได้")
-                          ? Colors.green
-                          : Colors.red,
-                      fontSize: 13,
-                    ),
+                Text(
+                  couponMessage,
+                  style: TextStyle(
+                    color: couponMessage.contains("ใช้ได้")
+                        ? Colors.green
+                        : Colors.red,
+                    fontSize: 13,
                   ),
+                ),
                 couponModel != null
                     ? Container(
                         padding: EdgeInsets.symmetric(
@@ -1416,126 +1189,16 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                                   ),
                                 ),
                               );
-                              // if (index == 0) {
-                              //   return StackTap(
-                              //     borderRadius: BorderRadius.circular(10),
-                              //     splashColor:
-                              //         Color(0xFF09665a).withOpacity(0.2),
-                              //     onTap: () {
-
-                              //       setState(() {
-                              //         couponsCode =
-                              //             snapshot.data[index]['id'];
-                              //       });
-                              //     },
-                              //     child: Container(
-                              //       width: 169,
-                              //       padding: EdgeInsets.fromLTRB(
-                              //           12, 10, 15, 15),
-                              //       decoration: BoxDecoration(
-                              //         borderRadius:
-                              //             BorderRadius.circular(10),
-                              //         border: Border.all(
-                              //             width: 1,
-                              //             // color: Color(0xFF09665a)
-                              //             color:
-                              //             creditCardCode == snapshot.data[index]['id']
-                              //                 ? Color(0xFF09665a)
-                              //                 : Color(0xFFE4E4E4),
-                              //             ),
-                              //       ),
-                              //       child: Column(
-                              //         mainAxisAlignment:
-                              //             MainAxisAlignment.center,
-                              //         crossAxisAlignment:
-                              //             CrossAxisAlignment.start,
-                              //         children: [
-                              //           Text(
-                              //             'ส่วนลด ' +
-                              //                 (snapshot.data[index]
-                              //                         ['discount']
-                              //                     .toString()) +
-                              //                 ' บาท',
-                              //             style: TextStyle(
-                              //               fontSize: 13,
-                              //               fontWeight: FontWeight.w500,
-                              //             ),
-                              //           ),
-                              //           Text(
-                              //             'ชำระเงินเมื่อได้รับสินค้า',
-                              //             style: TextStyle(
-                              //               fontSize: 11,
-                              //               color: Color(0xFF707070),
-                              //             ),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   );
-                              // } else {
-                              //   return StackTap(
-                              //     borderRadius: BorderRadius.circular(10),
-                              //     splashColor:
-                              //         Color(0xFF09665a).withOpacity(0.2),
-                              //     onTap: () {
-                              //       setState(() {
-                              //         couponsCode =
-                              //             snapshot.data[index]['id'];
-                              //       });
-                              //     },
-                              //     child: Container(
-                              //       width: 169,
-                              //       padding: EdgeInsets.fromLTRB(
-                              //           12, 10, 15, 15),
-                              //       decoration: BoxDecoration(
-                              //         borderRadius:
-                              //             BorderRadius.circular(10),
-                              //         border: Border.all(
-                              //           width: 1,
-                              //           color: snapshot.data[index]
-                              //                       ['code'] ==
-                              //                   creditCardCode
-                              //               ? Color(0xFF09665a)
-                              //               : Color(0xFFE4E4E4),
-                              //         ),
-                              //       ),
-                              //       child: Column(
-                              //         mainAxisAlignment:
-                              //             MainAxisAlignment.center,
-                              //         crossAxisAlignment:
-                              //             CrossAxisAlignment.start,
-                              //         children: [
-                              //           Text(
-                              //             'บัตรเครดิต / เดบิต',
-                              //             style: TextStyle(
-                              //               fontSize: 13,
-                              //               fontWeight: FontWeight.w500,
-                              //             ),
-                              //           ),
-                              //           // Text(
-                              //           //   'บัตร ${snapshot.data[index]['type']} xxx - ${snapshot.data[index]['number']}',
-                              //           //   style: TextStyle(
-                              //           //     fontSize: 11,
-                              //           //     color: Color(0xFF707070),
-                              //           //   ),
-                              //           // ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   );
-                              // }
                             },
                           );
                         } else {
                           return Container(
-                            // width: 169,
                             height: 165,
                             padding: EdgeInsets.symmetric(horizontal: 15),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 width: 1,
-                                // color: Color(0xFF09665a)
                                 color: Color(0xFFE4E4E4),
                               ),
                             ),
@@ -1560,8 +1223,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                                // width: 169,
-                                // height: 165,
                                 height: AdaptiveTextSize()
                                     .getadaptiveTextSize(context, 70),
                                 padding: EdgeInsets.symmetric(horizontal: 15),
@@ -1569,7 +1230,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     width: 1,
-                                    // color: Color(0xFF09665a)
                                     color: Color(0xFFE4E4E4),
                                   ),
                                 ),
@@ -1582,7 +1242,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
                                         ),
-                                        // textAlign: TextAlign.center,
                                         textScaleFactor:
                                             ScaleSize.textScaleFactor(context)),
                                   ],
@@ -2180,7 +1839,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                   GestureDetector(
                     onTap: () async {
                       print('-- PO 1');
-                      var status = await _validate();
                       print('-- PO 2');
                       // if (status == '') {
                       await _buy();

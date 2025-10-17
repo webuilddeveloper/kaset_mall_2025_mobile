@@ -71,7 +71,7 @@ textFormFieldPasswordOldNew(
       if (model!.isEmpty) {
         return 'กรุณากรอก' + validator + '.';
       }
-      if (isPassword && model != modelMatch && modelMatch != null) {
+      if (isPassword && model != modelMatch) {
         return 'กรุณากรอกรหัสผ่านให้ตรงกัน.';
       }
 
@@ -82,6 +82,7 @@ textFormFieldPasswordOldNew(
           return 'กรุณากรอกรูปแบบรหัสผ่านให้ถูกต้อง.';
         }
       }
+      return null;
     },
     controller: model,
     enabled: enabled,
@@ -187,8 +188,6 @@ textFormField(
       // }
 
       if (isPassword) {
-        String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
-        RegExp regex = new RegExp(pattern);
         // if (!regex.hasMatch(model)) {
         if (model.length < 6) {
           return 'กรุณากรอกรูปแบบรหัสผ่านให้ถูกต้อง.';
@@ -202,6 +201,7 @@ textFormField(
           return 'กรุณากรอกรูปแบบอีเมลให้ถูกต้อง.';
         }
       }
+      return null;
       // return true;
     },
     controller: model,
@@ -268,6 +268,7 @@ textFormFieldNoValidator(
             }
           }
         }
+        return null;
         // return true;
       },
       controller: model,
@@ -318,6 +319,7 @@ textFormPhoneField(
           return 'กรุณากรอกรูปแบบเบอร์ติดต่อให้ถูกต้อง.';
         }
       }
+      return null;
     },
     controller: model,
     enabled: enabled,
@@ -440,8 +442,6 @@ textFormFieldAddress(
       }
 
       if (isPassword) {
-        String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
-        RegExp regex = new RegExp(pattern);
         // if (!regex.hasMatch(model)) {
         if (model.length < 6) {
           return 'กรุณากรอกรูปแบบรหัสผ่านให้ถูกต้อง.';
@@ -462,6 +462,7 @@ textFormFieldAddress(
           return 'กรุณากรอกรูปแบบเบอร์ติดต่อให้ถูกต้อง.';
         }
       }
+      return null;
     },
     controller: model,
     enabled: enabled,

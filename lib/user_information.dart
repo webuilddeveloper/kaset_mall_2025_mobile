@@ -1,39 +1,24 @@
+// ignore_for_file: unnecessary_null_comparison, deprecated_member_use
+
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kasetmall/game_selection_page.dart';
-import 'package:kasetmall/math_game/setting_main.dart';
-import 'package:kasetmall/phonics_game.dart';
-import 'package:kasetmall/product_favorite.dart';
-import 'package:kasetmall/read_book_list.dart';
+import 'package:kasetmall/setting_main.dart';
 import 'package:kasetmall/register.dart';
 import 'package:kasetmall/register_shop.dart';
-import 'package:kasetmall/review_success.dart';
 import 'package:kasetmall/to_pay.dart';
 import 'package:kasetmall/to_rate.dart';
 import 'package:kasetmall/to_receive.dart';
 import 'package:kasetmall/to_ship.dart';
 import 'package:kasetmall/to_success.dart';
 import 'package:kasetmall/user_profile_form.dart';
-import 'package:kasetmall/verify_phone.dart';
-import 'package:provider/provider.dart';
+
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'chats_staff.dart';
-import '../component/link_url_in.dart';
-import '../component/loading_image_network.dart';
-import '../dark_mode.dart';
-import '../read_book.dart';
 import '../shared/api_provider.dart';
-import '../shared/extension.dart';
 import 'cart.dart';
-import 'coupons_pickup.dart';
 import 'delivery_address.dart';
 import 'login.dart';
-
-import 'dart:math';
 
 class UserInformationCentralPage extends StatefulWidget {
   @override
@@ -46,40 +31,7 @@ class _UserInformationCentralPageState
   final storage = new FlutterSecureStorage();
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-  late Future<dynamic> _futureProfile;
-  late Future<dynamic> _countLike;
-  Future<dynamic> _futureCoupon = Future.value([
-    {
-      'title': 'ส่วนลด 100 บาท',
-      'description': 'เมื่อสั่งซื้อสินค้าครั้งแรกกับแอพ'
-    },
-    {
-      'title': 'ส่วนลด 200 บาท',
-      'description': 'เมื่อสั่งซื้อสินค้าครั้งแรกกับแอพ'
-    },
-    {
-      'title': 'ส่วนลด 200 บาท',
-      'description': 'เมื่อสั่งซื้อสินค้าครั้งแรกกับแอพ'
-    },
-    {
-      'title': 'ส่วนลด 200 บาท',
-      'description': 'เมื่อสั่งซื้อสินค้าครั้งแรกกับแอพ'
-    },
-  ]);
   Future<dynamic>? _futureDeliveryAddress;
-
-  Future<dynamic> _futurePaymentOptions = Future.value([
-    {
-      'title': 'ชำระเงินปลายทาง',
-      'description': 'ชำระเงินเมื่อได้รับสินค้า',
-    },
-    {'title': 'บัตรเครดิต / เดบิต', 'description': 'บัตร visa xxx-123'},
-    {
-      'title': 'ชำระเงินปลายทาง2',
-      'description': 'ชำระเงินเมื่อได้รับสินค้า',
-    },
-    {'title': 'บัตรเครดิต / เดบิต2', 'description': 'บัตร visa xxx-123'},
-  ]);
 
   List<dynamic> addressList = [
     {
@@ -122,9 +74,6 @@ class _UserInformationCentralPageState
   String verifyPhonePage = 'false';
   int follower = 0;
   int following = 0;
-
-  late String _userId;
-  late String _username;
 
   final txtUsername = TextEditingController();
   final txtPassword = TextEditingController();
@@ -205,60 +154,6 @@ class _UserInformationCentralPageState
     );
   }
 
-  _getCredit() async {
-    try {
-      var res = await postDio('${server}m/manageCreditCard/read', {});
-      var mapData = res.map((e) {
-        return {
-          'title': 'บัตรเครดิต / เดบิต',
-          'description': 'บัตร ${e['type']} xxx-${e['number']}'
-        };
-      }).toList();
-      setState(() {
-        _futurePaymentOptions = Future.value([
-          // {
-          //   'title': 'ชำระเงินปลายทาง',
-          //   'description': 'ชำระเงินเมื่อได้รับสินค้า',
-          // },
-          ...mapData
-        ]);
-      });
-    } catch (e) {}
-  }
-
-  _readWaiteReview() async {
-    try {
-      await get('${server}users/me/order-details/review-pending')
-          .then((value) => {
-                setState(() {
-                  review = value.length;
-                })
-              });
-    } catch (e) {
-      setState(() {
-        review = 0;
-      });
-    }
-  }
-
-  _readCoupon() {
-    _futureCoupon = get('${server}users/me/coupons');
-  }
-
-  _readOrder() async {
-    setState(() {
-      // Timer(
-      //   Duration(seconds: 1),
-      //   () => {
-      //     setState(
-      //       () {
-      //       },
-      //     ),
-      //   },
-      // );
-    });
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -324,7 +219,7 @@ class _UserInformationCentralPageState
               ),
             },
             child: Image.asset(
-              'assets/images/settings.png',
+              'assets/images/kaset/settings.png',
               width: (ScaleSize.textScaleFactor(context) /
                       (MediaQuery.of(context).size.aspectRatio)) +
                   AdaptiveTextSize().getadaptiveTextSize(context, 35),
@@ -370,7 +265,7 @@ class _UserInformationCentralPageState
                   borderRadius: BorderRadius.circular(35),
                 ),
                 child: Image.asset(
-                  'assets/images/central/profile.png',
+                  'assets/images/kaset/user.png',
                   fit: BoxFit.cover,
                   width: 50,
                   height: 50,
@@ -423,7 +318,7 @@ class _UserInformationCentralPageState
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25.0),
                     border: Border.all(
-                      color: Color(0XFF0B24FB),
+                      color: Color(0xFF09665a),
                     ),
                   ),
                   child: Text(
@@ -431,7 +326,7 @@ class _UserInformationCentralPageState
                     style: TextStyle(
                       fontFamily: 'Kanit',
                       fontSize: 13,
-                      color: Color(0XFF0B24FB),
+                      color: Color(0xFF09665a),
                     ),
                   ),
                 ),
@@ -520,7 +415,7 @@ class _UserInformationCentralPageState
                               borderRadius: BorderRadius.circular(35),
                             ),
                             child: Image.asset(
-                              'assets/images/central/profile.png',
+                              'assets/images/kaset/user.png',
                               fit: BoxFit.cover,
                               width: 50,
                               height: 50,
@@ -548,23 +443,23 @@ class _UserInformationCentralPageState
               SizedBox(height: 5),
               InkWell(
                 onTap: () {
-                  profilePhone == null
-                      ? Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                UserProfileForm(mode: "addPhone"),
-                          ),
-                        )
-                      : verifyPhonePage == 'false'
-                          ? Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    VerifyPhonePage(),
-                              ),
-                            )
-                          : null;
+                  // profilePhone == null
+                  //     ? Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (BuildContext context) =>
+                  //               UserProfileForm(mode: "addPhone"),
+                  //         ),
+                  //       )
+                  //     : verifyPhonePage == 'false'
+                  //         ? Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (BuildContext context) =>
+                  //                   VerifyPhonePage(),
+                  //             ),
+                  //           )
+                  //         : null;
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 10),
@@ -596,7 +491,7 @@ class _UserInformationCentralPageState
   }
 
   _screen() {
-    final themeChange = Provider.of<DarkThemeProvider>(context);
+    // Provider.of<DarkThemeProvider>(context);
     return memberType == '2'
         ? Padding(
             padding: const EdgeInsets.all(12.0),
@@ -648,59 +543,13 @@ class _UserInformationCentralPageState
                       : {}),
               _deliveryAddress(),
               _rowTitle(Icons.confirmation_num_outlined, 'คูปองของฉัน',
-                  callback: () => verifyPhonePage == 'true'
-                      ? Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                CouponPickUpCentralPage(
-                              readMode: true,
-                            ),
-                          ),
-                        )
-                      : {},
-                  isShowMenu: memberType == '1'),
-              _coupon(),
-              _rowTitle(Icons.headset_mic, 'ติดต่อ', callback: () {
-                if (profileCode != '' && profileCode != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => chatstaff(
-                        userId: _userId,
-                        userName: _username,
-                      ),
-                    ),
-                  );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => LoginCentralPage(),
-                    ),
-                  );
-                }
-              }),
+                  callback: () {}, isShowMenu: memberType == '1'),
+              // _coupon(),
+              _rowTitle(Icons.headset_mic, 'ติดต่อ', callback: () {}),
               _rowTitle(Icons.reviews_outlined, 'สินค้าที่รีวิวแล้ว',
-                  callback: () => verifyPhonePage == 'true'
-                      ? Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                ReviewSuccessPage(),
-                          ),
-                        )
-                      : {}),
+                  callback: () => {}),
               _rowTitle(Icons.favorite_border, 'สินค้าที่ฉันถูกใจ',
-                  callback: () => verifyPhonePage == 'true'
-                      ? Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                ProductFavoriteCentralPage(),
-                          ),
-                        )
-                      : {}),
+                  callback: () => {}),
               _rowTitle(
                   Icons.add_business,
                   isShopRegis == 'true'
@@ -758,7 +607,7 @@ class _UserInformationCentralPageState
         ),
         _boxOrderList(
           'ระหว่าง\nขนส่ง',
-          'assets/logo/car.png',
+          'assets/images/kaset/car.png',
           delivery.length > 0 ? delivery.length : null,
           callback: () => {
             Navigator.push(
@@ -840,7 +689,7 @@ class _UserInformationCentralPageState
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color(0XFF0B24FB),
+                          color: Color(0xFF09665a),
                         ),
                         child: Text(
                           countItem > 99 ? '99+' : countItem.toString(),
@@ -973,89 +822,41 @@ class _UserInformationCentralPageState
         : SizedBox();
   }
 
-  _coupon() {
-    if (discountList.length > 0 && (profileFirstName ?? '') != '') {
-      var row = <Widget>[];
-      for (var d in discountList) {
-        row.add(_boxCoupon(
-            'ส่วนลด ' + moneyFormat(d['discount'].toString()) + ' บาท',
-            'เมื่อซื้อครบ ' +
-                moneyFormat(d['minimumOrderTotal'].toString()) +
-                ' บาท'));
-      }
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: row,
-            ),
-          ),
-        ],
-      );
-    } else {
-      return _boxNotData(
-        callback: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => CouponPickUpCentralPage(
-              readMode: true,
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
-  _boxCoupon(title, description) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 8, right: 8),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        alignment: Alignment.centerLeft,
-        // width: (MediaQuery.of(context).size.aspectRatio) + 175,
-        // AdaptiveTextSize().getadaptiveTextSize(context, 165),
-        // height: AdaptiveTextSize().getadaptiveTextSize(context, 60),
-        // width: AdaptiveTextSize().getadaptiveTextSize(context, 165),
-        // height: (MediaQuery.of(context).size.aspectRatio) + 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(9),
-          color: Color(0XFFE3E6FE),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontFamily: 'Kanit',
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textScaleFactor: ScaleSize.textScaleFactor(context),
-            ),
-            Text(
-              description,
-              style: TextStyle(
-                fontFamily: 'Kanit',
-                fontSize: 11,
-                color: Color(0XFF707070),
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textScaleFactor: ScaleSize.textScaleFactor(context),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // _coupon() {
+  //   if (discountList.length > 0 && (profileFirstName ?? '') != '') {
+  //     var row = <Widget>[];
+  //     for (var d in discountList) {
+  //       row.add(_boxCoupon(
+  //           'ส่วนลด ' + moneyFormat(d['discount'].toString()) + ' บาท',
+  //           'เมื่อซื้อครบ ' +
+  //               moneyFormat(d['minimumOrderTotal'].toString()) +
+  //               ' บาท'));
+  //     }
+  //     return Column(
+  //       mainAxisAlignment: MainAxisAlignment.start,
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         SingleChildScrollView(
+  //           scrollDirection: Axis.horizontal,
+  //           child: Row(
+  //             children: row,
+  //           ),
+  //         ),
+  //       ],
+  //     );
+  //   } else {
+  //     return _boxNotData(
+  //       callback: () => Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (BuildContext context) => CouponPickUpCentralPage(
+  //             readMode: true,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
 
   _deliveryAddress() {
     if (addressList.length > 0 && (profileFirstName ?? '') != '') {
@@ -1149,90 +950,6 @@ class _UserInformationCentralPageState
     // );
   }
 
-  _paymentOptions() {
-    if ((profileCode == null ||
-        profileCode == '' ||
-        verifyPhonePage == 'false')) {
-      return _boxNotData();
-    } else {
-      return FutureBuilder<dynamic>(
-        future: _futurePaymentOptions,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data.length > 0) {
-              List<Widget> row = [];
-              var isSelect = false;
-              for (var d in snapshot.data) {
-                row.add(
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: InkWell(
-                      onTap: () {},
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        alignment: Alignment.centerLeft,
-                        width: 165,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(9),
-                          border: Border.all(
-                            color: isSelect
-                                ? Color(0xFF1434F7)
-                                : Color(0xFFE4E4E4),
-                            width: 1,
-                          ),
-                          color: Color(0XFFFFFFFF),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              d['title'],
-                              style: TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              d['description'],
-                              style: TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: 11,
-                                color: Color(0XFF707070),
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-                isSelect = false;
-              }
-
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: row,
-                ),
-              );
-            } else
-              return _boxNotData();
-          } else {
-            return _boxNotData();
-          }
-        },
-      );
-    }
-  }
-
   _boxDeliveryAndPayment(title, address, subDistrictTitle, districtTitle,
       provinceTitle, postalCode,
       {isSelect, Function? callback}) {
@@ -1301,29 +1018,29 @@ class _UserInformationCentralPageState
   _boxNotData({Function? callback}) {
     return GestureDetector(
       onTap: () => {
-        (profileCode == '' || profileCode == null)
-            ? Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => LoginCentralPage(),
-                ),
-              )
-            : ((profilePhone == '' || profilePhone == null) &&
-                    profileCode != null)
-                ? Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          UserProfileForm(mode: "addPhone"),
-                    )).then((value) => {_onRefresh()})
-                : (verifyPhonePage == 'false' && profileCode != '')
-                    ? Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => VerifyPhonePage(),
-                        ),
-                      )
-                    : callback!(),
+        // (profileCode == '' || profileCode == null)
+        //     ? Navigator.push(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (BuildContext context) => LoginCentralPage(),
+        //         ),
+        //       )
+        //     : ((profilePhone == '' || profilePhone == null) &&
+        //             profileCode != null)
+        //         ? Navigator.push(
+        //             context,
+        //             MaterialPageRoute(
+        //               builder: (BuildContext context) =>
+        //                   UserProfileForm(mode: "addPhone"),
+        //             )).then((value) => {_onRefresh()})
+        //         : (verifyPhonePage == 'false' && profileCode != '')
+        //             ? Navigator.push(
+        //                 context,
+        //                 MaterialPageRoute(
+        //                   builder: (BuildContext context) => VerifyPhonePage(),
+        //                 ),
+        //               )
+        //             : callback!(),
       },
       // (profilePhone == '' || profilePhone == null)
       //     ? Navigator.push(
@@ -1399,59 +1116,6 @@ class _UserInformationCentralPageState
           ),
         ),
       ),
-    );
-  }
-
-  _readUser() async {
-    try {
-      final result = await get(server + 'users/me');
-      print('Result: $result');
-      // print(result['id']);
-      if (result != null) {
-        _userId = result['id'];
-        _username = result['name'];
-        print('------userId--------${_userId}');
-        print('------username--------${_username}');
-      } else {
-        print('No result from API');
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  _read() async {
-    setState(() {
-      loadingSuccess = false;
-    });
-    profileImageUrl = (await storage.read(key: 'profileImageUrl')) ?? "";
-    profilePhone = (await storage.read(key: 'profilePhone')) ?? "";
-    profileFirstName = await storage.read(key: 'profileFirstName');
-    profileLastName = await storage.read(key: 'profileLastName');
-    referenceShopCode = (await storage.read(key: 'referenceShopCode')) ?? "";
-    referenceShopName = (await storage.read(key: 'referenceShopName')) ?? "";
-
-    //read profile
-    profileCode = (await storage.read(key: 'profileCode10')) ?? "";
-    // if (profileCode != '' && profileCode != null)
-
-    if (profilePhone != "") {
-      _getUserData();
-    }
-    _readOrder();
-    _readAddress();
-    _getCredit();
-    _readCoupon();
-    _readWaiteReview();
-    Timer(
-      Duration(seconds: 1),
-      () => {
-        setState(
-          () {
-            loadingSuccess = true;
-          },
-        ),
-      },
     );
   }
 

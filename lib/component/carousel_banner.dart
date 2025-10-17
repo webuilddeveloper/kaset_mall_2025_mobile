@@ -6,6 +6,7 @@ import 'package:kasetmall/component/link_url_in.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/exercise_main.dart';
+
 import 'package:kasetmall/login.dart';
 
 class CarouselBanner extends StatefulWidget {
@@ -78,8 +79,7 @@ class _CarouselBanner extends State<CarouselBanner>
                     List<String> linkSplit =
                         snapshot.data[_current]['linkUrl'].split('/');
                     if (snapshot.data[_current]['isChkLogin']) {
-                      if (userProfileCode != null &&
-                          userProfileCode.isNotEmpty &&
+                      if (userProfileCode.isNotEmpty &&
                           userProfileCode.length != 0) {
                         if (snapshot.data[_current]['action'] == 'out') {
                           if (linkSplit[0] == '') {
@@ -268,7 +268,6 @@ class _Carousel2 extends State<Carousel2> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     txtDescription.dispose();
     super.dispose();
   }
@@ -287,10 +286,8 @@ class _Carousel2 extends State<Carousel2> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return FutureBuilder<dynamic>(
-      future: widget.model, // function where you call your api
+      future: widget.model,
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data.length > 0) {
@@ -312,7 +309,6 @@ class _Carousel2 extends State<Carousel2> {
                               profileCode.replaceAll('-', '') +
                               code.replaceAll('-', '');
                           launchInWebViewWithJavaScript('$path$codeReplae');
-                          // launchURL(path);
                         }
                       } else
                         launchInWebViewWithJavaScript(
@@ -346,9 +342,6 @@ class _Carousel2 extends State<Carousel2> {
                     items: snapshot.data.map<Widget>(
                       (document) {
                         return new Container(
-                          // margin: EdgeInsets.symmetric(
-                          //   horizontal: 15,
-                          // ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -393,7 +386,6 @@ class _Carousel2 extends State<Carousel2> {
                         color: _current == index
                             ? Color(0xFFE84C12)
                             : Colors.transparent,
-                        // : Color.fromRGBO(0, 0, 0, 0.4),
                       ),
                     );
                   }).toList(),

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:kasetmall/chats_staff.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/order_details.dart';
 import 'package:kasetmall/payment_status.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
-import 'package:kasetmall/widget/data_error.dart';
 import 'package:kasetmall/widget/header.dart';
 import 'package:kasetmall/widget/show_loading.dart';
 
@@ -17,7 +15,6 @@ class ToPayCentralPage extends StatefulWidget {
 }
 
 class _ToPayCentralPageState extends State<ToPayCentralPage> {
-  late Future<dynamic> _futureModel;
   bool loading = false;
   List<dynamic> orderModel = [
     {
@@ -28,7 +25,8 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
       "discount": 0,
       "priceTotal": 203000,
       "shipping": 5000,
-      "imageUrl": "assets/images/mock_pro_1.png",
+      "imageUrl":
+          "https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png",
       "purchaseDate": "10/10/2568 10:30:00",
       "taxId": "1004293962218",
       "phone": "0999999999",
@@ -42,8 +40,6 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
       }
     }
   ];
-  late String _userId;
-  late String _username;
 
   @override
   void initState() {
@@ -58,9 +54,6 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
     super.dispose();
   }
 
-  _callRead() {
-    _futureModel = get(server + 'orders?statuses=[0, 1]');
-  }
 
   _readUser() async {
     // try {
@@ -78,16 +71,6 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
     // }
   }
 
-  _calculatePrice(List<dynamic> param) {
-    int a = 0;
-    param.forEach((e) {
-      a += ((e['total'] ?? 0) as num).toInt();
-      // e['items'].forEach((ee) => {
-      //       a += ee['price'] * ee['amount'],
-      //     });
-    });
-    return 'ยอดรวมส่วนนี้ ' + moneyFormat(a.toString()) + ' บาท';
-  }
 
   updateStatus(item) async {
     setState(() {
@@ -102,7 +85,6 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
     });
 
     setState(() {
-      _futureModel = postDio('${server}m/cart/order/read', {'status': 'W'});
     });
   }
 
@@ -383,7 +365,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
                   //             style: TextStyle(
                   //               fontFamily: 'Kanit',
                   //               fontSize: 12,
-                  //               color: Color(0xFF0B24FB),
+                  //               color: Color(0xFF09665a),
                   //             ),
                   //           ),
                   //         ),
@@ -456,81 +438,7 @@ class _ToPayCentralPageState extends State<ToPayCentralPage> {
     );
   }
 
-  _getProductById(param) async {
-    var res = await getData(server + 'products' + param);
-  }
 
-  Widget _buildItem(dynamic param) {
-    return GestureDetector(
-      onLongPress: () => updateStatus(param),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 80,
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: loadingImageNetwork(
-                    param['imageUrl'],
-                    height: 80,
-                    width: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        param['title'],
-                        style: TextStyle(
-                          fontSize: 13,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        param['goodsTitle'],
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF707070),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              moneyFormat(param['price'].toString()) + ' บาท',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'จำนวน ${param['qty']}',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   toPay(order_id) {
     dynamic modelData = {

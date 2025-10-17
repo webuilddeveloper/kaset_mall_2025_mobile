@@ -1,10 +1,8 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
-import 'package:kasetmall/widget/data_error.dart';
 import 'package:kasetmall/widget/header.dart';
 import 'package:kasetmall/widget/show_loading.dart';
 
@@ -18,7 +16,6 @@ class ToReceiveCentralPage extends StatefulWidget {
 }
 
 class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
-  late Future<dynamic> _futureModel;
   bool loading = false;
 
   List<dynamic> orderModel = [
@@ -30,7 +27,8 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
       "discount": 0,
       "priceTotal": 203000,
       "shipping": 5000,
-      "imageUrl": "assets/images/mock_pro_1.png",
+      "imageUrl":
+          "https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png",
       "purchaseDate": "10/10/2568 10:30:00",
       "paidDate": "10/10/2568 10:35:00",
       "destination_shipped_at": "15/10/2568",
@@ -63,20 +61,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
     super.dispose();
   }
 
-  _callRead() {
-    _futureModel = get(server + 'orders?statuses=20');
-  }
 
-  _calculatePrice(List<dynamic> param) {
-    int a = 0;
-    param.forEach((e) {
-      a += ((e['total'] ?? 0) as num).toInt();
-      // e['items'].forEach((ee) => {
-      //       a += ee['price'] * ee['amount'],
-      //     });
-    });
-    return 'ยอดรวมส่วนนี้ ' + moneyFormat(a.toString()) + ' บาท';
-  }
 
   updateStatus(item) async {
     setState(() {
@@ -90,7 +75,6 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
       'status': status,
     });
     setState(() {
-      _futureModel = postDio('${server}m/cart/order/read', {'status': 'W'});
     });
   }
 
@@ -264,7 +248,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                     (value) => toastFail(context, text: '✓  คัดลอกสำเร็จ'),
                   ),
                   child: Image.asset(
-                    'assets/images/central/copy_clipboard.png',
+                    'assets/images/kaset/copy_clipboard.png',
                     height: 25,
                     width: 25,
                   ),
@@ -294,7 +278,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(5),
                       child: param['imageUrl'] != null
-                          ? Image.asset(
+                          ? Image.network(
                               param['imageUrl'],
                               fit: BoxFit.cover,
                               width: 90,
@@ -326,7 +310,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                   //             style: TextStyle(
                   //               fontFamily: 'Kanit',
                   //               fontSize: 12,
-                  //               color: Color(0xFF0B24FB),
+                  //               color: Color(0xFF09665a),
                   //             ),
                   //           ),
                   //         ),
@@ -388,7 +372,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              '${moneyFormat(param['price'].toString() ?? '')} บาท',
+                              '${moneyFormat(param['price'].toString())} บาท',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -396,7 +380,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                             ),
                           ),
                           Text(
-                            'จำนวน ' + (param['qty'].toString() ?? ''),
+                            'จำนวน ' + (param['qty'].toString()),
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -423,78 +407,6 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
   }
 
   _getProductById(param) async {
-    var res = await getData(server + 'products' + param);
   }
 
-  Widget _buildItem(dynamic param) {
-    return GestureDetector(
-      onLongPress: () => updateStatus(param),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 80,
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: loadingImageNetwork(
-                    param['imageUrl'],
-                    height: 80,
-                    width: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        param['title'],
-                        style: TextStyle(
-                          fontSize: 13,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        param['goodsTitle'],
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF707070),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              moneyFormat(param['price'].toString()) + ' บาท',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'จำนวน ${param['qty']}',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

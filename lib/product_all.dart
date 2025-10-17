@@ -1,5 +1,6 @@
+// ignore_for_file: must_be_immutable, deprecated_member_use
+
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ import 'package:kasetmall/product_from.dart';
 import 'package:kasetmall/search.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
-import 'package:kasetmall/verify_phone.dart';
+
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'login.dart';
@@ -958,8 +959,8 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                         color: Color(0xFFE3E6FE).withOpacity(0.2),
                       ),
                       child: Image.asset(
-                        'assets/images/search.png',
-                        color: Color(0xFF0B24FB),
+                        'assets/images/kaset/search.png',
+                        color: Color(0xFF09665a),
                       ),
                     ),
                   ),
@@ -977,12 +978,12 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                       ),
                       child: changeToListView
                           ? Image.asset(
-                              'assets/images/grid.png',
-                              color: Color(0xFF0B24FB),
+                              'assets/images/kaset/grid.png',
+                              color: Color(0xFF09665a),
                             )
                           : Image.asset(
-                              'assets/images/list.png',
-                              color: Color(0xFF0B24FB),
+                              'assets/images/kaset/list.png',
+                              color: Color(0xFF09665a),
                             ),
                     ),
                   ),
@@ -1001,14 +1002,14 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                   //       color: Color(0xFFE3E6FE).withOpacity(0.2),
                   //     ),
                   //     child: Image.asset(
-                  //       'assets/images/cart.png',
-                  //       color: Color(0xFF0B24FB),
+                  //       'assets/images/kaset/basket.png',
+                  //       color: Color(0xFF09665a),
                   //     ),
                   //   ),
                   // )
                   GestureDetector(
                     onTap: () {
-                      if (profileCode == null || profileCode == '') {
+                      if (profileCode == '') {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -1016,8 +1017,8 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                 LoginCentralPage(),
                           ),
                         );
-                      } else if (verifyPhonePage == 'false') {
-                        _showVerifyCheckDialog();
+                        // } else if (verifyPhonePage == 'false') {
+                        //   // _showVerifyCheckDialog();
                       } else {
                         Navigator.push(
                           context,
@@ -1038,8 +1039,8 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                             color: Color(0xFFE3E6FE).withOpacity(0.2),
                           ),
                           child: Image.asset(
-                            'assets/images/cart.png',
-                            color: Color(0xFF0B24FB),
+                            'assets/images/kaset/basket.png',
+                            color: Color(0xFF09665a),
                           ),
                         ),
                         Positioned(
@@ -1105,7 +1106,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == '0'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
@@ -1130,7 +1131,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == '1'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
@@ -1159,7 +1160,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == '2'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
@@ -1184,7 +1185,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == '3'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
@@ -1209,12 +1210,12 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _filterSelected == '4'
-                                  ? Color(0xFF0B24FB)
+                                  ? Color(0xFF09665a)
                                   : Colors.black,
                             ),
                           ),
                         ),
-                        SizedBox(width: 10),
+                        SizedBox(width: 20),
                         // Expanded(
                         //   child: SizedBox(),
                         // ),
@@ -1225,7 +1226,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                           child: Row(
                             children: [
                               Image.asset(
-                                'assets/images/filter.png',
+                                'assets/images/kaset/filter_new.png',
                                 height: 15,
                                 width: 15,
                               ),
@@ -1269,7 +1270,8 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                     child: Row(
                       children: [
                         Image.asset(
-                          'assets/images/filter.png',
+                          // "assets/images/kaset/filter_new.png",
+                          'assets/images/kaset/filter_new.png',
                           height: 25,
                           width: 25,
                         ),
@@ -1317,19 +1319,19 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                               fontWeight: FontWeight.w300,
                               color: Colors.black,
                             ),
-                            cursorColor: Color(0xFF0B24FB),
+                            cursorColor: Color(0xFF09665a),
                             decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
@@ -1382,19 +1384,19 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                               fontWeight: FontWeight.w300,
                               color: Colors.black,
                             ),
-                            cursorColor: Color(0xFF0B24FB),
+                            cursorColor: Color(0xFF09665a),
                             decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide:
-                                    BorderSide(color: Color(0xFF0B24FB)),
+                                    BorderSide(color: Color(0xFF09665a)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
@@ -1905,11 +1907,11 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                       width: 165,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(9),
-                        child: param['media']['data'].length > 0
+                        child: param['image'].length > 0
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(5),
                                 child: loadingImageNetwork(
-                                  param['media']['data'][0]['url'],
+                                  param['image'],
                                   // width: 80,
                                   // height: 80,
                                   fit: BoxFit.contain,
@@ -1917,7 +1919,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                               )
                             : Container(
                                 decoration: BoxDecoration(
-                                  // color: Color(0XFF0B24FB),
+                                  // color: Color(0xFF09665a),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Image.asset(
@@ -1928,82 +1930,82 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                               ),
                       ),
                     ),
-                    param['product_variants']['data'][0]['promotion_active']
-                        ? Positioned(
-                            // left: 15,
-                            top: 5,
-                            right: 0,
-                            // top: MediaQuery.of(context).padding.top + 5,
-                            child: Container(
-                              // height: AdaptiveTextSize()
-                              //     .getadaptiveTextSize(context, 42),
-                              // width: AdaptiveTextSize()
-                              //     .getadaptiveTextSize(context, 20),
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.horizontal(
-                                    left: Radius.circular(40),
-                                  ),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color(0xFFFFD45A),
-                                      Color(0xFFFFD45A),
-                                    ],
-                                  )),
-                              child: Text(
-                                'โปรโมชั่น',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0XFFee4d2d),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textScaleFactor:
-                                    ScaleSize.textScaleFactor(context),
-                              ),
-                            ),
-                            // child: snapshot.data[index]
-                            //                 ['product_variants']['data']
-                            //             [0]['promotions']['data'] >
-                            //         0
-                            //     ? Container(
-                            //         // height: AdaptiveTextSize()
-                            //         //     .getadaptiveTextSize(context, 42),
-                            //         // width: AdaptiveTextSize()
-                            //         //     .getadaptiveTextSize(context, 20),
-                            //         padding: EdgeInsets.symmetric(
-                            //             horizontal: 10),
-                            //         alignment: Alignment.center,
-                            //         decoration: BoxDecoration(
-                            //             borderRadius:
-                            //                 BorderRadius.horizontal(
-                            //               left: Radius.circular(40),
-                            //             ),
-                            //             gradient: LinearGradient(
-                            //               begin: Alignment.topLeft,
-                            //               end: Alignment.bottomRight,
-                            //               colors: [
-                            //                 Color(0xFFFFD45A),
-                            //                 Color(0xFFFFD45A),
-                            //               ],
-                            //             )),
-                            //         child: Text(
-                            //           'โปรโมชั่น',
-                            //           style: TextStyle(
-                            //             fontSize: 11,
-                            //             color: Color(0XFFee4d2d),
-                            //             fontWeight: FontWeight.bold,
-                            //           ),
-                            //           textScaleFactor:
-                            //               ScaleSize.textScaleFactor(
-                            //                   context),
-                            //         ),
-                            //       )
-                            //     : Container(),
-                          )
-                        : Container(),
+                    // param['product_variants']['data'][0]['promotion_active']
+                    //     ? Positioned(
+                    //         // left: 15,
+                    //         top: 5,
+                    //         right: 0,
+                    //         // top: MediaQuery.of(context).padding.top + 5,
+                    //         child: Container(
+                    //           // height: AdaptiveTextSize()
+                    //           //     .getadaptiveTextSize(context, 42),
+                    //           // width: AdaptiveTextSize()
+                    //           //     .getadaptiveTextSize(context, 20),
+                    //           padding: EdgeInsets.symmetric(horizontal: 10),
+                    //           alignment: Alignment.center,
+                    //           decoration: BoxDecoration(
+                    //               borderRadius: BorderRadius.horizontal(
+                    //                 left: Radius.circular(40),
+                    //               ),
+                    //               gradient: LinearGradient(
+                    //                 begin: Alignment.topLeft,
+                    //                 end: Alignment.bottomRight,
+                    //                 colors: [
+                    //                   Color(0xFFFFD45A),
+                    //                   Color(0xFFFFD45A),
+                    //                 ],
+                    //               )),
+                    //           child: Text(
+                    //             'โปรโมชั่น',
+                    //             style: TextStyle(
+                    //               fontSize: 11,
+                    //               color: Color(0XFFee4d2d),
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //             textScaleFactor:
+                    //                 ScaleSize.textScaleFactor(context),
+                    //           ),
+                    //         ),
+                    //         // child: snapshot.data[index]
+                    //         //                 ['product_variants']['data']
+                    //         //             [0]['promotions']['data'] >
+                    //         //         0
+                    //         //     ? Container(
+                    //         //         // height: AdaptiveTextSize()
+                    //         //         //     .getadaptiveTextSize(context, 42),
+                    //         //         // width: AdaptiveTextSize()
+                    //         //         //     .getadaptiveTextSize(context, 20),
+                    //         //         padding: EdgeInsets.symmetric(
+                    //         //             horizontal: 10),
+                    //         //         alignment: Alignment.center,
+                    //         //         decoration: BoxDecoration(
+                    //         //             borderRadius:
+                    //         //                 BorderRadius.horizontal(
+                    //         //               left: Radius.circular(40),
+                    //         //             ),
+                    //         //             gradient: LinearGradient(
+                    //         //               begin: Alignment.topLeft,
+                    //         //               end: Alignment.bottomRight,
+                    //         //               colors: [
+                    //         //                 Color(0xFFFFD45A),
+                    //         //                 Color(0xFFFFD45A),
+                    //         //               ],
+                    //         //             )),
+                    //         //         child: Text(
+                    //         //           'โปรโมชั่น',
+                    //         //           style: TextStyle(
+                    //         //             fontSize: 11,
+                    //         //             color: Color(0XFFee4d2d),
+                    //         //             fontWeight: FontWeight.bold,
+                    //         //           ),
+                    //         //           textScaleFactor:
+                    //         //               ScaleSize.textScaleFactor(
+                    //         //                   context),
+                    //         //         ),
+                    //         //       )
+                    //         //     : Container(),
+                    //       )
+                    //     : Container(),
                   ],
                 ),
                 SizedBox(width: 10),
@@ -2025,51 +2027,51 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
                               overflow: TextOverflow.ellipsis,
                             )
                           : SizedBox(),
-                      SizedBox(height: 10),
-                      param['product_variants']['data'].length > 0
-                          ? param['product_variants']['data'][0]
-                                  ['promotion_active']
-                              ? Text(
-                                  (moneyFormat(param['product_variants']['data']
-                                                  [0]['promotion_price']
-                                              .toString()) +
-                                          " บาท") ??
-                                      '',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Color(0xFFED168B),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )
-                              : Text(
-                                  (moneyFormat(param['product_variants']['data']
-                                                  [0]['price']
-                                              .toString()) +
-                                          " บาท") ??
-                                      '',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Color(0xFFED168B),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )
-                          : Text(
-                              'สินค้าหมด',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Color(0xFFED168B),
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            )
+                      // SizedBox(height: 10),
+                      // param['product_variants']['data'].length > 0
+                      //     ? param['product_variants']['data'][0]
+                      //             ['promotion_active']
+                      //         ? Text(
+                      //             (moneyFormat(param['product_variants']['data']
+                      //                             [0]['promotion_price']
+                      //                         .toString()) +
+                      //                     " บาท") ??
+                      //                 '',
+                      //             style: TextStyle(
+                      //               fontSize: 20,
+                      //               color: Color(0xFFED168B),
+                      //               fontWeight: FontWeight.bold,
+                      //             ),
+                      //             textAlign: TextAlign.center,
+                      //             maxLines: 1,
+                      //             overflow: TextOverflow.ellipsis,
+                      //           )
+                      //         : Text(
+                      //             (moneyFormat(param['product_variants']['data']
+                      //                             [0]['price']
+                      //                         .toString()) +
+                      //                     " บาท") ??
+                      //                 '',
+                      //             style: TextStyle(
+                      //               fontSize: 20,
+                      //               color: Color(0xFFED168B),
+                      //               fontWeight: FontWeight.bold,
+                      //             ),
+                      //             textAlign: TextAlign.center,
+                      //             maxLines: 1,
+                      //             overflow: TextOverflow.ellipsis,
+                      //           )
+                      //     : Text(
+                      //         'สินค้าหมด',
+                      //         style: TextStyle(
+                      //           fontSize: 20,
+                      //           color: Color(0xFFED168B),
+                      //           fontWeight: FontWeight.bold,
+                      //         ),
+                      //         textAlign: TextAlign.center,
+                      //         maxLines: 1,
+                      //         overflow: TextOverflow.ellipsis,
+                      //       )
                     ],
                   ),
                 ),
@@ -2079,79 +2081,68 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     );
   }
 
-  _showVerifyCheckDialog() {
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () {
-              return Future.value(false);
-            },
-            child: CupertinoAlertDialog(
-              title: new Text(
-                'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Kanit',
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              content: Text(" "),
-              actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: new Text(
-                    "ตกลง",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => VerifyPhonePage(),
-                      ),
-                    );
-                  },
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: false,
-                  child: new Text(
-                    "ไม่ใช่ตอนนี้",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-                ),
-              ],
-            ),
-          );
-        });
-  }
+  // _showVerifyCheckDialog() {
+  //   return showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return WillPopScope(
+  //           onWillPop: () {
+  //             return Future.value(false);
+  //           },
+  //           child: CupertinoAlertDialog(
+  //             title: new Text(
+  //               'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
+  //               style: TextStyle(
+  //                 fontSize: 16,
+  //                 fontFamily: 'Kanit',
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.normal,
+  //               ),
+  //             ),
+  //             content: Text(" "),
+  //             actions: [
+  //               CupertinoDialogAction(
+  //                 isDefaultAction: true,
+  //                 child: new Text(
+  //                   "ตกลง",
+  //                   style: TextStyle(
+  //                     fontSize: 13,
+  //                     fontFamily: 'Kanit',
+  //                     color: Color(0xFFFF7514),
+  //                     fontWeight: FontWeight.normal,
+  //                   ),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.push(
+  //                     context,
+  //                     MaterialPageRoute(
+  //                       builder: (context) => VerifyPhonePage(),
+  //                     ),
+  //                   );
+  //                 },
+  //               ),
+  //               CupertinoDialogAction(
+  //                 isDefaultAction: false,
+  //                 child: new Text(
+  //                   "ไม่ใช่ตอนนี้",
+  //                   style: TextStyle(
+  //                     fontSize: 13,
+  //                     fontFamily: 'Kanit',
+  //                     color: Color(0xFFFF7514),
+  //                     fontWeight: FontWeight.normal,
+  //                   ),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.pop(
+  //                     context,
+  //                   );
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       });
+  // }
 
-  _callSumStock(param) {
-    // print(param.toString());
-    int qty = 0;
-    for (var item in param) {
-      // print("stock ${item['stock'].toString()}");
-      qty += int.parse(item['stock'].toString());
-    }
-
-    // print(qty);
-    return qty;
-  }
 }

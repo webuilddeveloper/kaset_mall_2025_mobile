@@ -65,14 +65,13 @@ textFieldCentral(
       obscureText: isPassword,
       controller: model,
       enabled: enabled,
-      cursorColor: Color(0xFF0B24FB),
+      cursorColor: Color(0xFF09665a),
       style: TextStyle(
           // color: Color(0xFF000070),
           fontWeight: FontWeight.normal,
           fontFamily: 'Kanit',
           fontSize: 15.00,
-          color: Color(0XFF0B24FB)
-          ),
+          color: Color(0xFF09665a)),
       decoration: InputDecoration(
         filled: true,
         fillColor: Color(0xFFFFFFFF),
@@ -80,11 +79,11 @@ textFieldCentral(
         hintText: hintText,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5.0),
-          borderSide: BorderSide(color: Color(0xFFE4E4E4),width: 1),
+          borderSide: BorderSide(color: Color(0xFFE4E4E4), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5.0),
-          borderSide: BorderSide(color: Color(0xFF0B24FB)),
+          borderSide: BorderSide(color: Color(0xFF09665a)),
         ),
       ),
     ),

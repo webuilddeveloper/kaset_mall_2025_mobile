@@ -6,7 +6,7 @@ class Styles {
       primarySwatch: Colors.blue,
       primaryColor: isDarkTheme ? Colors.black : Color(0xFF1794D2),
       colorScheme: ColorScheme.fromSwatch().copyWith(
-        background: isDarkTheme ? Color(0xFF505050) : Colors.white,
+        surface: isDarkTheme ? Color(0xFF505050) : Colors.white,
         primary: isDarkTheme ? Color(0xff3B3B3B) : Color(0xffF1F5FB),
         secondary: isDarkTheme ? Colors.black : Colors.white,
       ),

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -18,16 +20,11 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final storage = new FlutterSecureStorage();
-  late Future<dynamic> _futureModel;
-  late Future<dynamic> __futureHomeCategory;
   late RefreshController _refreshController;
   late TextEditingController _searchController;
   dynamic _historyModel;
-  int _limit = 30;
   int amountItemInCart = 0;
   dynamic _historyGroupModel;
-  dynamic _historyCategoryModel;
-  late String _selectedAnimal;
   String textSearch = "";
 
   List<dynamic> _suggestions = [
@@ -47,7 +44,6 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     _historyModel = [];
     _historyGroupModel = [];
-    _historyCategoryModel = [];
     _refreshController = new RefreshController();
     _searchController = TextEditingController();
     _callRead();
@@ -118,24 +114,19 @@ class _SearchPageState extends State<SearchPage> {
     dynamic valueStorage = await storage.read(key: 'dataUserLoginDDPM');
     dynamic dataValue = json.decode(valueStorage);
     if (dataValue != null) {
-      var data = await postDio(server_we_build + 'history/readCategory',
-          {'ip': '', 'email': dataValue['email']});
       setState(() {
-        _historyCategoryModel = data;
       });
     }
   }
 
   _readCategory() async {
     setState(() {
-      __futureHomeCategory = getData(server + 'categories');
     });
   }
 
   // business logic.
   void _onRefresh() async {
     setState(() {
-      _limit = 30;
     });
     // _callRead();
     _getCountItemInCart();
@@ -147,9 +138,6 @@ class _SearchPageState extends State<SearchPage> {
 
   void _onLoading() async {
     setState(() {
-      _limit += 30;
-      _futureModel =
-          postDio(server + 'm/goods/isPopular/false/read', {'limit': _limit});
     });
     _refreshController.loadComplete();
   }
@@ -225,7 +213,7 @@ class _SearchPageState extends State<SearchPage> {
                               );
                             },
                             child: Image.asset(
-                              'assets/images/search.png',
+                              'assets/images/kaset/search.png',
                               height: 15,
                               width: 15,
                             ),
@@ -328,7 +316,7 @@ class _SearchPageState extends State<SearchPage> {
                               onChanged: (e) {
                                 _onLoadSearch();
                                 setState(() {
-                                  textSearch = e ?? "";
+                                  textSearch = e;
                                 });
                                 _suggestions
                                     .where((element) => element.contains(e));
@@ -376,8 +364,8 @@ class _SearchPageState extends State<SearchPage> {
                             color: Color(0xFFE3E6FE).withOpacity(0.2),
                           ),
                           child: Image.asset(
-                            'assets/images/cart.png',
-                            color: Color(0xFF0B24FB),
+                            'assets/images/kaset/basket.png',
+                            color: Color(0xFF09665a),
                           ),
                         ),
                         Positioned(
@@ -546,16 +534,17 @@ class _SearchPageState extends State<SearchPage> {
                                   Text(
                                     'ล้างประวัติ',
                                     style: TextStyle(
-                                        fontSize: 11, color: Color(0xFF0B24FB)),
+                                        fontSize: 11, color: Color(0xFF09665a)),
                                     textAlign: TextAlign.center,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   SizedBox(width: 5),
                                   Image.asset(
-                                    'assets/images/central/bin.png',
+                                    'assets/images/kaset/bin.png',
                                     height: 15,
                                     width: 15,
+                                    color: Color(0xFF09665a),
                                   )
                                 ],
                               ),
@@ -627,7 +616,7 @@ class _SearchPageState extends State<SearchPage> {
                 child: Text(
                   e['title'],
                   style: TextStyle(
-                      color: Color(0xFF0B24FB).withOpacity(0.5), fontSize: 13),
+                      color: Color(0xFF09665a).withOpacity(0.5), fontSize: 13),
                 ),
               ),
             ),

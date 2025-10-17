@@ -1,19 +1,15 @@
-import 'dart:async';
-import 'dart:io';
+// ignore_for_file: deprecated_member_use
 
-import 'package:clipboard/clipboard.dart';
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/payment_status.dart';
-import 'package:kasetmall/product_from.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/widget/scroll_behavior.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../component/link_url_in.dart';
-import '../component/loading_image_network.dart';
 import '../shared/extension.dart';
 import '../widget/header.dart';
 
@@ -74,12 +70,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       // _callReadProfileCode();
       Timer(
         Duration(seconds: 1),
-        () => {
+        () {
           setState(
             () {
               loading = false;
             },
-          ),
+          );
         },
       );
     });
@@ -91,15 +87,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     super.initState();
   }
 
-  _callReadProfileCode() async {
-    // profileCode = await storage.read(key: 'profileCode10');
-    // dynamic valueStorage = await storage.read(key: 'dataUserLoginDDPM');
-    // dynamic dataValue = valueStorage == null ? {'email': ''} : json.decode(valueStorage);
-
-    setState(() {
-      // emailProfile = dataValue['email'].toString() ?? "";
-    });
-  }
 
   @override
   void dispose() {
@@ -140,22 +127,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           )
         });
     return result;
-  }
-
-  _addLog(param) async {
-    await postObjectData(server_we_build + 'log/logGoods/create', {
-      "username": emailProfile ?? "",
-      "profileCode": profileCode ?? "",
-      "platform": Platform.isAndroid
-          ? "android"
-          : Platform.isIOS
-              ? "ios"
-              : "other",
-      "prodjctId": param['id'] ?? "",
-      "title": param['name'] ?? "",
-      "categoryId": param['category']['data']['id'] ?? "",
-      "category": param['category']['data']['name'] ?? "",
-    });
   }
 
   @override
@@ -199,9 +170,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
     final String encodedURl = Uri.encodeFull(googleMapslocationUrl);
 
-    // ignore: deprecated_member_use
     if (await canLaunch(encodedURl)) {
-      // ignore: deprecated_member_use
       await launch(encodedURl);
     } else {
       throw 'Could not launch $encodedURl';
@@ -697,20 +666,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           ),
                           Flexible(
                             child: ElevatedButton(
-                              onPressed: () {
-                                // modelProduct['receipt'] != null
-                                //     ? launchUrl(
-                                //         Uri.parse(modelProduct['receipt']
-                                //             ['data']['url']),
-                                //         mode: LaunchMode.inAppWebView)
-                                //     : null;
-                              },
+                              onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 // primary: Color.fromARGB(255, 208, 141, 147),
-                                backgroundColor: Color(0xFF0B24FB),
+                                backgroundColor: Color(0xFF09665a),
                                 // backgroundColor: Colors.teal,
                                 side: BorderSide(
-                                    color: Color(0xFF0B24FB),
+                                    color: Color(0xFF09665a),
                                     width: 1,
                                     style: BorderStyle.solid),
                                 shape: const RoundedRectangleBorder(
@@ -742,29 +704,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               child: Text(
                                 'ใบเสร็จค่าขนส่ง',
                                 style: TextStyle(
-                                    fontSize: 13, color: Color(0xFF707070)
-                                    // fontWeight: FontWeight.bold,
-                                    ),
+                                    fontSize: 13, color: Color(0xFF707070)),
                               ),
                             ),
                           ),
                           Flexible(
                             child: ElevatedButton(
-                              onPressed: () {
-                                // modelProduct['receipt_shipping'] != null
-                                //     ? launchUrl(
-                                //         Uri.parse(
-                                //             modelProduct['receipt_shipping']
-                                //                 ['data']['url']),
-                                //         mode: LaunchMode.inAppWebView)
-                                //     : null;
-                              },
+                              onPressed: () {},
                               style: ElevatedButton.styleFrom(
-                                // primary: Color.fromARGB(255, 208, 141, 147),
-                                backgroundColor: Color(0xFF0B24FB),
-                                // backgroundColor: Colors.teal,
+                                backgroundColor: Color(0xFF09665a),
                                 side: BorderSide(
-                                    color: Color(0xFF0B24FB),
+                                    color: Color(0xFF09665a),
                                     width: 1,
                                     style: BorderStyle.solid),
                                 shape: const RoundedRectangleBorder(
@@ -1015,7 +965,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF0B24FB)),
+                          color: Color(0xFF09665a)),
                     ),
                   ),
                 ],
@@ -1215,10 +1165,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                             },
                             style: ElevatedButton.styleFrom(
                               // primary: Color.fromARGB(255, 208, 141, 147),
-                              backgroundColor: Color(0xFF0B24FB),
+                              backgroundColor: Color(0xFF09665a),
                               // backgroundColor: Colors.teal,
                               side: BorderSide(
-                                  color: Color(0xFF0B24FB),
+                                  color: Color(0xFF09665a),
                                   width: 1,
                                   style: BorderStyle.solid),
                               shape: const RoundedRectangleBorder(
@@ -1274,7 +1224,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           //       toastFail(context, text: '✓  คัดลอกสำเร็จ'),
                           // ),
                           child: Image.asset(
-                            'assets/images/central/copy_clipboard.png',
+                            'assets/images/kaset/copy_clipboard.png',
                             height: 25,
                             width: 25,
                           ),
@@ -1289,7 +1239,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF0B24FB)),
+                                  color: Color(0xFF09665a)),
                             ),
                           ),
                         )
@@ -1403,20 +1353,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         ),
                         Flexible(
                           child: ElevatedButton(
-                            onPressed: () {
-                              // modelProduct['receipt'] != null
-                              //     ? launchUrl(
-                              //         Uri.parse(modelProduct['receipt']['data']
-                              //             ['url']),
-                              //         mode: LaunchMode.inAppWebView)
-                              //     : null;
-                            },
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              // primary: Color.fromARGB(255, 208, 141, 147),
-                              backgroundColor: Color(0xFF0B24FB),
-                              // backgroundColor: Colors.teal,
+                              backgroundColor: Color(0xFF09665a),
                               side: BorderSide(
-                                  color: Color(0xFF0B24FB),
+                                  color: Color(0xFF09665a),
                                   width: 1,
                                   style: BorderStyle.solid),
                               shape: const RoundedRectangleBorder(
@@ -1448,28 +1389,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                             child: Text(
                               'ใบเสร็จค่าขนส่ง',
                               style: TextStyle(
-                                  fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
+                                  fontSize: 13, color: Color(0xFF707070)),
                             ),
                           ),
                         ),
                         Flexible(
                           child: ElevatedButton(
-                            onPressed: () {
-                              // modelProduct['receipt_shipping'] != null
-                              //     ? launchUrl(
-                              //         Uri.parse(modelProduct['receipt_shipping']
-                              //             ['data']['url']),
-                              //         mode: LaunchMode.inAppWebView)
-                              //     : null;
-                            },
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              // primary: Color.fromARGB(255, 208, 141, 147),
-                              backgroundColor: Color(0xFF0B24FB),
-                              // backgroundColor: Colors.teal,
+                              backgroundColor: Color(0xFF09665a),
                               side: BorderSide(
-                                  color: Color(0xFF0B24FB),
+                                  color: Color(0xFF09665a),
                                   width: 1,
                                   style: BorderStyle.solid),
                               shape: const RoundedRectangleBorder(
@@ -1629,7 +1559,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF0B24FB)),
+                          color: Color(0xFF09665a)),
                     ),
                   ),
                 ],
@@ -1774,7 +1704,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF0B24FB)),
+                        color: Color(0xFF09665a)),
                   ),
                 ),
                 SizedBox(
@@ -1890,7 +1820,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           //       toastFail(context, text: '✓  คัดลอกสำเร็จ'),
                           // ),
                           child: Image.asset(
-                            'assets/images/central/copy_clipboard.png',
+                            'assets/images/kaset/copy_clipboard.png',
                             height: 25,
                             width: 25,
                           ),
@@ -1905,7 +1835,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF0B24FB)),
+                                  color: Color(0xFF09665a)),
                             ),
                           ),
                         )
@@ -2021,20 +1951,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         ),
                         Flexible(
                           child: ElevatedButton(
-                            onPressed: () {
-                              // modelProduct['receipt'] != null
-                              //     ? launchUrl(
-                              //         Uri.parse(modelProduct['receipt']['data']
-                              //             ['url']),
-                              //         mode: LaunchMode.inAppWebView)
-                              //     : null;
-                            },
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              // primary: Color.fromARGB(255, 208, 141, 147),
-                              backgroundColor: Color(0xFF0B24FB),
-                              // backgroundColor: Colors.teal,
+                              backgroundColor: Color(0xFF09665a),
                               side: BorderSide(
-                                  color: Color(0xFF0B24FB),
+                                  color: Color(0xFF09665a),
                                   width: 1,
                                   style: BorderStyle.solid),
                               shape: const RoundedRectangleBorder(
@@ -2074,20 +1995,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         ),
                         Flexible(
                           child: ElevatedButton(
-                            onPressed: () {
-                              // modelProduct['receipt_shipping'] != null
-                              //     ? launchUrl(
-                              //         Uri.parse(modelProduct['receipt_shipping']
-                              //             ['data']['url']),
-                              //         mode: LaunchMode.inAppWebView)
-                              //     : null;
-                            },
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              // primary: Color.fromARGB(255, 208, 141, 147),
-                              backgroundColor: Color(0xFF0B24FB),
-                              // backgroundColor: Colors.teal,
+                              backgroundColor: Color(0xFF09665a),
                               side: BorderSide(
-                                  color: Color(0xFF0B24FB),
+                                  color: Color(0xFF09665a),
                                   width: 1,
                                   style: BorderStyle.solid),
                               shape: const RoundedRectangleBorder(
@@ -2247,7 +2159,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF0B24FB)),
+                          color: Color(0xFF09665a)),
                     ),
                   ),
                 ],
@@ -2362,14 +2274,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   }
 
   rowBusinessHours(String day, String time) {
-    Color color = day == nowDayOfWeek ? Color(0xFF0B24FB) : Color(0xFF707070);
+    Color color = day == nowDayOfWeek ? Color(0xFF09665a) : Color(0xFF707070);
     return Row(
       children: [
         Container(
           height: 10,
           width: 10,
           decoration: BoxDecoration(
-            color: day == nowDayOfWeek ? Color(0xFF0B24FB) : Colors.transparent,
+            color: day == nowDayOfWeek ? Color(0xFF09665a) : Colors.transparent,
             borderRadius: BorderRadius.circular(100),
           ),
         ),

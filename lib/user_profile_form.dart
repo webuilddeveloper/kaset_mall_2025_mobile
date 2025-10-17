@@ -1,7 +1,8 @@
+// ignore_for_file: unnecessary_null_comparison, deprecated_member_use
+
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as datetimePicker;
@@ -13,6 +14,7 @@ import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/widget/header.dart';
 import 'package:kasetmall/widget/image_picker.dart';
 
+// ignore: must_be_immutable
 class UserProfileForm extends StatefulWidget {
   UserProfileForm(
       {Key? key,
@@ -43,10 +45,6 @@ final storage = new FlutterSecureStorage();
 
 class _UserProfileForm extends State<UserProfileForm> {
   // final storage = new FlutterSecureStorage();
-  late Future<dynamic> _futureModel;
-  int _selectedDay = 0;
-  int _selectedMonth = 0;
-  int _selectedYear = 0;
   int year = 0;
   int month = 0;
   int day = 0;
@@ -68,10 +66,6 @@ class _UserProfileForm extends State<UserProfileForm> {
   String profilePhone = "";
 
   ScrollController scrollController = new ScrollController();
-  dynamic _futureAffiliationModel = [
-    {'code': '1', 'title': 'สมาชิก ศึกษาภัณฑ์ มอลล์.', 'Affiliation': '1'},
-    {'code': '2', 'title': 'บุคคลทั่วไป', 'Affiliation': '2'},
-  ];
   dynamic _futureSexModel = [
     {'code': 1, 'title': 'ชาย', 'icon': Icons.male},
     {'code': 2, 'title': 'หญิง', 'icon': Icons.female},
@@ -104,9 +98,6 @@ class _UserProfileForm extends State<UserProfileForm> {
     year = now.year;
     month = now.month;
     day = now.day;
-    _selectedYear = now.year;
-    _selectedMonth = now.month;
-    _selectedDay = now.day;
     // _callRead();
 
     super.initState();
@@ -235,12 +226,12 @@ class _UserProfileForm extends State<UserProfileForm> {
                                           width: 150,
                                           padding: EdgeInsets.all(30),
                                           decoration: BoxDecoration(
-                                            color: Color(0XFF0B24FB),
+                                            color: Color(0xFF09665a),
                                             borderRadius:
                                                 BorderRadius.circular(75),
                                           ),
                                           child: Image.asset(
-                                            'assets/images/central/profile.png',
+                                            'assets/images/kaset/user.png',
                                             fit: BoxFit.cover,
                                             width: 50,
                                             height: 50,
@@ -266,7 +257,7 @@ class _UserProfileForm extends State<UserProfileForm> {
                               padding: EdgeInsets.only(top: 25),
                               child: Text(name,
                                   style: TextStyle(
-                                    color: Color(0xFF0B24FB),
+                                    color: Color(0xFF09665a),
                                     fontSize: 17,
                                     fontWeight: FontWeight.normal,
                                   )),
@@ -296,14 +287,14 @@ class _UserProfileForm extends State<UserProfileForm> {
                                       borderRadius:
                                           new BorderRadius.circular(25.0),
                                       border: Border.all(
-                                        color: Color(0xFF0B24FB),
+                                        color: Color(0xFF09665a),
                                         width: 1,
                                       ),
                                     ),
                                     child: Text(
                                       'สมาชิก ศึกษาภัณฑ์ มอลล์.',
                                       style: TextStyle(
-                                        color: Color(0xFF0B24FB),
+                                        color: Color(0xFF09665a),
                                         fontSize: 13.0,
                                         fontWeight: FontWeight.normal,
                                         letterSpacing: 0.33,
@@ -618,6 +609,7 @@ class _UserProfileForm extends State<UserProfileForm> {
                               int.parse(value.toString()) == 0
                                   ? 'กรุณาเลือกอาชีพ'
                                   : 0;
+                              return null;
                             },
                             hint: Text(
                               'อาชีพ',
@@ -905,17 +897,13 @@ class _UserProfileForm extends State<UserProfileForm> {
 
   _update() async {
     FocusScope.of(context).unfocus();
-    String fileName;
-    String fileType;
     var birthDate;
     // if (imageProfile != null) {
     //   fileName = imageProfile.path.split('/').last;
     //   fileType = fileName.split('.').last;
     // }
-    if (txtBirthday.text != null) {
-      birthDate = txtBirthday.text.split('/');
-    }
-    var map = {
+    birthDate = txtBirthday.text.split('/');
+      var map = {
       "name": txtName?.text ?? '',
       "email": txtEmail?.text ?? '',
       "phone": txtPhone?.text ?? '',
@@ -939,71 +927,10 @@ class _UserProfileForm extends State<UserProfileForm> {
       //     filename: fileName, contentType: MediaType('image', fileType)) :
     };
     // var b = await storage.read(key: 'profilePhone');
-    if (profilePhone == null) {
-      await put(server + 'users/me', map).then((value) async => {
-            await postReturnAll(server + 'users/me/phone-number', {
-              'phone': (txtPhone?.text).toString() ?? ''
-            }).then((value2) async => {
-                  setState(() {
-                    if (value2['status2'] == 'S') {
-                      storage.write(
-                          key: 'profilePhone',
-                          value: txtPhone?.text.toString());
-                      Navigator.pop(context, 'success');
-                    } else {
-                      // phoneFocus.requestFocus();
-                      // toastFail(context, text: value2['message'], duration: 3);
-                      showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (BuildContext context) {
-                            return WillPopScope(
-                              onWillPop: () {
-                                return Future.value(false);
-                              },
-                              child: CupertinoAlertDialog(
-                                title: new Text(
-                                  value2['message'],
-                                  // '',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Kanit',
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                                content: Text(" "),
-                                actions: [
-                                  CupertinoDialogAction(
-                                    isDefaultAction: true,
-                                    child: new Text(
-                                      "ตกลง",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontFamily: 'Kanit',
-                                        color: Color(0xFFFF7514),
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      phoneFocus.requestFocus();
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          });
-                    }
-                  }),
-                }),
-          });
-    } else {
-      await put(server + 'users/me', map).then((value) async => {
-            Navigator.pop(context, 'success'),
-          });
-    }
-    return null;
+    await put(server + 'users/me', map).then((value) async => {
+          Navigator.pop(context, 'success'),
+        });
+      return null;
   }
 
   dialogOpenPickerDate() {
@@ -1015,19 +942,19 @@ class _UserProfileForm extends State<UserProfileForm> {
           containerHeight: 210.0,
           itemStyle: TextStyle(
             fontSize: 16.0,
-            color: Color(0xFF0B24FB),
+            color: Color(0xFF09665a),
             fontWeight: FontWeight.normal,
             fontFamily: 'Kanit',
           ),
           doneStyle: TextStyle(
             fontSize: 16.0,
-            color: Color(0xFF0B24FB),
+            color: Color(0xFF09665a),
             fontWeight: FontWeight.normal,
             fontFamily: 'Kanit',
           ),
           cancelStyle: TextStyle(
             fontSize: 16.0,
-            color: Color(0xFF0B24FB),
+            color: Color(0xFF09665a),
             fontWeight: FontWeight.normal,
             fontFamily: 'Kanit',
           ),
@@ -1037,9 +964,6 @@ class _UserProfileForm extends State<UserProfileForm> {
         maxTime: DateTime(year, month, day), onConfirm: (date) {
       setState(
         () {
-          _selectedYear = int.parse(birthDate[2]);
-          _selectedMonth = int.parse(birthDate[1]);
-          _selectedDay = int.parse(birthDate[0]);
           txtBirthday.value = TextEditingValue(
             text: DateFormat("dd / MM / yyyy").format(date),
           );
@@ -1061,11 +985,9 @@ class _UserProfileForm extends State<UserProfileForm> {
     });
     String? fileName;
     String? fileType;
-    if (imageProfile != null) {
-      fileName = imageProfile.path.split('/').last;
-      fileType = fileName.split('.').last;
-    }
-
+    fileName = imageProfile.path.split('/').last;
+    fileType = fileName.split('.').last;
+  
     var map = FormData.fromMap({
       "name": model['name'] ?? '',
       "email": model['email'] ?? '',
@@ -1076,7 +998,7 @@ class _UserProfileForm extends State<UserProfileForm> {
       "profile_picture": imageProfile != null
           ? await MultipartFile.fromFile(imageProfile.path,
               filename: fileName,
-              contentType: MediaType('image', (fileType ?? "")))
+              contentType: MediaType('image', (fileType)))
           : "",
     });
     await postFormData(server + 'users/me?_method=put', map)

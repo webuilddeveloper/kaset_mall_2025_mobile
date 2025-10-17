@@ -495,5 +495,3 @@ class OffsetTransition extends AnimatedWidget {
     );
   }
 }
-
-// main() => runApp(GalleryView());

@@ -16,15 +16,16 @@ class DecorationRegister {
         contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7.0),
-          borderSide: BorderSide(color: Color(0xFF0B24FB)),
+          borderSide: BorderSide(color: Color(0xFF09665a)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7.0),
-          borderSide: BorderSide(color: Color(0xFF0B24FB)),
+          borderSide: BorderSide(color: Color(0xFF09665a)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7.0),
           borderSide: BorderSide(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.2),
           ),
         ),
@@ -64,15 +65,16 @@ class DecorationRegister {
         contentPadding: const EdgeInsets.fromLTRB(15.0, 5.0, 5.0, 5.0),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7.0),
-          borderSide: BorderSide(color: Color(0xFF0B24FB)),
+          borderSide: BorderSide(color: Color(0xFF09665a)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7.0),
-          borderSide: BorderSide(color: Color(0xFF0B24FB)),
+          borderSide: BorderSide(color: Color(0xFF09665a)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7.0),
           borderSide: BorderSide(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.2),
           ),
         ),
@@ -157,7 +159,7 @@ class ValidateRegister {
   }
 
   static occupation(int value) {
-    if (value == 0 || value == null) {
+    if (value == 0) {
       return '**กรุณาเลือกอาชีพ';
     }
     return null;

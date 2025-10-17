@@ -21,9 +21,7 @@ class _EventCalendarPageState extends State<EventCalendarPage>
   String _keySearch = '';
   String _category = '';
   int _limit = 10;
-  bool _loading = false;
   bool _showSearch = false;
-  bool _isSearch = false;
   late AnimationController _animationSearchController;
   TextEditingController _searchController = new TextEditingController();
 
@@ -256,7 +254,6 @@ class _EventCalendarPageState extends State<EventCalendarPage>
                       onEditingComplete: () {
                         FocusScope.of(context).unfocus();
                         setState(() {
-                          _isSearch = true;
                           _showSearch = false;
                           _limit = 0;
                         });
@@ -280,7 +277,7 @@ class _EventCalendarPageState extends State<EventCalendarPage>
                       },
                     )
                   : Image.asset(
-                      'assets/images/search.png',
+                      'assets/images/kaset/search.png',
                       color: Color(0x802D9CED),
                       height: 15,
                       width: 15,
@@ -318,8 +315,6 @@ class _EventCalendarPageState extends State<EventCalendarPage>
     return GestureDetector(
       onTap: () {
         setState(() {
-          _isSearch = false;
-          _loading = true;
           _category = model['code'];
           _limit = 0;
         });
@@ -529,7 +524,6 @@ class _EventCalendarPageState extends State<EventCalendarPage>
           onTap: () {
             FocusScope.of(context).unfocus();
             setState(() {
-              _isSearch = true;
               _showSearch = false;
               _limit = 0;
             });
@@ -538,7 +532,7 @@ class _EventCalendarPageState extends State<EventCalendarPage>
           child: Container(
             padding: EdgeInsets.all(3),
             child: Image.asset(
-              'assets/images/search.png',
+              'assets/images/kaset/search.png',
               color: Color(0x802D9CED),
             ),
           ),
@@ -547,7 +541,6 @@ class _EventCalendarPageState extends State<EventCalendarPage>
           onTap: () {
             setState(() {
               if (_searchController.text == '') {
-                _isSearch = false;
                 _showSearch = false;
               } else {
                 _searchController = TextEditingController(text: '');

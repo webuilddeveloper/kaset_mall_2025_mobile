@@ -49,9 +49,7 @@ header(
         ),
       ),
     ),
-    
     centerTitle: isCenter,
-    
     actions: [
       if (isShowButtonCalendar)
         GestureDetector(
@@ -64,13 +62,12 @@ header(
             margin: const EdgeInsets.only(right: 16, top: 12, bottom: 4),
             width: 85,
             decoration: BoxDecoration(
-                color: Colors.white, 
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   width: 1,
                   color: Theme.of(context).primaryColor,
-                )
-            ),
+                )),
             child: isButtonCalendar
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -95,7 +92,7 @@ header(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Image.asset(
-                        'assets/images/icon_header_calendar_1.png',
+                        'assets/images/kaset/icon_header_calendar_1.png',
                         color: Theme.of(context).primaryColor,
                         width: 16,
                       ),
@@ -106,8 +103,6 @@ header(
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
-                      // widgetText(
-                      //     title: 'ปฏิทิน', fontSize: 9, color: 0xFF1B6CA8),
                     ],
                   ),
           ),
@@ -165,6 +160,5 @@ header(
           ),
         ),
     ],
-  
   );
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 
@@ -50,7 +49,7 @@ class _DeleteUserState extends State<DeleteUser> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var tween = Tween<double>(begin: 0, end: 100).animate(animationController);
+    Tween<double>(begin: 0, end: 100).animate(animationController);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(

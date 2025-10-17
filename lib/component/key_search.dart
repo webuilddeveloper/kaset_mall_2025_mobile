@@ -1,9 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 
 class KeySearch extends StatefulWidget {
   KeySearch({super.key, this.show, this.onKeySearchChange});
 
-//  final VoidCallback onTabCategory;
   final bool? show;
   final Function(String)? onKeySearchChange;
 
@@ -32,7 +33,6 @@ class _SearchBox extends State<KeySearch> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 12.0),
@@ -75,56 +75,6 @@ class _SearchBox extends State<KeySearch> {
           contentPadding: EdgeInsets.all(16),
         ),
       ),
-      // Row(
-      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //   children: [
-      //     Container(
-      //       height: 45.0,
-      //       width: width - 90.0,
-      //       child: TextField(
-      //         autofocus: false,
-      //         cursorColor: Theme.of(context).primaryColor,
-      //         controller: txtDescription,
-      //         onChanged: (text) {
-      //           onKeySearchChange!(txtDescription.text);
-      //         },
-      //         keyboardType: TextInputType.multiline,
-      //         maxLines: 1,
-      //         style: TextStyle(
-      //           fontSize: 13,
-      //           fontFamily: 'Kanit',
-      //         ),
-      //         textAlign: TextAlign.left,
-      //         decoration: InputDecoration(
-      //           filled: true,
-      //           fillColor: Colors.transparent,
-      //           hintText: 'ใส่คำที่ต้องการค้นหา',
-      //           contentPadding: const EdgeInsets.only(left: 5.0, right: 5.0),
-      //           enabledBorder: const OutlineInputBorder(
-      //               borderSide: BorderSide(color: Colors.white)),
-      //           focusedBorder: const OutlineInputBorder(
-      //               borderSide: BorderSide(color: Colors.white)),
-      //         ),
-      //       ),
-      //     ),
-      //     InkWell(
-      //       onTap: () {
-      //         onKeySearchChange!(txtDescription.text);
-      //         setState(() {
-      //           show = !show!;
-      //         });
-      //       },
-      //       child: Container(
-      //         color: Colors.transparent,
-      //         child: Image.asset(
-      //           'assets/images/search.png',
-      //           height: 20.0,
-      //           width: 20.0,
-      //         ),
-      //       ),
-      //     )
-      //   ],
-      // ),
     );
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -67,16 +69,16 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
       String fileName = file.path.split('/').last;
       String fileType = fileName.split('.').last;
       // var id = DateTime.now().millisecondsSinceEpoch;
-      setState(() => {
-            image = res,
-            loadingImage = false,
+      setState(() {
+            image = res;
+            loadingImage = false;
             imageList.add({
               'value': image,
               'id': random.nextInt(100),
               'file': file,
               'fileName': fileName,
               'fileType': fileType,
-            }),
+            });
             // image = server + res,
             // showLoadingImage = false,
           });
@@ -199,7 +201,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
-              'assets/images/add_image_file.png',
+              'assets/images/kaset/add_image_file.png',
               height: 50,
               width: 50,
             ),
@@ -243,7 +245,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
+              child: Image.network(
                 widget.modelMediaData['imageUrl'],
                 height: 80,
                 width: 80,
@@ -292,7 +294,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
                   color: Color(0xFFE4E4E4),
                 ),
               ),
-              child: imageList.length == 0 || imageList == null
+              child: imageList.length == 0
                   ? _imageUploadPicker()
                   : _listViewImageList(),
             ),

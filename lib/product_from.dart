@@ -10,7 +10,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/blank_page/blank_loading.dart';
-import 'package:kasetmall/chats_staff.dart';
 import 'package:kasetmall/component/gallery_view.dart';
 import 'package:kasetmall/component/link_url_in.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
@@ -18,7 +17,6 @@ import 'package:kasetmall/login.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
 import 'package:kasetmall/user_profile_form.dart';
-import 'package:kasetmall/verify_phone.dart';
 import 'package:kasetmall/widget/data_error.dart';
 import 'package:kasetmall/widget/show_loading.dart';
 import 'package:kasetmall/widget/stack_tap.dart';
@@ -77,8 +75,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   String? profilePhone;
   String? verifyPhone;
 
-  String? _userId = "";
-  String? _username = "";
 
   @override
   void initState() {
@@ -93,8 +89,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
       final result = await get(server + 'users/me');
       print(result['id']);
       if (result != null) {
-        _userId = result['id'] ?? '';
-        _username = result?['name'] ?? '';
       } else {
         print('No result from API');
       }
@@ -111,7 +105,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   }
 
   read() async {
-  
     _getUserData();
     profilePhone = (await storage.read(key: 'profilePhone'));
     verifyPhone = (await storage.read(key: 'phoneVerified'));
@@ -133,7 +126,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
         ...widget.model
       };
 
- 
       print(tempData);
     });
   }
@@ -314,8 +306,8 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                         children: [
                           Image.asset(
                             like
-                                ? 'assets/images/heart_full.png'
-                                : 'assets/images/heart.png',
+                                ? 'assets/images/kaset/heart_full.png'
+                                : 'assets/images/kaset/heart.png',
                             height: AdaptiveTextSize()
                                 .getadaptiveTextSize(context, 25),
                             width: AdaptiveTextSize()
@@ -337,7 +329,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                     ),
                   ),
                 ),
-                // รถเข็น
+                // ตะกร้า
                 Flexible(
                   flex: 1,
                   child: StackTap(
@@ -375,7 +367,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/images/cart.png',
+                            'assets/images/kaset/basket.png',
                             height: AdaptiveTextSize()
                                 .getadaptiveTextSize(context, 25),
                             width: AdaptiveTextSize()
@@ -383,7 +375,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                             color: Color(0xFF09665a),
                           ),
                           Text(
-                            'ใส่รถเข็น',
+                            'ใส่ตะกร้า',
                             style: TextStyle(
                               fontFamily: 'Kanit',
                               fontSize: 13,
@@ -475,7 +467,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                           }
                           ;
                         } else {
-                          _dialogCheckVerify();
+                          // _dialogCheckVerify();
                         }
                       } else {
                         Navigator.push(
@@ -494,8 +486,8 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                         children: [
                           Image.asset(
                             like
-                                ? 'assets/images/heart_full.png'
-                                : 'assets/images/heart.png',
+                                ? 'assets/images/kaset/heart_full.png'
+                                : 'assets/images/kaset/heart.png',
                             height: AdaptiveTextSize()
                                 .getadaptiveTextSize(context, 25),
                             width: AdaptiveTextSize()
@@ -504,7 +496,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                           ),
                           Text(
                             'ถูกใจ',
-                            // (MediaQuery.maybeOf(context).size.height / MediaQuery.maybeOf(context).size.width).toString(),
                             style: TextStyle(
                               fontFamily: 'Kanit',
                               fontSize: 13,
@@ -523,69 +514,69 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     // );
   }
 
-  _dialogCheckVerify() {
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () {
-              return Future.value(false);
-            },
-            child: CupertinoAlertDialog(
-              title: new Text(
-                'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Kanit',
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              content: Text(" "),
-              actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: new Text(
-                    "ตกลง",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFc50817),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => VerifyPhonePage(),
-                      ),
-                    );
-                  },
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: false,
-                  child: new Text(
-                    "ไม่ใช่ตอนนี้",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFF000000),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-                ),
-              ],
-            ),
-          );
-        });
-  }
+  // _dialogCheckVerify() {
+  //   return showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return WillPopScope(
+  //           onWillPop: () {
+  //             return Future.value(false);
+  //           },
+  //           child: CupertinoAlertDialog(
+  //             title: new Text(
+  //               'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
+  //               style: TextStyle(
+  //                 fontSize: 16,
+  //                 fontFamily: 'Kanit',
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.normal,
+  //               ),
+  //             ),
+  //             content: Text(" "),
+  //             actions: [
+  //               CupertinoDialogAction(
+  //                 isDefaultAction: true,
+  //                 child: new Text(
+  //                   "ตกลง",
+  //                   style: TextStyle(
+  //                     fontSize: 13,
+  //                     fontFamily: 'Kanit',
+  //                     color: Color(0xFFc50817),
+  //                     fontWeight: FontWeight.normal,
+  //                   ),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.push(
+  //                     context,
+  //                     MaterialPageRoute(
+  //                       builder: (context) => VerifyPhonePage(),
+  //                     ),
+  //                   );
+  //                 },
+  //               ),
+  //               CupertinoDialogAction(
+  //                 isDefaultAction: false,
+  //                 child: new Text(
+  //                   "ไม่ใช่ตอนนี้",
+  //                   style: TextStyle(
+  //                     fontSize: 13,
+  //                     fontFamily: 'Kanit',
+  //                     color: Color(0xFF000000),
+  //                     fontWeight: FontWeight.normal,
+  //                   ),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.pop(
+  //                     context,
+  //                   );
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       });
+  // }
 
   _dialogCheckPhone() {
     return showDialog(
@@ -1844,8 +1835,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                 print('-----------------');
                                               } else {
                                                 // ซื้อสินค้าทันที
-                                                var result = await _addCart(
-                                                    [model], 'buy');
 
                                                 // List<dynamic> data = [
                                                 //   {
@@ -1894,7 +1883,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                     (model['stock'] ?? 0) <= 0
                                                         ? 'สินค้าหมด'
                                                         : type == 'cart'
-                                                            ? 'เพิ่มไปยังรถเข็น'
+                                                            ? 'เพิ่มไปยังตะกร้า'
                                                             : 'ซื้อสินค้า',
                                                     style: TextStyle(
                                                       fontFamily: 'Kanit',
@@ -1935,727 +1924,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
       },
     );
   }
-  // buildModal(String type) {
-  //   setState(() {
-  //     productQty = 1;
-  //     qtyController.text = productQty.toString();
-  //   });
-
-  //   return showCupertinoModalBottomSheet(
-  //     context: context,
-  //     barrierColor: Colors.black.withOpacity(0.3),
-  //     backgroundColor: Colors.transparent,
-  //     builder: (context) {
-  //       return GestureDetector(
-  //         onTap: () => FocusScope.of(context).unfocus(),
-  //         child: StatefulBuilder(
-  //           builder: (BuildContext context,
-  //               StateSetter setState /*You can rename this!*/) {
-  //             return FutureBuilder(
-  //                 future: _futureProductDetailModel,
-  //                 builder: (contect, snapshot) {
-  //                   print(
-  //                       '================== _futureProductDetailModel =================');
-  //                   print(snapshot.data);
-  //                   print(
-  //                       '==============================================================');
-  //                   if (snapshot.hasData) {
-  //                     if (snapshot.data.length == 0) {
-  //                       // toastFail(context, text: 'ไม่พบสินค้า', duration: 1);
-  //                       // Navigator.pop(context, true);
-  //                       return Container();
-  //                     }
-  //                     var model = snapshot.data?['image'];
-  //                     if ((selectedInventory) == '') {
-  //                       if (snapshot.data?['image'].length > 0) {
-  //                         selectedInventory = snapshot.data?['image'];
-  //                         selectedInventoryModel = snapshot.data?['image'];
-  //                       }
-  //                     }
-  //                     return Material(
-  //                       type: MaterialType.transparency,
-  //                       child: new Container(
-  //                         height:
-  //                             WidgetsBinding.instance.window.viewInsets.bottom >
-  //                                     0.0
-  //                                 ? MediaQuery.of(context).size.height
-  //                                 : MediaQuery.of(context).size.height * 0.60,
-  //                         width: double.infinity,
-  //                         decoration: BoxDecoration(
-  //                           color: Colors.white,
-  //                           borderRadius: BorderRadius.vertical(
-  //                             top: Radius.circular(40),
-  //                           ),
-  //                         ),
-  //                         child: Scaffold(
-  //                             body: ShowLoadingWidget(
-  //                           loading: loadingAddCart,
-  //                           children: [
-  //                             Stack(
-  //                               children: [
-  //                                 Positioned(
-  //                                   top: AdaptiveTextSize()
-  //                                       .getadaptiveTextSize(context, 15),
-  //                                   right: AdaptiveTextSize()
-  //                                       .getadaptiveTextSize(context, 15),
-  //                                   child: InkWell(
-  //                                     onTap: () => Navigator.pop(context),
-  //                                     child: Container(
-  //                                       height: AdaptiveTextSize()
-  //                                           .getadaptiveTextSize(context, 35),
-  //                                       width: AdaptiveTextSize()
-  //                                           .getadaptiveTextSize(context, 35),
-  //                                       decoration: BoxDecoration(
-  //                                         shape: BoxShape.circle,
-  //                                         color: Color(0xFF09665a),
-  //                                       ),
-  //                                       child: Icon(
-  //                                         Icons.clear,
-  //                                         size: AdaptiveTextSize()
-  //                                             .getadaptiveTextSize(context, 20),
-  //                                         color: Colors.white,
-  //                                       ),
-  //                                     ),
-  //                                   ),
-  //                                 ),
-  //                                 Padding(
-  //                                   padding: EdgeInsets.fromLTRB(
-  //                                       25,
-  //                                       AdaptiveTextSize()
-  //                                           .getadaptiveTextSize(context, 50),
-  //                                       15,
-  //                                       80),
-  //                                   child: ListView(
-  //                                     // shrinkWrap: true,
-  //                                     // physics: ClampingScrollPhysics(),
-  //                                     children: [
-  //                                       Row(
-  //                                         crossAxisAlignment:
-  //                                             CrossAxisAlignment.start,
-  //                                         mainAxisAlignment:
-  //                                             MainAxisAlignment.start,
-  //                                         children: [
-  //                                           selectedInventoryModel != null
-  //                                               ? Container(
-  //                                                   height: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 130),
-  //                                                   width: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 100),
-  //                                                   child: selectedInventoryModel[
-  //                                                               'url'] !=
-  //                                                           null
-  //                                                       ? loadingImageNetwork(
-  //                                                           selectedInventoryModel[
-  //                                                               'url'],
-  //                                                           fit: BoxFit.cover,
-  //                                                         )
-  //                                                       : Image.asset(
-  //                                                           'assets/images/kaset/no-img.png',
-  //                                                           fit: BoxFit.contain,
-  //                                                         ))
-  //                                               : Container(
-  //                                                   height: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 130),
-  //                                                   width: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 100),
-  //                                                   child: snapshot
-  //                                                               .data['image']
-  //                                                               .length >
-  //                                                           0
-  //                                                       ? loadingImageNetwork(
-  //                                                           snapshot.data[
-  //                                                                       'image']
-  //                                                                   ['data'][0]
-  //                                                               ['url'],
-  //                                                           fit: BoxFit.cover,
-  //                                                         )
-  //                                                       : Image.asset(
-  //                                                           'assets/images/kaset/no-img.png',
-  //                                                           fit: BoxFit.contain,
-  //                                                         )),
-  //                                           SizedBox(width: 20),
-  //                                           Expanded(
-  //                                             child: Column(
-  //                                               crossAxisAlignment:
-  //                                                   CrossAxisAlignment.start,
-  //                                               children: [
-  //                                                 Text(
-  //                                                   snapshot.data?['name'],
-  //                                                   style: TextStyle(
-  //                                                     fontFamily: 'Kanit',
-  //                                                     fontSize: 13,
-  //                                                     color: Colors.black,
-  //                                                   ),
-  //                                                   textScaleFactor: ScaleSize
-  //                                                       .textScaleFactor(
-  //                                                           context),
-  //                                                   maxLines: 2,
-  //                                                   overflow:
-  //                                                       TextOverflow.ellipsis,
-  //                                                 ),
-  //                                                 if (model['price'] !=
-  //                                                     model['netPrice'])
-  //                                                   Text(
-  //                                                     selectedInventoryModel !=
-  //                                                             null
-  //                                                         ? moneyFormat(selectedInventoryModel[
-  //                                                                     'price']
-  //                                                                 .toString()) +
-  //                                                             " บาทX"
-  //                                                         : moneyFormat(model[
-  //                                                                     'price']
-  //                                                                 .toString()) +
-  //                                                             " บาทY",
-  //                                                     style: TextStyle(
-  //                                                       fontSize: 16,
-  //                                                       fontFamily: 'Kanit',
-  //                                                       color: Colors.grey,
-  //                                                       fontWeight:
-  //                                                           FontWeight.w500,
-  //                                                       decoration:
-  //                                                           TextDecoration
-  //                                                               .lineThrough,
-  //                                                     ),
-  //                                                     textScaleFactor: ScaleSize
-  //                                                         .textScaleFactor(
-  //                                                             context),
-  //                                                   ),
-  //                                                 Text(
-  //                                                   selectedInventoryModel !=
-  //                                                           null
-  //                                                       ? moneyFormat(
-  //                                                               selectedInventoryModel[
-  //                                                                       'price']
-  //                                                                   .toString()) +
-  //                                                           " บาท"
-  //                                                       : moneyFormat(model[
-  //                                                                   'price']
-  //                                                               .toString()) +
-  //                                                           " บาท",
-  //                                                   style: TextStyle(
-  //                                                     fontSize: 23,
-  //                                                     fontFamily: 'Kanit',
-  //                                                     fontWeight:
-  //                                                         FontWeight.w500,
-  //                                                   ),
-  //                                                   textScaleFactor: ScaleSize
-  //                                                       .textScaleFactor(
-  //                                                           context),
-  //                                                 ),
-  //                                                 Text(
-  //                                                   selectedInventoryModel !=
-  //                                                           null
-  //                                                       ? 'คลัง : ' +
-  //                                                           (selectedInventoryModel[
-  //                                                                       'stock'] ??
-  //                                                                   0)
-  //                                                               .toString() +
-  //                                                           ' ชิ้น'
-  //                                                       : '',
-  //                                                   style: TextStyle(
-  //                                                     fontSize: 13,
-  //                                                     fontFamily: 'Kanit',
-  //                                                     color: Colors.grey,
-  //                                                     fontWeight:
-  //                                                         FontWeight.w400,
-  //                                                   ),
-  //                                                   textScaleFactor: ScaleSize
-  //                                                       .textScaleFactor(
-  //                                                           context),
-  //                                                 ),
-  //                                               ],
-  //                                             ),
-  //                                           )
-  //                                         ],
-  //                                       ),
-  //                                       SizedBox(height: 15),
-  //                                       Text(
-  //                                         'ระบุลักษณะสินค้า',
-  //                                         style: TextStyle(
-  //                                           fontFamily: 'Kanit',
-  //                                           fontSize: 15,
-  //                                           fontWeight: FontWeight.bold,
-  //                                         ),
-  //                                         textScaleFactor:
-  //                                             ScaleSize.textScaleFactor(
-  //                                                 context),
-  //                                       ),
-  //                                       // SizedBox(height: 25),
-  //                                       // Expanded(
-  //                                       //   child:
-  //                                       ListView(
-  //                                         shrinkWrap: true,
-  //                                         physics: ClampingScrollPhysics(),
-  //                                         children: [
-  //                                           SizedBox(height: 10),
-  //                                           buildWrap(setState, snapshot.data),
-  //                                           // SizedBox(height: 100),
-  //                                         ],
-  //                                       ),
-
-  //                                       SizedBox(height: 15),
-  //                                       Row(
-  //                                         mainAxisAlignment:
-  //                                             MainAxisAlignment.spaceBetween,
-  //                                         children: [
-  //                                           Text(
-  //                                             'จำนวน',
-  //                                             style: TextStyle(
-  //                                               fontFamily: 'Kanit',
-  //                                               fontSize: 15,
-  //                                               fontWeight: FontWeight.bold,
-  //                                             ),
-  //                                             textScaleFactor:
-  //                                                 ScaleSize.textScaleFactor(
-  //                                                     context),
-  //                                           ),
-  //                                           Row(
-  //                                             children: [
-  //                                               InkWell(
-  //                                                 onTap: () => setState(() {
-  //                                                   if (productQty > 1) {
-  //                                                     productQty--;
-  //                                                   }
-  //                                                   ;
-  //                                                   qtyController.text =
-  //                                                       productQty.toString();
-  //                                                 }),
-  //                                                 child: Container(
-  //                                                   height: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 30),
-  //                                                   width: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 30),
-  //                                                   alignment:
-  //                                                       Alignment.topCenter,
-  //                                                   decoration: BoxDecoration(
-  //                                                       borderRadius:
-  //                                                           BorderRadius
-  //                                                               .circular(7),
-  //                                                       border: Border.all(
-  //                                                           width: 1,
-  //                                                           color: productQty ==
-  //                                                                   1
-  //                                                               ? Color(
-  //                                                                   0xFFFAF9F9)
-  //                                                               : Color(
-  //                                                                   0xFFF7F7F7)),
-  //                                                       color: productQty == 1
-  //                                                           ? Color(0xFFFAF9F9)
-  //                                                           : Color(
-  //                                                               0xFFF7F7F7)),
-  //                                                   child: Text(
-  //                                                     '-',
-  //                                                     style: TextStyle(
-  //                                                       fontFamily: 'Kanit',
-  //                                                       fontSize: 16,
-  //                                                       color: productQty == 1
-  //                                                           ? Colors.grey[400]
-  //                                                           : Color(0xFF707070),
-  //                                                     ),
-  //                                                     textScaleFactor: ScaleSize
-  //                                                         .textScaleFactor(
-  //                                                             context),
-  //                                                     textAlign:
-  //                                                         TextAlign.start,
-  //                                                   ),
-  //                                                 ),
-  //                                               ),
-  //                                               SizedBox(width: 15),
-  //                                               Container(
-  //                                                 width: AdaptiveTextSize()
-  //                                                     .getadaptiveTextSize(
-  //                                                         context, 50),
-  //                                                 height: AdaptiveTextSize()
-  //                                                     .getadaptiveTextSize(
-  //                                                         context, 30),
-  //                                                 // constraints:
-  //                                                 //     BoxConstraints(minWidth: 220),
-  //                                                 alignment:
-  //                                                     Alignment.topCenter,
-
-  //                                                 child: TextFormField(
-  //                                                   keyboardType:
-  //                                                       TextInputType.number,
-  //                                                   textInputAction:
-  //                                                       TextInputAction.next,
-  //                                                   controller: qtyController,
-  //                                                   style: TextStyle(
-  //                                                     fontSize: AdaptiveTextSize()
-  //                                                         .getadaptiveTextSize(
-  //                                                             context, 13),
-  //                                                     fontWeight:
-  //                                                         FontWeight.w300,
-  //                                                     color: Colors.black,
-  //                                                   ),
-  //                                                   cursorColor:
-  //                                                       Color(0xFF09665a),
-  //                                                   decoration: InputDecoration(
-  //                                                     fillColor: Colors.white,
-  //                                                     filled: true,
-  //                                                     border:
-  //                                                         OutlineInputBorder(
-  //                                                       borderRadius:
-  //                                                           BorderRadius
-  //                                                               .circular(5),
-  //                                                       borderSide: BorderSide(
-  //                                                           color: Color(
-  //                                                               0xFF09665a)),
-  //                                                     ),
-  //                                                     focusedBorder:
-  //                                                         OutlineInputBorder(
-  //                                                       borderRadius:
-  //                                                           BorderRadius
-  //                                                               .circular(10.0),
-  //                                                       borderSide: BorderSide(
-  //                                                           color: Color(
-  //                                                               0xFF09665a)),
-  //                                                     ),
-  //                                                     enabledBorder:
-  //                                                         OutlineInputBorder(
-  //                                                       borderRadius:
-  //                                                           BorderRadius
-  //                                                               .circular(10.0),
-  //                                                       borderSide: BorderSide(
-  //                                                         color: Colors.black
-  //                                                             .withOpacity(0.2),
-  //                                                       ),
-  //                                                     ),
-  //                                                     errorStyle:
-  //                                                         const TextStyle(
-  //                                                       fontWeight:
-  //                                                           FontWeight.normal,
-  //                                                       fontSize: 10.0,
-  //                                                     ),
-  //                                                     contentPadding:
-  //                                                         EdgeInsets.symmetric(
-  //                                                             horizontal: 15),
-  //                                                   ),
-  //                                                   onSaved: (String? value) {},
-  //                                                 ),
-  //                                                 // Text(
-  //                                                 //   productQty.toString(),
-  //                                                 //   style: TextStyle(
-  //                                                 //     fontFamily: 'Kanit',
-  //                                                 //     fontSize: 16,
-  //                                                 //   ),
-  //                                                 //   textAlign: TextAlign.start,
-  //                                                 // ),
-  //                                               ),
-  //                                               SizedBox(width: 15),
-  //                                               InkWell(
-  //                                                 onTap: () => setState(() {
-  //                                                   if (productQty <
-  //                                                       model['stock']) {
-  //                                                     productQty++;
-  //                                                   } else {
-  //                                                     Toast.show(
-  //                                                         'สินค้าในคลังเหลือแค่ ' +
-  //                                                             (model['stock'] ??
-  //                                                                     0)
-  //                                                                 .toString() +
-  //                                                             ' ชิ้น',
-  //                                                         backgroundColor:
-  //                                                             Colors.red[800] ??
-  //                                                                 Colors.red,
-  //                                                         duration: 3,
-  //                                                         gravity: Toast.center,
-  //                                                         textStyle: TextStyle(
-  //                                                             color: Colors
-  //                                                                 .white));
-  //                                                   }
-  //                                                   qtyController.text =
-  //                                                       productQty.toString();
-  //                                                 }),
-  //                                                 child: Container(
-  //                                                   height: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 30),
-  //                                                   width: AdaptiveTextSize()
-  //                                                       .getadaptiveTextSize(
-  //                                                           context, 30),
-  //                                                   alignment:
-  //                                                       Alignment.topCenter,
-  //                                                   decoration: BoxDecoration(
-  //                                                     borderRadius:
-  //                                                         BorderRadius.circular(
-  //                                                             7),
-  //                                                     border: Border.all(
-  //                                                       width: 1,
-  //                                                       color: model['stock'] ==
-  //                                                               productQty
-  //                                                           ? Color.fromARGB(
-  //                                                               255,
-  //                                                               250,
-  //                                                               249,
-  //                                                               249)
-  //                                                           : Color(0xFFF7F7F7),
-  //                                                     ),
-  //                                                     color: model['stock'] ==
-  //                                                             productQty
-  //                                                         ? Color.fromARGB(255,
-  //                                                             250, 249, 249)
-  //                                                         : Color(0xFFF7F7F7),
-  //                                                   ),
-  //                                                   child: Text(
-  //                                                     '+',
-  //                                                     style: TextStyle(
-  //                                                       fontFamily: 'Kanit',
-  //                                                       fontSize: 16,
-  //                                                       color: model['stock'] ==
-  //                                                               productQty
-  //                                                           ? Colors.grey[400]
-  //                                                           : Color(0xFF707070),
-  //                                                     ),
-  //                                                     textScaleFactor: ScaleSize
-  //                                                         .textScaleFactor(
-  //                                                             context),
-  //                                                     textAlign:
-  //                                                         TextAlign.start,
-  //                                                   ),
-  //                                                 ),
-  //                                               ),
-  //                                             ],
-  //                                           )
-  //                                         ],
-  //                                       )
-
-  //                                       // )
-  //                                     ],
-  //                                   ),
-  //                                 ),
-  //                                 Positioned(
-  //                                   bottom: 0 +
-  //                                       MediaQuery.of(context).padding.bottom,
-  //                                   left: 0,
-  //                                   right: 0,
-  //                                   // top: 20 + MediaQuery.of(context).padding.bottom,
-  //                                   child: Container(
-  //                                     padding:
-  //                                         EdgeInsets.fromLTRB(15, 0, 15, 15),
-  //                                     color: Colors.white,
-  //                                     child: Column(
-  //                                       children: [
-  //                                         InkWell(
-  //                                           onTap: () async {
-  //                                             if (type == 'cart') {
-  //                                               if ((selectedInventoryModel[
-  //                                                               'stock'] ??
-  //                                                           0) >
-  //                                                       0 &&
-  //                                                   (int.parse(qtyController
-  //                                                           .text) <=
-  //                                                       (selectedInventoryModel[
-  //                                                               'stock'] ??
-  //                                                           0)) &&
-  //                                                   (int.parse(qtyController
-  //                                                           .text) >
-  //                                                       0)) {
-  //                                                 setState(() {
-  //                                                   loadingAddCart = true;
-  //                                                 });
-  //                                                 _addCart(selectedInventory,
-  //                                                     'cart');
-  //                                               } else if (int.parse(
-  //                                                       qtyController.text) >
-  //                                                   (selectedInventoryModel[
-  //                                                           'stock'] ??
-  //                                                       0)) {
-  //                                                 Toast.show(
-  //                                                     'สินค้าในคลังเหลือแค่ ' +
-  //                                                         (selectedInventoryModel[
-  //                                                                     'stock'] ??
-  //                                                                 0)
-  //                                                             .toString() +
-  //                                                         ' ชิ้น',
-  //                                                     backgroundColor:
-  //                                                         Colors.red[800] ??
-  //                                                             Colors.red,
-  //                                                     duration: 3,
-  //                                                     gravity: Toast.center,
-  //                                                     textStyle: TextStyle(
-  //                                                         color: Colors.white));
-  //                                               } else if (int.parse(
-  //                                                       qtyController.text) <=
-  //                                                   0) {
-  //                                                 Toast.show(
-  //                                                     'กรุณาใส่จำนวนสินค้าอย่างน้อย 1 ชิ้น ',
-  //                                                     backgroundColor:
-  //                                                         Colors.red[800] ??
-  //                                                             Colors.red,
-  //                                                     duration: 3,
-  //                                                     gravity: Toast.center,
-  //                                                     textStyle: TextStyle(
-  //                                                         color: Colors.white));
-  //                                               }
-  //                                             } else {
-  //                                               if ((selectedInventoryModel[
-  //                                                               'stock'] ??
-  //                                                           0) >
-  //                                                       0 &&
-  //                                                   int.parse(qtyController
-  //                                                           .text) <=
-  //                                                       (selectedInventoryModel[
-  //                                                               'stock'] ??
-  //                                                           0) &&
-  //                                                   int.parse(qtyController
-  //                                                           .text) >
-  //                                                       0) {
-  //                                                 setState(() {
-  //                                                   loadingAddCart = true;
-  //                                                 });
-  //                                                 List<dynamic> data = [];
-  //                                                 _addCart(selectedInventory,
-  //                                                         'buy')
-  //                                                     .then(
-  //                                                   (value) => {
-  //                                                     // getCountItemInCartV2());
-  //                                                     data.add({
-  //                                                       'product_name':
-  //                                                           value['product']
-  //                                                                   ['data']
-  //                                                               ?['name'],
-  //                                                       'url': value['media']
-  //                                                           ['data']['url'],
-  //                                                       'product_variant':
-  //                                                           value['product_variant']
-  //                                                                       ['data']
-  //                                                                   ?['name'] ??
-  //                                                               value['product_variant']
-  //                                                                       ['data']
-  //                                                                   ['sku'],
-  //                                                       'price': value[
-  //                                                               'product_variant']
-  //                                                           ['data']['price'],
-  //                                                       'cart_id': value['id'],
-  //                                                       'quantity':
-  //                                                           value['quantity'],
-  //                                                       'promotion_price': value[
-  //                                                                           'product_variant']
-  //                                                                       ['data']
-  //                                                                   [
-  //                                                                   'promotion_active'] ==
-  //                                                               true
-  //                                                           ? value['product_variant']
-  //                                                                   ['data'][
-  //                                                               'promotion_price']
-  //                                                           : 0,
-  //                                                       'isPromotion':
-  //                                                           value['product_variant']
-  //                                                                           [
-  //                                                                           'data']
-  //                                                                       [
-  //                                                                       'promotion_active:'] ==
-  //                                                                   true
-  //                                                               ? true
-  //                                                               : false,
-  //                                                     }),
-  //                                                     Navigator.push(
-  //                                                       context,
-  //                                                       MaterialPageRoute(
-  //                                                         builder: (context) =>
-  //                                                             ConfirmOrderCentralPage(
-  //                                                                 modelCode:
-  //                                                                     data,
-  //                                                                 type: 'buy'),
-  //                                                         //     ConfirmOrderPage(
-  //                                                         //   productList: [allProduct],
-  //                                                         //   from: 'buyNow',
-  //                                                         // ),
-  //                                                       ),
-  //                                                     ),
-  //                                                   },
-  //                                                 );
-  //                                               } else {
-  //                                                 Toast.show(
-  //                                                     'สินค้าในคลังเหลือแค่ ' +
-  //                                                         (selectedInventoryModel[
-  //                                                                     'stock'] ??
-  //                                                                 0)
-  //                                                             .toString() +
-  //                                                         ' ชิ้น',
-  //                                                     backgroundColor:
-  //                                                         Colors.red[800] ??
-  //                                                             Colors.red,
-  //                                                     duration: 3,
-  //                                                     gravity: Toast.center,
-  //                                                     textStyle: TextStyle(
-  //                                                         color: Colors.white));
-  //                                               }
-  //                                             }
-  //                                           },
-  //                                           child: ShowLoadingWidget(
-  //                                             loading: loading,
-  //                                             children: [
-  //                                               Container(
-  //                                                 padding: EdgeInsets.symmetric(
-  //                                                     vertical: 10),
-  //                                                 // height: AdaptiveTextSize().getadaptiveTextSize(context, 50),
-  //                                                 color: selectedInventoryModel ==
-  //                                                         null
-  //                                                     ? Colors.grey
-  //                                                     : (selectedInventoryModel[
-  //                                                                     'stock'] ??
-  //                                                                 0) <=
-  //                                                             0
-  //                                                         ? Colors.grey
-  //                                                         : Color(0xFF09665a),
-  //                                                 alignment: Alignment.center,
-  //                                                 child: Text(
-  //                                                   selectedInventoryModel ==
-  //                                                           null
-  //                                                       ? 'กรุณาเลือกลักษณะสินค้า'
-  //                                                       : (selectedInventoryModel[
-  //                                                                       'stock'] ??
-  //                                                                   0) <=
-  //                                                               0
-  //                                                           ? 'สินค้าหมด'
-  //                                                           : type == 'cart'
-  //                                                               ? 'เพิ่มไปยังรถเข็น'
-  //                                                               : 'ซื้อสินค้า',
-  //                                                   style: TextStyle(
-  //                                                     fontFamily: 'Kanit',
-  //                                                     fontSize: 20,
-  //                                                     color: Colors.white,
-  //                                                     fontWeight:
-  //                                                         FontWeight.bold,
-  //                                                   ),
-  //                                                   textScaleFactor: ScaleSize
-  //                                                       .textScaleFactor(
-  //                                                           context),
-  //                                                   // textAlign: TextAlign.center,
-  //                                                 ),
-  //                                               ),
-  //                                             ],
-  //                                           ),
-  //                                         ),
-  //                                       ],
-  //                                     ),
-  //                                   ),
-  //                                 )
-  //                               ],
-  //                             ),
-  //                           ],
-  //                         )),
-  //                       ),
-  //                     );
-  //                   } else if (snapshot.hasError) {
-  //                     return Container();
-  //                   } else {
-  //                     return Container();
-  //                   }
-  //                 });
-  //           },
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Row buildCounter() {
     return Row(
@@ -3089,7 +2357,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   //   setState(() {});
 
   //   if (type == 'cart') {
-  //     Toast.show('เพิ่มลงรถเข็นแล้ว',
+  //     Toast.show('เพิ่มลงตะกร้าแล้ว',
   //         backgroundColor: Color(0xFF09665a),
   //         duration: 3,
   //         gravity: Toast.bottom,
@@ -3128,7 +2396,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     setState(() {});
 
     if (type == 'cart') {
-      Toast.show('เพิ่มลงรถเข็นแล้ว',
+      Toast.show('เพิ่มลงตะกร้าแล้ว',
           backgroundColor: Color(0xFF09665a),
           duration: 3,
           gravity: Toast.bottom,

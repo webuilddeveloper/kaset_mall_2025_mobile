@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kasetmall/payment_status.dart';
-import 'package:kasetmall/widget/data_error.dart';
 
-import '../component/loading_image_network.dart';
 import '../shared/api_provider.dart';
 import '../shared/extension.dart';
 import '../widget/header.dart';
@@ -18,7 +15,6 @@ class ToSuccessPage extends StatefulWidget {
 }
 
 class _ToSuccessPageState extends State<ToSuccessPage> {
-  late Future<dynamic> _futureModel;
   bool loading = false;
 
   List<dynamic> orderModel = [
@@ -30,7 +26,8 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
       "discount": 0,
       "priceTotal": 203000,
       "shipping": 5000,
-      "imageUrl": "assets/images/mock_pro_1.png",
+      "imageUrl":
+          "https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png",
       "purchaseDate": "10/10/2568 10:30:00",
       "paidDate": "10/10/2568 10:35:00",
       "destination_shipped_at": "15/10/2568",
@@ -64,20 +61,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
     super.dispose();
   }
 
-  _callRead() {
-    _futureModel = get(server + 'orders?statuses=[30,40]');
-  }
 
-  _calculatePrice(List<dynamic> param) {
-    int a = 0;
-    param.forEach((e) {
-      a += ((e['total'] ?? 0) as num).toInt();
-      // e['items'].forEach((ee) => {
-      //       a += ee['price'] * ee['amount'],
-      //     });
-    });
-    return 'ยอดรวมส่วนนี้ ' + moneyFormat(a.toString()) + ' บาท';
-  }
 
   updateStatus(item) async {
     setState(() {
@@ -91,7 +75,6 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
       'status': status,
     });
     setState(() {
-      _futureModel = postDio('${server}m/cart/order/read', {'status': 'W'});
     });
   }
 
@@ -196,7 +179,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
               //         'กำลังดำเนินการ',
               //         style: TextStyle(
               //           fontSize: 13,
-              //           color: Color(0xFF0B24FB),
+              //           color: Color(0xFF09665a),
               //         ),
               //       ),
               //     ),
@@ -250,15 +233,11 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                       children: [
                         Flexible(
                           child: ElevatedButton(
-                            onPressed: () {
-                              // _acceptProduct(param['code']);
-                            },
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              // primary: Color.fromARGB(255, 208, 141, 147),
-                              backgroundColor: Color(0xFF33cd32),
-                              // backgroundColor: Colors.teal,
+                              backgroundColor: Color(0xFF09665a),
                               side: BorderSide(
-                                  color: Color(0xFF33cd32),
+                                  color: Color(0xFF09665a),
                                   width: 1,
                                   style: BorderStyle.solid),
                               shape: const RoundedRectangleBorder(
@@ -277,67 +256,9 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                             ),
                           ),
                         )
-                        // MaterialButton(
-                        //   height: 50,
-                        //   // minWidth: 168,
-                        //   shape: RoundedRectangleBorder(
-                        //       borderRadius: new BorderRadius.circular(25)),
-                        //   onPressed: () {
-                        //     _acceptProduct(param['id']);
-                        //     // toPay(param['id']);
-                        //   },
-                        //   child: Container(
-                        //     color: Color(0xFF33cd32),
-
-                        //     alignment: Alignment.center,
-                        //     // height: double.infinity,
-                        //     height: 40,
-                        //     width: 120,
-                        //     child: Text(
-                        //       'ยอมรับสินค้า',
-                        //       style: TextStyle(
-                        //         fontSize: 20,
-                        //         color: Colors.white,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     )
                   : Container(),
-              // SizedBox(height: 10),
-
-              // MaterialButton(
-              //   height: 50,
-              //   // minWidth: 168,
-              //   // shape: RoundedRectangleBorder(
-              //   //     borderRadius: new BorderRadius.circular(25)),
-              //   onPressed: () {
-              //     // toPay(param['id']);
-              //   },
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     crossAxisAlignment: CrossAxisAlignment.center,
-              //     children: [
-              //       Container(
-              //         child: Text(
-              //           'ดูรายละเอียดสินค้า',
-              //           style: TextStyle(
-              //             fontSize: 20,
-              //             color: Color(0xFFDF0B24),
-              //           ),
-              //         ),
-              //       ),
-              //       Container(
-              //         child: Icon(
-              //           Icons.chevron_right,
-              //           color: Color(0xFFDF0B24),
-              //           size: 20,
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         ));
@@ -357,7 +278,7 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),
-                  child: Image.asset(
+                  child: Image.network(
                     param['imageUrl'],
                     width: 80,
                     height: 80,
@@ -431,80 +352,8 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
   }
 
   _getProductById(param) async {
-    var res = await getData(server + 'products' + param);
   }
 
-  Widget _buildItem(dynamic param) {
-    return GestureDetector(
-      onLongPress: () => updateStatus(param),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 80,
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: loadingImageNetwork(
-                    param['imageUrl'],
-                    height: 80,
-                    width: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        param['title'],
-                        style: TextStyle(
-                          fontSize: 13,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        param['goodsTitle'],
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF707070),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              moneyFormat(param['price'].toString()) + ' บาท',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'จำนวน ${param['qty']}',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   toPay(order_id) {
     dynamic modelData = {
@@ -520,56 +369,4 @@ class _ToSuccessPageState extends State<ToSuccessPage> {
     );
   }
 
-  _acceptProduct(param) {
-    put(server + 'orders/' + param, {}).then((value) => {
-          setState(() {
-            _callRead();
-            showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (BuildContext context) {
-                  return WillPopScope(
-                    onWillPop: () {
-                      return Future.value(false);
-                    },
-                    child: CupertinoAlertDialog(
-                      title: new Text(
-                        'ยอมรับสินค้าแล้ว',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Kanit',
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      content: Text(" "),
-                      actions: [
-                        CupertinoDialogAction(
-                          isDefaultAction: true,
-                          child: new Text(
-                            "ตกลง",
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontFamily: 'Kanit',
-                              color: Color(0xFFFF7514),
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            // Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => VerifyPhonePage(),
-                            //   ),
-                            // );
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                });
-          }),
-        });
-  }
 }

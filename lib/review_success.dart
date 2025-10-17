@@ -1,4 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -166,9 +167,7 @@ class _ReviewSuccessPageState extends State<ReviewSuccessPage> {
                       initialRating: double.parse(param['rating'].toString()),
                       minRating: 1,
                       direction: Axis.horizontal,
-                      // allowHalfRating: true,
                       itemCount: 5,
-                      // itemPadding: EdgeInsets.symmetric(horizontal: 1.0),
                       itemBuilder: (context, _) => Icon(
                         Icons.star,
                         color: Colors.amber,
@@ -219,8 +218,7 @@ class _ReviewSuccessPageState extends State<ReviewSuccessPage> {
                                           imageProviders: images
                                                   .map((e) =>
                                                       NetworkImage(e['url']))
-                                                  .toList() ??
-                                              [],
+                                                  .toList(),
                                         );
                                       },
                                     );
@@ -297,21 +295,8 @@ class _ReviewSuccessPageState extends State<ReviewSuccessPage> {
   }
 
   _get_product_variant(String variant_id, List<dynamic> variant_list) {
-    if (variant_id == null) {
-      return null;
-    } else {
-      var variant_value = variant_list.firstWhere((i) => i['id'] == variant_id);
-      return variant_value['name'] ?? variant_value['sku'];
+    var variant_value = variant_list.firstWhere((i) => i['id'] == variant_id);
+    return variant_value['name'] ?? variant_value['sku'];
     }
-  }
 
-  _checkImage(param) {
-    if (param['media_id'] == null) {
-      return null;
-    } else {
-      var url =
-          imageVariantsList.firstWhere((i) => i['id'] == param['media_id']);
-      return url['url'];
-    }
-  }
 }

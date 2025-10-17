@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
@@ -33,7 +32,6 @@ class _MainPopupDialogState extends State<MainPopupDialog> {
   final storage = new FlutterSecureStorage();
   String profileCode = "";
   bool notShowOnDay = false;
-  late String _token;
 
   @override
   void initState() {
@@ -43,7 +41,6 @@ class _MainPopupDialogState extends State<MainPopupDialog> {
 
   _getprofileCode() async {
     profileCode = (await storage.read(key: 'profileCode10')) ?? "";
-    _token = (await storage.read(key: 'token')) ?? "";
     // print('_token form dialog main  >>>>>>>>>>>>>> ${_token}');
   }
 
@@ -124,48 +121,6 @@ class _MainPopupDialogState extends State<MainPopupDialog> {
               nav: (String path, String action, dynamic model, String code,
                   String urlGallery) {
                 if (model['isChkLogin']) {
-                  if (_token != null) {
-                    if (action == 'out') {
-                      if (model['isPostHeader']) {
-                        var path = model['linkUrl'];
-                        if (profileCode != '') {
-                          var splitCheck = path.split('').reversed.join();
-                          if (splitCheck[0] != "/") {
-                            path = path + "/";
-                          }
-                          var codeReplae =
-                              (widget.type == "mainPopup" ? "M" : "F") +
-                                  profileCode.replaceAll('-', '') +
-                                  model['code'].replaceAll('-', '');
-                          launchInWebViewWithJavaScript('$path$codeReplae');
-                          // launchURL(path);
-                        }
-                      } else {
-                        launchInWebViewWithJavaScript(path);
-                      }
-                      // launchURL(path);
-                    } else if (action == 'in') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CarouselForm(
-                            code: code,
-                            model: model,
-                            url: widget.url,
-                            urlGallery: widget.urlGallery,
-                          ),
-                        ),
-                      );
-                    }
-                  } else {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => LoginCentralPage(),
-                    //   ),
-                    // );
-                  }
-                } else {
                   if (action == 'out') {
                     if (model['isPostHeader']) {
                       var path = model['linkUrl'];
@@ -179,11 +134,40 @@ class _MainPopupDialogState extends State<MainPopupDialog> {
                                 profileCode.replaceAll('-', '') +
                                 model['code'].replaceAll('-', '');
                         launchInWebViewWithJavaScript('$path$codeReplae');
-                        // launchURL(path);
+                      }
+                    } else {
+                      launchInWebViewWithJavaScript(path);
+                    }
+                  } else if (action == 'in') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CarouselForm(
+                          code: code,
+                          model: model,
+                          url: widget.url,
+                          urlGallery: widget.urlGallery,
+                        ),
+                      ),
+                    );
+                  }
+                                } else {
+                  if (action == 'out') {
+                    if (model['isPostHeader']) {
+                      var path = model['linkUrl'];
+                      if (profileCode != '') {
+                        var splitCheck = path.split('').reversed.join();
+                        if (splitCheck[0] != "/") {
+                          path = path + "/";
+                        }
+                        var codeReplae =
+                            (widget.type == "mainPopup" ? "M" : "F") +
+                                profileCode.replaceAll('-', '') +
+                                model['code'].replaceAll('-', '');
+                        launchInWebViewWithJavaScript('$path$codeReplae');
                       }
                     } else
                       launchInWebViewWithJavaScript(path);
-                    // launchURL(path);
                   } else if (action == 'in') {
                     Navigator.push(
                       context,

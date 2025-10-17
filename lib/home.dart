@@ -1,8 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/cart.dart';
 import 'package:kasetmall/component/carousel_banner.dart';
@@ -18,17 +19,13 @@ import 'package:kasetmall/privilege_form.dart';
 import 'package:kasetmall/product_all.dart';
 import 'package:kasetmall/product_from.dart';
 import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/shared/extension.dart';
 import 'package:kasetmall/shared/notification_service.dart';
-import 'package:kasetmall/verify_phone.dart';
+
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../read_book.dart';
-import '../read_book_list.dart';
-import 'package:googleapis_auth/auth_io.dart' as auth;
 
+// ignore: must_be_immutable
 class HomeCentralPage extends StatefulWidget {
   HomeCentralPage({Key? key, this.changePage}) : super(key: key);
   late _HomeCentralPageState homeCentralPageState;
@@ -58,23 +55,18 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   Future<dynamic>? _futureModelNew;
   List<dynamic> _futureModelTrending = [];
   List<dynamic> _futureProductHot = [];
-  List<dynamic> _futureListVideo = [];
 
   Future<dynamic>? _futureModelForYou;
 
   int amountItemInCart = 0;
   String profileCode = "";
-  String verifyPhonePage = '';
+  // String verifyPhonePage = '';
   DateTime? currentBackPressTime;
 
   String? emailProfile;
   int total_page = 0;
   int page = 1;
-  Future<dynamic>? _futureknowledge;
   bool loadProduct = true;
-  bool _isVisible = true;
-  String? _userId;
-  String? _username;
 
   @override
   void initState() {
@@ -82,9 +74,9 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     _refreshController = RefreshController();
     _getCategory();
     _callRead();
-    _getUserData();
+    // _getUserData();
     _getCountItemInCart();
-    _callReadVideoShort();
+    // _callReadVideoShort();
     _callReadAll();
     _onLoading();
 
@@ -96,42 +88,34 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     String? title,
     String? body,
   }) async {
-    const rootFilePath =
-        'assets/json/suksapan-mall-firebase-adminsdk-86uob-5a14014c90.json';
-    final jsonCredentials = await rootBundle.loadString(rootFilePath);
-    final creds = auth.ServiceAccountCredentials.fromJson(jsonCredentials);
-    final client = await auth.clientViaServiceAccount(
-      creds,
-      ['https://www.googleapis.com/auth/cloud-platform'],
-    ).then((value) => {});
     return true;
   }
 
-  _getUserData() async {
-    var _token = await storage.read(key: 'tokenD');
-    var _category = await storage.read(key: 'profileCategory');
-    final result = await getUser(server + 'users/me');
+  // _getUserData() async {
+  //   var _token = await storage.read(key: 'tokenD');
+  //   var _category = await storage.read(key: 'profileCategory');
+  //   final result = await getUser(server + 'users/me');
 
-    if (result != null) if (result['id'] != '') {
-      storage.write(key: 'email', value: result['email']);
+  //   if (result != null) if (result['id'] != '') {
+  //     storage.write(key: 'email', value: result['email']);
 
-      postDio(
-        '${server_we_build}log/logToken/create',
-        {
-          'userId': result['id'],
-          'email': result['email'],
-          'category': _category,
-          'token': _token,
-        },
-      );
-      setState(() {
-        verifyPhonePage = result['phone_verified'].toString();
-        emailProfile = result['email'].toString();
-        _userId = result['id'];
-        _username = result['name'];
-      });
-    }
-  }
+  //     postDio(
+  //       '${server_we_build}log/logToken/create',
+  //       {
+  //         'userId': result['id'],
+  //         'email': result['email'],
+  //         'category': _category,
+  //         'token': _token,
+  //       },
+  //     );
+  //     setState(() {
+  //       verifyPhonePage = result['phone_verified'].toString();
+  //       emailProfile = result['email'].toString();
+  //       _userId = result['id'];
+  //       _username = result['name'];
+  //     });
+  //   }
+  // }
 
   _getCountItemInCart() async {
     String? value = await storage.read(key: 'cartItems');
@@ -239,11 +223,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
 
     profileCode = (await storage.read(key: 'profileCode10')) ?? '';
 
-    List<String> keySearchRandom;
-    var element1 = "";
-    var element2 = "";
-    var element3 = "";
-
     if (profileCode == '') {
       NotificationService.subscribeToAllTopic('suksapan-general');
     } else {
@@ -251,12 +230,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     }
   }
 
-  _callReadVideoShort() async {
-    var value = await postDio('${server_we_build}videoShort/read', {});
-    setState(() {
-      _futureListVideo = value;
-    });
-  }
+  // _callReadVideoShort() async {
+  //   var value = await postDio('${server_we_build}videoShort/read', {});
+  //   setState(() {
+  //   });
+  // }
 
   _callReadAll() async {
     _callReadBanner();
@@ -269,11 +247,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         {'limit': 10});
   }
 
-  _callReadKnowledge() {
-    _futureknowledge = postDio(server_we_build + 'm/knowledge/read', {
-      "limit": _limit,
-    });
-  }
+  _callReadKnowledge() {}
 
   _readCoupons() async {
     var ConponsMe = await get(server + 'users/me/coupons');
@@ -284,8 +258,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         NotificationService.subscribeToAllTopic('suksapan-register');
     }
   }
-
-  Offset _offset = Offset(300, 300);
 
   @override
   Widget build(BuildContext context) {
@@ -315,9 +287,9 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     InkWell(
                       onTap: () async {
                         // Check if user has previously logged in
-                        final prefs = await SharedPreferences.getInstance();
-                        final String? savedCardId =
-                            prefs.getString('saved_card_id');
+                        // final prefs = await SharedPreferences.getInstance();
+                        // final String? savedCardId =
+                        //     prefs.getString('saved_card_id');
 
                         // if (savedCardId != null && savedCardId.isNotEmpty) {
                         // User has logged in before, navigate directly to PurchaseMenuPage
@@ -941,7 +913,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                         )
                                       : Container(
                                           decoration: BoxDecoration(
-                                            // color: Color(0XFF0B24FB),
+                                            // color: Color(0xFF09665a),
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                           ),
@@ -1045,7 +1017,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                         )
                                       : Container(
                                           decoration: BoxDecoration(
-                                            // color: Color(0XFF0B24FB),
+                                            // color: Color(0xFF09665a),
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                           ),
@@ -1273,384 +1245,214 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
             height: 145,
           ),
           SizedBox(height: 5),
-          // LoadingTween(
-          //   width: 145,
-          //   height: 40,
-          // ),
-          // SizedBox(height: 5),
-          // LoadingTween(
-          //   width: 145,
-          //   height: 17,
-          // ),
         ],
       ),
     );
   }
 
-  _showVerifyCheckDialog() {
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () {
-              return Future.value(false);
-            },
-            child: CupertinoAlertDialog(
-              title: new Text(
-                'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Kanit',
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              content: Text(" "),
-              actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: new Text(
-                    "ตกลง",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => VerifyPhonePage(),
-                      ),
-                    );
-                  },
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: false,
-                  child: new Text(
-                    "ไม่ใช่ตอนนี้",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-                ),
-              ],
-            ),
-          );
-        });
-  }
+  // _showVerifyCheckDialog() {
+  //   return showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return WillPopScope(
+  //           onWillPop: () {
+  //             return Future.value(false);
+  //           },
+  //           child: CupertinoAlertDialog(
+  //             title: new Text(
+  //               'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
+  //               style: TextStyle(
+  //                 fontSize: 16,
+  //                 fontFamily: 'Kanit',
+  //                 color: Colors.black,
+  //                 fontWeight: FontWeight.normal,
+  //               ),
+  //             ),
+  //             content: Text(" "),
+  //             actions: [
+  //               CupertinoDialogAction(
+  //                 isDefaultAction: true,
+  //                 child: new Text(
+  //                   "ตกลง",
+  //                   style: TextStyle(
+  //                     fontSize: 13,
+  //                     fontFamily: 'Kanit',
+  //                     color: Color(0xFFFF7514),
+  //                     fontWeight: FontWeight.normal,
+  //                   ),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.pushReplacement(
+  //                     context,
+  //                     MaterialPageRoute(
+  //                       builder: (context) => VerifyPhonePage(),
+  //                     ),
+  //                   );
+  //                 },
+  //               ),
+  //               CupertinoDialogAction(
+  //                 isDefaultAction: false,
+  //                 child: new Text(
+  //                   "ไม่ใช่ตอนนี้",
+  //                   style: TextStyle(
+  //                     fontSize: 13,
+  //                     fontFamily: 'Kanit',
+  //                     color: Color(0xFFFF7514),
+  //                     fontWeight: FontWeight.normal,
+  //                   ),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.pop(
+  //                     context,
+  //                   );
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       });
+  // }
 
-  _buildnovel() {
-    return Container(
-      color: Color(0xFFF7F7F7),
-      padding: const EdgeInsets.only(),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {},
-            child: _buildTitle(
-              title: 'อ่านนิยาย',
-              color: Color(0xFFF7F7F7),
-              showAll: true,
-              nextPage: ReadBookList(),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0),
-            child: SizedBox(
-              height: 250, // ความสูงของคอนเทนเนอร์แนวนอน
-              child: FutureBuilder(
-                future: _futureknowledge,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data.length > 0) {
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal, // แสดงข้อมูลแนวนอน
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (context, index) {
-                          final param = snapshot.data[index];
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 2.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PdfViewerScreen(
-                                      title: param['title'],
-                                      pdfUrl: param['fileUrl'] ?? '',
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 110, // กำหนดความกว้างของแต่ละการ์ด
-                                    height: 160, // ความสูงของภาพ
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(9),
-                                      child: (param['imageUrl'] ?? "") != ""
-                                          ? loadingImageNetwork(
-                                              param['imageUrl'],
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.asset(
-                                              'assets/images/kaset/no-img.png',
-                                              fit: BoxFit.cover,
-                                            ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  SizedBox(
-                                    width: 120, // กำหนดความกว้างของข้อความ
-                                    child: Text(
-                                      param['title'] ?? '',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                      maxLines: 2, // จำกัดข้อความไว้ 2 บรรทัด
-                                      overflow: TextOverflow
-                                          .ellipsis, // ตัดข้อความที่เกิน
-                                    ),
-                                  ),
-                                  if ((param['description'] ?? "") != '')
-                                    SizedBox(
-                                      width: 110, // กำหนดความกว้างของข้อความ
-                                      child: Text(
-                                        parseHtmlString(
-                                            param['description'] ?? ''),
-                                        maxLines: 2, // จำกัดข้อความไว้ 2 บรรทัด
-                                        overflow: TextOverflow
-                                            .ellipsis, // ตัดข้อความที่เกิน
-                                        style: TextStyle(fontSize: 13),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    } else {
-                      return Center(
-                        child: Text(
-                          'ไม่พบข้อมูล',
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 15,
-                          ),
-                        ),
-                      );
-                    }
-                  } else {
-                    return loadProduct == true
-                        ? ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 6,
-                            itemBuilder: (context, index) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 10),
-                                  LoadingTween(height: 165, width: 120),
-                                  SizedBox(height: 5),
-                                  LoadingTween(height: 40, width: 120),
-                                  SizedBox(height: 5),
-                                  LoadingTween(height: 17, width: 80),
-                                ],
-                              ),
-                            ),
-                          )
-                        : Container(
-                            child: Center(
-                              child: Text('รอสักครู่'),
-                            ),
-                          );
-                  }
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGridView(List<dynamic> param) {
-    return GridView.builder(
-      // scrollDirection: Axis.horizontal,
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      padding: EdgeInsets.all(15),
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          // childAspectRatio: AdaptiveTextSize().getadaptiveTextSize(context, 20) / AdaptiveTextSize().getadaptiveTextSize(context, 35),
-          childAspectRatio: 0.55,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 1),
-      itemCount: param.length,
-      itemBuilder: (context, index) => _buildCardGrid(param[index]),
-    );
-  }
-
-  _buildCardGrid(dynamic param) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PdfViewerScreen(
-              title: param['title'],
-              pdfUrl: (param['fileUrl'] ?? ""),
-            ),
-          ),
-        );
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            height: 120,
-            alignment: Alignment.center,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(9),
-              child: (param['imageUrl'] ?? "") != ""
-                  ? loadingImageNetwork(
-                      param['imageUrl'],
-                      fit: BoxFit.cover,
-                    )
-                  : Image.asset(
-                      'assets/images/kaset/no-img.png',
-                      fit: BoxFit.cover,
-                      // col
-                    ),
-            ),
-          ),
-          SizedBox(height: 5),
-          Text(
-            param['title'] ?? '',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textScaleFactor: ScaleSize.textScaleFactor(context),
-          ),
-          (param['description'] ?? "") != ''
-              ? Text(
-                  parseHtmlString(param['description'] ?? ''),
-                  maxLines: 1,
-                  style: TextStyle(fontSize: 13),
-                  overflow: TextOverflow.ellipsis,
-                  textScaleFactor: ScaleSize.textScaleFactor(context),
-                )
-              : SizedBox(),
-          SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
-
-  _buildListView(List<dynamic> param) {
-    return ListView.separated(
-      // scrollDirection: Axis.horizontal,
-      shrinkWrap: true,
-      padding: EdgeInsets.symmetric(vertical: 10),
-      physics: ClampingScrollPhysics(),
-      itemBuilder: (context, index) => _buildCardList(param[index]),
-      separatorBuilder: (_, __) => SizedBox(height: 10),
-      itemCount: param.length,
-    );
-  }
-
-  _buildCardList(dynamic param) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PdfViewerScreen(
-              title: param['title'],
-              pdfUrl: (param['fileUrl'] ?? ""),
-            ),
-          ),
-        );
-      },
-      child: SizedBox(
-          height: 165,
-          child: Container(
-            padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 165,
-                  width: 165,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(9),
-                    child: (param['imageUrl'] ?? "") != ""
-                        ? loadingImageNetwork(
-                            param['imageUrl'],
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            'assets/images/kaset/no-img.png',
-                            fit: BoxFit.cover,
-                            // col
-                          ),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        param['title'] ?? '',
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      (param['description'] ?? "") != ''
-                          ? Text(
-                              parseHtmlString(param['description'] ?? ''),
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          : SizedBox(),
-                      SizedBox(height: 10),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )),
-    );
-  }
-
-  _callSumStock(param) {
-    int qty = 0;
-    for (var item in param) {
-      qty += int.parse(item['stock'].toString());
-    }
-
-    return qty;
-  }
+  // _buildnovel() {
+  //   return Container(
+  //     color: Color(0xFFF7F7F7),
+  //     padding: const EdgeInsets.only(),
+  //     child: Column(
+  //       children: [
+  //         GestureDetector(
+  //           onTap: () {},
+  //           child: _buildTitle(
+  //             title: 'อ่านนิยาย',
+  //             color: Color(0xFFF7F7F7),
+  //             showAll: true,
+  //             nextPage: ReadBookList(),
+  //           ),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 6.0),
+  //           child: SizedBox(
+  //             height: 250, // ความสูงของคอนเทนเนอร์แนวนอน
+  //             child: FutureBuilder(
+  //               future: _futureknowledge,
+  //               builder: (context, snapshot) {
+  //                 if (snapshot.hasData) {
+  //                   if (snapshot.data.length > 0) {
+  //                     return ListView.builder(
+  //                       scrollDirection: Axis.horizontal, // แสดงข้อมูลแนวนอน
+  //                       itemCount: snapshot.data.length,
+  //                       itemBuilder: (context, index) {
+  //                         final param = snapshot.data[index];
+  //                         return Padding(
+  //                           padding:
+  //                               const EdgeInsets.symmetric(horizontal: 2.0),
+  //                           child: GestureDetector(
+  //                             onTap: () {
+  //                               Navigator.push(
+  //                                 context,
+  //                                 MaterialPageRoute(
+  //                                   builder: (context) => PdfViewerScreen(
+  //                                     title: param['title'],
+  //                                     pdfUrl: param['fileUrl'] ?? '',
+  //                                   ),
+  //                                 ),
+  //                               );
+  //                             },
+  //                             child: Column(
+  //                               crossAxisAlignment: CrossAxisAlignment.start,
+  //                               children: [
+  //                                 Container(
+  //                                   width: 110, // กำหนดความกว้างของแต่ละการ์ด
+  //                                   height: 160, // ความสูงของภาพ
+  //                                   child: ClipRRect(
+  //                                     borderRadius: BorderRadius.circular(9),
+  //                                     child: (param['imageUrl'] ?? "") != ""
+  //                                         ? loadingImageNetwork(
+  //                                             param['imageUrl'],
+  //                                             fit: BoxFit.cover,
+  //                                           )
+  //                                         : Image.asset(
+  //                                             'assets/images/kaset/no-img.png',
+  //                                             fit: BoxFit.cover,
+  //                                           ),
+  //                                   ),
+  //                                 ),
+  //                                 SizedBox(height: 5),
+  //                                 SizedBox(
+  //                                   width: 120, // กำหนดความกว้างของข้อความ
+  //                                   child: Text(
+  //                                     param['title'] ?? '',
+  //                                     style: TextStyle(
+  //                                         fontSize: 15,
+  //                                         fontWeight: FontWeight.bold),
+  //                                     maxLines: 2, // จำกัดข้อความไว้ 2 บรรทัด
+  //                                     overflow: TextOverflow
+  //                                         .ellipsis, // ตัดข้อความที่เกิน
+  //                                   ),
+  //                                 ),
+  //                                 if ((param['description'] ?? "") != '')
+  //                                   SizedBox(
+  //                                     width: 110, // กำหนดความกว้างของข้อความ
+  //                                     child: Text(
+  //                                       parseHtmlString(
+  //                                           param['description'] ?? ''),
+  //                                       maxLines: 2, // จำกัดข้อความไว้ 2 บรรทัด
+  //                                       overflow: TextOverflow
+  //                                           .ellipsis, // ตัดข้อความที่เกิน
+  //                                       style: TextStyle(fontSize: 13),
+  //                                     ),
+  //                                   ),
+  //                               ],
+  //                             ),
+  //                           ),
+  //                         );
+  //                       },
+  //                     );
+  //                   } else {
+  //                     return Center(
+  //                       child: Text(
+  //                         'ไม่พบข้อมูล',
+  //                         style: TextStyle(
+  //                           fontFamily: 'Kanit',
+  //                           fontSize: 15,
+  //                         ),
+  //                       ),
+  //                     );
+  //                   }
+  //                 } else {
+  //                   return loadProduct == true
+  //                       ? ListView.builder(
+  //                           scrollDirection: Axis.horizontal,
+  //                           itemCount: 6,
+  //                           itemBuilder: (context, index) => Padding(
+  //                             padding:
+  //                                 const EdgeInsets.symmetric(horizontal: 8.0),
+  //                             child: Column(
+  //                               children: [
+  //                                 SizedBox(height: 10),
+  //                                 LoadingTween(height: 165, width: 120),
+  //                                 SizedBox(height: 5),
+  //                                 LoadingTween(height: 40, width: 120),
+  //                                 SizedBox(height: 5),
+  //                                 LoadingTween(height: 17, width: 80),
+  //                               ],
+  //                             ),
+  //                           ),
+  //                         )
+  //                       : Container(
+  //                           child: Center(
+  //                             child: Text('รอสักครู่'),
+  //                           ),
+  //                         );
+  //                 }
+  //               },
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   final List<Map<String, dynamic>> mockCategories = [
     {'id': '1', 'name': 'พรรณพืช', 'img': "assets/images/kaset/pngegg.png"},

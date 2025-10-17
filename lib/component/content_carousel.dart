@@ -2,7 +2,6 @@ import 'package:kasetmall/component/gallery_view.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -18,7 +17,7 @@ class ContentCarousel extends StatefulWidget {
 
   final String? code;
   final String? url;
-  final dynamic? model;
+  final dynamic model;
   final String? urlGallery;
 
   @override

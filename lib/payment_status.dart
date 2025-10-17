@@ -1,8 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:kasetmall/menu.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/extension.dart';
@@ -62,25 +62,8 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
     });
   }
 
-  _checkOrder() {
-    postLineNoti(widget.model['order_id']);
 
-    setState(() {
-      myTimerCheck = Timer.periodic(Duration(seconds: 5), (timer) {
-        get(server + 'orders/' + widget.model['order_id'])
-            .then((value) async => {
-                  if (value['status'] != 0)
-                    {
-                      setState(() {
-                        success = true;
-                        myTimerCheck.cancel();
-                      }),
-                    },
-                });
-      });
-    });
-  }
-
+  // ignore: unused_element
   _getQRCode() async {
     try {
       var value = await getQRCode(
@@ -187,69 +170,6 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage>
     // );
   }
 
-  _successToPayPage() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Opacity(
-          opacity: animationController.value,
-          child: Icon(
-            Icons.check_circle_rounded,
-            size: animationController.value * 100,
-            color: Color(0xFF09665a),
-          ),
-        ),
-        SizedBox(height: 15),
-        Opacity(
-          opacity: animationController.value,
-          child: Text(
-            'การสั่งซื้อสำเร็จ',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF09665a),
-            ),
-          ),
-        ),
-        Text(
-          'ขอบคุณที่ไว้วางใจซื้อสินค้ากับเรา',
-          style: TextStyle(
-            fontSize: 13,
-          ),
-        ),
-        SizedBox(height: 15),
-        GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => MenuCentralPage(),
-              ),
-              (Route<dynamic> route) => false,
-            );
-            // myTimerCheck.cancel();
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 9),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                width: 1,
-                color: Color(0xFFDF0B24),
-              ),
-            ),
-            child: Text(
-              'กลับหน้าหลัก',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFFDF0B24),
-              ),
-            ),
-          ),
-        )
-      ],
-    );
-  }
 
   _qrCodePage() {
     return
