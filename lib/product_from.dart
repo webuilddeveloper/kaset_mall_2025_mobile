@@ -75,7 +75,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   String? profilePhone;
   String? verifyPhone;
 
-
   @override
   void initState() {
     super.initState();
@@ -334,32 +333,8 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                   flex: 1,
                   child: StackTap(
                     onTap: () => {
-                      // if (profileCode != '' && profileCode != null)
-                      // {
-                      // if (profilePhone == null || profilePhone == '')
-                      //   {
-                      //     _dialogCheckPhone(),
-                      //   }
-                      // else if (verifyPhonePage == 'true')
-                      //   {
                       buildModal('cart')
                           .then((value) => getCountItemInCartV2()),
-                      // }
-                      // else
-                      //   {
-                      //     _dialogCheckVerify(),
-                      //   }
-                      // }
-                      // else
-                      //   {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (BuildContext context) =>
-                      //             LoginCentralPage(),
-                      //       ),
-                      //     )
-                      //   }
                     },
                     child: Container(
                       alignment: Alignment.center,
@@ -393,29 +368,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                   flex: 2,
                   child: StackTap(
                     onTap: () => {
-                      // if (profileCode != '' && profileCode != null)
-                      //   {
-                      //     if (profilePhone == null || profilePhone == '')
-                      //       {
-                      //         _dialogCheckPhone(),
-                      //       }
-                      //     else if (verifyPhone == 'true')
-                      //       {
                       buildModal('buy'),
-                      //   }
-                      // else
-                      //   {
-                      //     _dialogCheckVerify(),
-                      //   }
-                      // }
-                      // else
-                      //   Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (BuildContext context) =>
-                      //           LoginCentralPage(),
-                      //     ),
-                      //   )
                     },
                     child: Container(
                       width: double.infinity,
@@ -423,7 +376,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                       alignment: Alignment.center,
                       color: Color(0xFF09665a),
                       child: Text(
-                        'ซื้อเลย',
+                        'ซื้อเลย ',
                         style: TextStyle(
                           fontFamily: 'Kanit',
                           fontSize: 20,
@@ -1342,9 +1295,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                     if (snapshot.data == null) {
                       return Container();
                     }
-
                     var model = snapshot.data;
-
                     if (model['stock'] == null) {
                       model['stock'] = 0;
                     }
@@ -1409,7 +1360,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
-                                            // แสดงรูปภาพสินค้า
                                             Container(
                                               height: AdaptiveTextSize()
                                                   .getadaptiveTextSize(
@@ -1436,7 +1386,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  // ชื่อสินค้า
                                                   Text(
                                                     model['name'] ?? '',
                                                     style: TextStyle(
@@ -1463,7 +1412,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                         .textScaleFactor(
                                                             context),
                                                   ),
-                                                  // แสดงจำนวนสต็อก
                                                   Text(
                                                     'คลัง : ' +
                                                         (model['stock'] ?? 0)
@@ -1486,8 +1434,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                           ],
                                         ),
                                         SizedBox(height: 15),
-
-                                        // คำอธิบายสินค้า
                                         if (model['description'] != null &&
                                             model['description']
                                                 .toString()
@@ -1536,7 +1482,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                             ),
                                             Row(
                                               children: [
-                                                // ปุ่มลด
                                                 InkWell(
                                                   onTap: () => setState(() {
                                                     if (productQty > 1) {
@@ -1586,7 +1531,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                   ),
                                                 ),
                                                 SizedBox(width: 15),
-                                                // ช่องกรอกจำนวน
                                                 Container(
                                                   width: AdaptiveTextSize()
                                                       .getadaptiveTextSize(
@@ -1774,7 +1718,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                       qtyController.text) ??
                                                   0;
                                               int stock = model['stock'] ?? 0;
-
                                               if (stock <= 0) {
                                                 Toast.show(
                                                   'สินค้าหมด',
@@ -1788,7 +1731,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                 );
                                                 return;
                                               }
-
                                               if (currentQty <= 0) {
                                                 Toast.show(
                                                   'กรุณาใส่จำนวนสินค้าอย่างน้อย 1 ชิ้น',
@@ -1802,7 +1744,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                 );
                                                 return;
                                               }
-
                                               if (currentQty > stock) {
                                                 Toast.show(
                                                   'สินค้าในคลังเหลือแค่ ' +
@@ -1818,14 +1759,12 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                                 );
                                                 return;
                                               }
-
                                               setState(() {
                                                 loadingAddCart = true;
                                               });
 
                                               if (type == 'cart') {
                                                 // เพิ่มสินค้าลงตะกร้า
-
                                                 await _addCart([model], 'cart');
                                                 Navigator.pop(context);
                                                 print('-----------------');
@@ -1836,32 +1775,12 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                               } else {
                                                 // ซื้อสินค้าทันที
 
-                                                // List<dynamic> data = [
-                                                //   {
-                                                //     'product_name':
-                                                //         model['name'],
-                                                //     'url': model['image'],
-                                                //     'product_variant':
-                                                //         model['name'],
-                                                //     'price': model['price'],
-                                                //     'cart_id': model['id'],
-                                                //     'quantity': currentQty,
-                                                //     'promotion_price':
-                                                //         model['netPrice'] ??
-                                                //             model['price'],
-                                                //     'isPromotion':
-                                                //         model['price'] !=
-                                                //             model['netPrice'],
-                                                //   }
-                                                // ];
-
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         ConfirmOrderCentralPage(
-                                                      // modelCode: [model],
-                                                      modelCode: cartItems,
+                                                      modelCode: [model],
                                                       type: 'buy',
                                                     ),
                                                   ),
@@ -2149,7 +2068,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   _listViewImageList(model) {
     var sizeUrl = (MediaQuery.of(context).size.width / 5.5);
     List<dynamic> listImage = model;
-    print('=============>${listImage} ');
+
     return Container(
       height: sizeUrl,
       child: ListView(
@@ -2278,17 +2197,11 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                         : Color(0xFF000000),
                   ),
                   textScaleFactor: ScaleSize.textScaleFactor(context),
-                  // overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
         ));
-    // return Container(
-    //   height: 20,
-    //   width: 30,
-    //   color: Colors.red,
-    // );
   }
 
   Widget ratingBar(param) {
@@ -2332,53 +2245,13 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
 
   List<Map<String, dynamic>> cartItems = [];
 
-  // _addCart(List<Map<String, dynamic>> products, String type) async {
-  //   // โหลด cartItems จาก storage
-  //   String? cartData = await storage.read(key: 'cartItems');
-  //   cartItems = cartData != null
-  //       ? List<Map<String, dynamic>>.from(jsonDecode(cartData))
-  //       : [];
-
-  //   int qty = int.tryParse(qtyController.text) ?? 1;
-
-  //   for (var product in products) {
-  //     var newItem = {...product, 'qty': qty};
-
-  //     int existingIndex =
-  //         cartItems.indexWhere((item) => item['id'] == newItem['id']);
-  //     if (existingIndex != -1) {
-  //       cartItems[existingIndex]['qty'] += qty;
-  //     } else {
-  //       cartItems.add(newItem);
-  //     }
-  //   }
-
-  //   await storage.write(key: 'cartItems', value: jsonEncode(cartItems));
-  //   setState(() {});
-
-  //   if (type == 'cart') {
-  //     Toast.show('เพิ่มลงตะกร้าแล้ว',
-  //         backgroundColor: Color(0xFF09665a),
-  //         duration: 3,
-  //         gravity: Toast.bottom,
-  //         textStyle: TextStyle(color: Colors.white));
-  //   }
-
-  //   Navigator.pop(context, 'success');
-  // }
   _addCart(List<Map<String, dynamic>> products, String type) async {
-    // โหลด cartItems จาก storage
     String? cartData = await storage.read(key: 'cartItems');
     cartItems = cartData != null
         ? List<Map<String, dynamic>>.from(jsonDecode(cartData))
         : [];
 
     int qty = int.tryParse(qtyController.text) ?? 1;
-
-    // ถ้าเป็น buy ให้เคลียร์รายการเก่าทั้งหมด
-    if (type == 'buy') {
-      cartItems.clear();
-    }
 
     for (var product in products) {
       var newItem = {...product, 'qty': qty};

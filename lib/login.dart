@@ -30,7 +30,6 @@ class LoginCentralPage extends StatefulWidget {
 class _LoginCentralPageState extends State<LoginCentralPage> {
   final storage = new FlutterSecureStorage();
 
-
   final txtUsername = TextEditingController();
   final txtPassword = TextEditingController();
   bool showVisibility = false;
@@ -38,8 +37,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
 
   @override
   void initState() {
-    setState(() {
-    });
+    setState(() {});
 
     final random = Random();
     selectedAgency = mockAgencyList[random.nextInt(mockAgencyList.length)];
@@ -676,7 +674,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
   //                         style: TextStyle(
   //                           fontSize: 13,
   //                           fontFamily: 'Kanit',
-  //                           color: Color(0xFFFF7514),
+  //                           color: Color(0xFF09665a),
   //                           fontWeight: FontWeight.normal,
   //                         ),
   //                       ),
@@ -696,7 +694,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
   //                         style: TextStyle(
   //                           fontSize: 13,
   //                           fontFamily: 'Kanit',
-  //                           color: Color(0xFFFF7514),
+  //                           color: Color(0xFF09665a),
   //                           fontWeight: FontWeight.normal,
   //                         ),
   //                       ),
@@ -816,7 +814,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
       //                   style: TextStyle(
       //                     fontSize: 13,
       //                     fontFamily: 'Kanit',
-      //                     color: Color(0xFFFF7514),
+      //                     color: Color(0xFF09665a),
       //                     fontWeight: FontWeight.normal,
       //                   ),
       //                 ),
@@ -846,8 +844,7 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
 
   //login guest
   void loginWithGuest() async {
-    setState(() {
-    });
+    setState(() {});
     // login();
   }
 

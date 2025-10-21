@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, deprecated_member_use
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -711,13 +712,19 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   // }
 
   _getCountItemInCart() async {
-    //get amount item in cart.
-    await get(server + 'carts').then((value) async {
-      if (value != null)
-        setState(() {
-          amountItemInCart = value.length;
-        });
-    });
+    String? value = await storage.read(key: 'cartItems');
+
+    if (value != null) {
+      List<dynamic> items = jsonDecode(value);
+
+      setState(() {
+        amountItemInCart = items.length;
+      });
+    } else {
+      setState(() {
+        amountItemInCart = 0;
+      });
+    }
   }
 
   // business logic.
@@ -2109,7 +2116,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   //                   style: TextStyle(
   //                     fontSize: 13,
   //                     fontFamily: 'Kanit',
-  //                     color: Color(0xFFFF7514),
+  //                     color: Color(0xFF09665a),
   //                     fontWeight: FontWeight.normal,
   //                   ),
   //                 ),
@@ -2129,7 +2136,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   //                   style: TextStyle(
   //                     fontSize: 13,
   //                     fontFamily: 'Kanit',
-  //                     color: Color(0xFFFF7514),
+  //                     color: Color(0xFF09665a),
   //                     fontWeight: FontWeight.normal,
   //                   ),
   //                 ),
@@ -2144,5 +2151,4 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   //         );
   //       });
   // }
-
 }

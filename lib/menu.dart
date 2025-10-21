@@ -48,20 +48,14 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     // _callReadPolicy();
     onSetPage();
     home = HomeCentralPage(changePage: _changePage);
+
     _futureMainPopUp = postDio('${mainPopupHomeApi}read', {'limit': 10});
     _getProfile();
     searchController = TextEditingController(text: '');
     _widgetOptions = <Widget>[
       home,
-      //// HomeMartPage(),
-
-      CartCentralPage(),
+      CartCentralPage(changePage: _changePage),
       NotificationCentralPage(),
-      // CommercialOrganizationPage(
-      //   commercialOrganization: widget.commercialOrganization,
-      // ),
-      // GameSelectionPage(),
-      // CouponCentralPage(),
       UserInformationCentralPage(),
     ];
     pageController = new PageController(
@@ -99,7 +93,7 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     }
   }
 
-  _changePage(index) {
+  void _changePage(int index) {
     setState(() {
       _currentPage = index;
       pageController.jumpToPage(index);
@@ -135,18 +129,6 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
             {"token": token, "profileCode": profileCode});
       },
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      pageController.jumpToPage(index);
-      if (index == 0 && _currentPage == 0) {
-        _getProfile();
-        _buildMainPopUp();
-        home.getState().onRefresh();
-      }
-      _currentPage = index;
-    });
   }
 
   @override
@@ -328,6 +310,18 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
       hasSelected: hasSelected,
       onTap: () => _onItemTapped(index),
     );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      pageController.jumpToPage(index);
+      if (index == 0 && _currentPage == 0) {
+        _getProfile();
+        _buildMainPopUp();
+        home.getState().onRefresh();
+      }
+      _currentPage = index;
+    });
   }
 
   _buildMainPopUp() async {

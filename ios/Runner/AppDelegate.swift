@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-import GoogleMaps
+
 import Firebase
 import flutter_local_notifications
 
@@ -15,7 +15,7 @@ import flutter_local_notifications
       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
     }
 
-    GMSServices.provideAPIKey("AIzaSyDPcNbGx51w5cVYGIW1QURDHwmLeMwDD4c") //DDPM
+    // GMSServices.provideAPIKey("AIzaSyDPcNbGx51w5cVYGIW1QURDHwmLeMwDD4c") //DDPM
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

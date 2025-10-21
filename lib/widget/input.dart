@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 class DecorationRegister {
   static InputDecoration register(context, {String hintText = ''}) =>
       InputDecoration(
-        // label: Text(hintText),
         hintStyle: TextStyle(
           color: Color(0xFF707070),
           fontSize: 13,

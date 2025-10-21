@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
@@ -8,15 +10,16 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/confirm_order.dart';
-import 'package:kasetmall/home.dart';
+import 'package:kasetmall/menu.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/widget/show_loading.dart';
 
 class CartCentralPage extends StatefulWidget {
-  const CartCentralPage({Key? key}) : super(key: key);
+  const CartCentralPage({Key? key, this.changePage}) : super(key: key);
 
   @override
   State<CartCentralPage> createState() => _CartCentralPageState();
+  final Function? changePage;
 }
 
 class AdaptiveTextSize {
@@ -148,7 +151,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
 
   _changeCarts(action, param) async {
     if (action == 0) {
-      // ลดจำนวน
       if (param['qty'] == 1) {
         return null;
       } else {
@@ -225,10 +227,11 @@ class _CartCentralPageState extends State<CartCentralPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => HomeCentralPage()));
+                    if (widget.changePage != null) {
+                      widget.changePage!(0);
+                    } else {
+                      Navigator.pop(context); // fallback ถ้าไม่มี changePage
+                    }
                   },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -275,35 +278,37 @@ class _CartCentralPageState extends State<CartCentralPage> {
       body: ShowLoadingWidget(
         loading: loading,
         children: [
-          if (model.length > 0)
+          if (model.isEmpty)
+            _cartEmpty()
+          else ...[
             SizedBox(
               height: double.infinity,
               child: Container(
-                  margin: EdgeInsets.only(
-                      bottom:
-                          AdaptiveTextSize().getadaptiveTextSize(context, 45) +
-                              MediaQuery.of(context).padding.bottom),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero,
-                    physics: ClampingScrollPhysics(),
-                    itemBuilder: (context, indexItem) =>
-                        _buildCard(model[indexItem], indexItem),
-                    separatorBuilder: (_, __) => SizedBox(
-                      height:
-                          AdaptiveTextSize().getadaptiveTextSize(context, 10),
-                    ),
-                    itemCount: model.length,
-                  )),
+                margin: EdgeInsets.only(
+                  bottom: AdaptiveTextSize().getadaptiveTextSize(context, 45) +
+                      MediaQuery.of(context).padding.bottom,
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: ClampingScrollPhysics(),
+                  itemBuilder: (context, indexItem) =>
+                      _buildCard(model[indexItem], indexItem),
+                  separatorBuilder: (_, __) => SizedBox(
+                    height: AdaptiveTextSize().getadaptiveTextSize(context, 10),
+                  ),
+                  itemCount: model.length,
+                ),
+              ),
             ),
-          if (model.length > 0)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom),
+                  bottom: MediaQuery.of(context).padding.bottom,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
@@ -332,24 +337,19 @@ class _CartCentralPageState extends State<CartCentralPage> {
                     SizedBox(width: 10),
                     Text(
                       'ทั้งหมด',
-                      style: TextStyle(
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(fontSize: 13),
                       textScaleFactor: ScaleSize.textScaleFactor(context),
                     ),
                     SizedBox(width: 5),
                     Text(
                       'ยอดรวม',
-                      style: TextStyle(
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(fontSize: 13),
                       textScaleFactor: ScaleSize.textScaleFactor(context),
                     ),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         _priceAll(),
-                        // '_priceAll',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -375,7 +375,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                           }
                         });
 
-                        if (data.length > 0) {
+                        if (data.isNotEmpty) {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -384,10 +384,8 @@ class _CartCentralPageState extends State<CartCentralPage> {
                             ),
                           );
 
-                          // Refresh cart หลังกลับมาจากหน้า Confirm Order
                           await _readLocalCart();
                         } else {
-                          // แสดง toast เมื่อไม่มีรายการที่เลือก
                           toastFail(context,
                               text: 'กรุณาเลือกสินค้าที่ต้องการชำระเงิน');
                         }
@@ -395,16 +393,11 @@ class _CartCentralPageState extends State<CartCentralPage> {
                       child: Container(
                         color: Color(0xFFDF0B24),
                         alignment: Alignment.center,
-                        // height: double.infinity,
-                        // width: 130,
                         padding:
                             EdgeInsets.symmetric(horizontal: 25, vertical: 10),
                         child: Text(
                           'ชำระเงิน ',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                          ),
+                          style: TextStyle(fontSize: 20, color: Colors.white),
                           textScaleFactor: ScaleSize.textScaleFactor(context),
                         ),
                       ),
@@ -413,6 +406,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                 ),
               ),
             ),
+          ],
         ],
       ),
     );
@@ -491,18 +485,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
           ],
         ),
         child: GestureDetector(
-          onTap: () async {
-            // var productModel = await readProduct(param['product_id']);
-            // await _addLog(productModel);
-            // await Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (_) => ProductFormCentralPage(
-            //       model: productModel,
-            //     ),
-            //   ),
-            // );
-          },
+          onTap: () async {},
           child: SizedBox(
             width: double.infinity,
             child: Row(
@@ -557,8 +540,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
                               padding: const EdgeInsets.only(right: 5),
                               child: Text(
                                 param['name'],
-                                // ??
-                                //     param['product']['data']['sku'],
                                 style: TextStyle(
                                   fontSize: 13,
                                   overflow: TextOverflow.ellipsis,
@@ -568,7 +549,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                 maxLines: 2,
                               ),
                             ),
-                            // SizedBox(height: 5),
                             Row(
                               children: [
                                 Flexible(
@@ -585,8 +565,6 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                       ),
                                       child: Text(
                                         param['name'],
-                                        // ?? param['product_variant']['data']
-                                        //     ['sku'],
                                         style: TextStyle(
                                           fontSize: 13,
                                           color: Colors.black,
@@ -599,33 +577,10 @@ class _CartCentralPageState extends State<CartCentralPage> {
                                     ),
                                   ),
                                 ),
-                                // param['product_variant']['data']
-                                //             ['promotion_active'] ==
-                                //         true
-                                //     ?
-                                // Expanded(
-                                //         child: Text(
-                                //           '${moneyFormat(param['product_variant']['data']['price'].toString())} บาท',
-                                //           style: TextStyle(
-                                //             fontSize: 13,
-                                //             fontWeight: FontWeight.bold,
-                                //             decoration:
-                                //                 TextDecoration.lineThrough,
-                                //           ),
-                                //           textScaleFactor:
-                                //               ScaleSize.textScaleFactor(
-                                //                   context),
-                                //         ),
-                                //       )
-                                //     : Container(),
                               ],
                             )
                           ],
                         ),
-                      ),
-                      SizedBox(
-                        height:
-                            AdaptiveTextSize().getadaptiveTextSize(context, 10),
                       ),
                       SizedBox(
                         height:
@@ -635,13 +590,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                           children: [
                             Expanded(
                               child: Text(
-                                // param['product_variant']['data']
-                                //             ['promotion_active'] ==
-                                //         true
-                                //     ? '${moneyFormat(param['product_variant']['data']['promotion_price'].toString())} บาท'
-                                // :
                                 '${formatPrice(_calculateItemPrice(param))} บาท',
-
                                 style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -732,6 +681,52 @@ class _CartCentralPageState extends State<CartCentralPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  _cartEmpty() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'ตะกร้ายังว่างอยู่ ต้องหาอะไรมาเพิ่มหน่อยแล้ว!',
+            style: TextStyle(fontFamily: 'Kanit', fontSize: 15),
+          ),
+          SizedBox(height: 15),
+          Image.asset(
+            'assets/images/kaset/basket.png',
+            height: 50,
+            width: 50,
+            color: Color(0xFF09665a),
+          ),
+          SizedBox(height: 15),
+          InkWell(
+            onTap: () => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => MenuCentralPage()),
+                (route) => false),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(3),
+                border: Border.all(
+                  width: 1,
+                  color: Color(0xFFDF0B24),
+                ),
+              ),
+              child: Text(
+                'ช้อปตอนนี้',
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  fontSize: 15,
+                  color: Color(0xFFDF0B24),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -878,7 +873,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                     style: TextStyle(
                       fontSize: 13,
                       fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
+                      color: Color(0xFF09665a),
                       fontWeight: FontWeight.normal,
                     ),
                   ),
@@ -935,7 +930,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
                     style: TextStyle(
                       fontSize: 13,
                       fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
+                      color: Color(0xFF09665a),
                       fontWeight: FontWeight.normal,
                     ),
                   ),
@@ -949,34 +944,5 @@ class _CartCentralPageState extends State<CartCentralPage> {
         });
   }
 
-  // _changeCartsn, param) {
-  //   if (action == 0) {
-  //     if (param['qty'] == 1) {
-  //       return null;
-  //     } else {
-  //       param['qty']--;
-  //       // _updateCart(param);
-  //     }
-  //   } else {
-  //     if (param['qty'] >= param['product_variant']['data']['stock']) {
-  //       toastFail(context,
-  //           text:
-  //               'สินค้าเหลือเพียง ${param['product_variant']['data']['stock']} ชิ้น เท่านั้น');
-  //       return null;
-  //     } else {
-  //       param['qty']++;
-  //       // _updateCart(param);
-  //     }
-  //   }
-  // }
-
-  // _updateCart(param) {
-  //   setState(() {
-  //     widget;
-  //     put(server + 'carts/' + param['id'], {
-  //       'product_variant_id': param['product_variant_id'],
-  //       'quantity': param['quantity']
-  //     });
-  //   });
-  // }
+ 
 }

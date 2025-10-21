@@ -162,7 +162,7 @@ class _ContentCarousel extends State<ContentCarousel> {
             //   height: 31.0,
             //   decoration: BoxDecoration(
             //       image: DecorationImage(
-            //     image: AssetImage('assets/images/share.png'),
+            //     image: AssetImage(' assets/images/kaset/share.png'),
             //   )),
             //   alignment: Alignment.centerRight,
             //   child: FlatButton(

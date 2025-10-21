@@ -93,10 +93,18 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
   bool checkOrder = false;
   Future<dynamic>? _futureCoupons;
   List<dynamic> _futurePayments = [
-    // {'id': '1', 'title': 'ชำระเงินปลายทาง'},
-    // {'id': '2', 'title': 'บัตรเครดิต/เดบิต'},
-    {'id': '3', 'title': 'ชำระเงินด้วย QR Code'}
+    {
+      'id': '1',
+      'title': 'ชำระเงินด้วย QR Code',
+      'des': 'สแกนจ่ายผ่านแอปธนาคาร',
+    },
+    {
+      'id': '2',
+      'title': 'ชำระเงินด้วย Kaset Pay',
+      'des': 'จ่ายผ่าน Kaset Pay ได้ทันที',
+    }
   ];
+
   bool showOfficeTaxInvoice = false;
   TextEditingController couponController = TextEditingController();
   late String couponMessage = "";
@@ -131,7 +139,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
       loading = true;
     });
 
-    // แปลง modelCode ให้เป็น model สำหรับแสดงผล
+
     try {
       setState(() {
         model = modelCode; // หรือ logic ที่เหมาะสม
@@ -238,7 +246,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
     //       context: context,
     //       builder: (BuildContext context) {
     //         return WillPopScope(
-    //           onWillPop: () {
     //             return Future.value(false);
     //           },
     //           child: CupertinoAlertDialog(
@@ -827,49 +834,27 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('ตัวเลือกชำระเงิน',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textScaleFactor: ScaleSize.textScaleFactor(context)),
-                    // GestureDetector(
-                    //   onTap: () => Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (_) => MyCreditCardCentralPage(),
-                    //     ),
-                    //   ),
-                    //   child: Container(
-                    //     // height: 25,
-                    //     // width: 25,
-                    //     padding:
-                    //         EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                    //     decoration: BoxDecoration(
-                    //       color: Color(0xFFF7F7F7),
-                    //       borderRadius: BorderRadius.circular(7),
-                    //     ),
-                    //     child: Icon(
-                    //       Icons.arrow_forward_ios_rounded,
-                    //       color: Color(0xFF09665a),
-                    //       size: AdaptiveTextSize()
-                    //           .getadaptiveTextSize(context, 17),
-                    //     ),
-                    //   ),
-                    // )
+                    Text(
+                      'ตัวเลือกชำระเงิน',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textScaleFactor: ScaleSize.textScaleFactor(context),
+                    ),
                   ],
                 ),
                 SizedBox(height: 10),
+
                 SizedBox(
-                  // height: 70,
+                  width: 200,
                   height: AdaptiveTextSize().getadaptiveTextSize(context, 70),
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     padding: EdgeInsets.zero,
                     itemCount: _futurePayments.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 10),
-                    itemBuilder: (_, index) {
-                      // if (index == 0) {
+                    itemBuilder: (context, index) {
                       return StackTap(
                         borderRadius: BorderRadius.circular(10),
                         splashColor: Color(0xFF09665a).withOpacity(0.2),
@@ -879,7 +864,6 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                           });
                         },
                         child: Container(
-                          // width: 169,
                           padding: EdgeInsets.fromLTRB(12, 10, 15, 15),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -895,20 +879,25 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(_futurePayments[index]['title'],
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  textScaleFactor:
-                                      ScaleSize.textScaleFactor(context)),
-                              Text('ชำระเงินเมื่อได้รับสินค้า',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0xFF707070),
-                                  ),
-                                  textScaleFactor:
-                                      ScaleSize.textScaleFactor(context)),
+                              Text(
+                                _futurePayments[index]['title'],
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textScaleFactor:
+                                    ScaleSize.textScaleFactor(context),
+                              ),
+                              Text(
+                                _futurePayments[index]['des'],
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF707070),
+                                ),
+                                maxLines: 3,
+                                textScaleFactor:
+                                    ScaleSize.textScaleFactor(context),
+                              ),
                             ],
                           ),
                         ),

@@ -226,8 +226,6 @@ Future<dynamic> getData(String url) async {
 Future<dynamic> getShippingPrice(String url) async {
   final storage = await new FlutterSecureStorage().read(key: 'token');
 
-  print('getShippingPrice ${url}');
-  print('getShippingPrice $storage');
   var response = await http.get(Uri.parse(url), headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
@@ -425,8 +423,7 @@ Future<dynamic> postLoginSocial(String url, dynamic criteria) async {
     "Accept": "application/json",
     "Content-Type": "application/json"
   });
-  print('------Url-------->>>  ${url}');
-  print('--------body----->>>  ${body}');
+
   // var data = json.decode(response.body);
   var data = jsonDecode(utf8.decode(response.bodyBytes));
   if (response.statusCode == 200) {
@@ -440,17 +437,13 @@ Future<dynamic> postLoginSocial(String url, dynamic criteria) async {
 Future<dynamic> postObjectData(String url, dynamic criteria) async {
   print('-- PO 3');
   final token = await new FlutterSecureStorage().read(key: 'token');
-  print('----------$token');
-  print('----------${criteria.toString()}');
+
   var body = json.encode(criteria);
   var response = await http.post(Uri.parse(url), body: body, headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
     // "Authorization": "Bearer " + token!
   });
-
-  print('-----statusCode-----${response.statusCode}');
-  print("-----Response Body-----${response.body}");
 
   var data = jsonDecode(utf8.decode(response.bodyBytes));
   return Future.value(data);
@@ -480,8 +473,7 @@ Future<dynamic> postQuestion(String url, dynamic criteria) async {
 
 Future<dynamic> postProductData(String url, dynamic criteria) async {
   var body = json.encode(criteria);
-  // print(url);
-  // print('criteria ===== ${body}');
+
   var response = await http.post(Uri.parse(url), body: body, headers: {
     "Accept": "application/json",
     "Content-Type": "application/json",
@@ -490,7 +482,6 @@ Future<dynamic> postProductData(String url, dynamic criteria) async {
 
   var data = jsonDecode(utf8.decode(response.bodyBytes));
 
-  // print('----------' + data['data'][0].toString());
   // var data = json.decode(response.body);
   if (data['meta'] != null) {
     data['data'][0]['countItem'] = (data['meta']['pagination']['total']);
@@ -589,7 +580,7 @@ Future<dynamic> postRegister(String url, dynamic criteria) async {
   });
   var data = jsonDecode(utf8.decode(response.bodyBytes));
   data['statusCode'] = response.statusCode;
-  print('--------------register ${data}');
+
   return Future.value(data);
 }
 
@@ -802,15 +793,12 @@ Future<dynamic> postDio(String url, dynamic criteria) async {
     criteria = {'profileCode': profileCode, ...criteria};
     criteria['profileCode'] = profileCode;
   }
-  // print('12345kkkkkkkkkkk ${criteria}');
+
   Dio dio = new Dio();
 
   var response = await dio.post(url, data: criteria);
-  if (url == '${mainPopupHomeApi}read') {
-    // print(response.data.toString());
-  }
-  // if (url == server + 'm/goods/isPopular/true/read')
-  //   print(response.data.toString());
+  if (url == '${mainPopupHomeApi}read') {}
+
   return Future.value(response.data['objectData']);
 }
 
@@ -829,14 +817,14 @@ Future<dynamic> postDioAny(String url, dynamic criteria) async {
   }
   Dio dio = new Dio();
   var response = await dio.post(url, data: criteria);
-  // print(response.data['objectData'].toString());
+
   return Future.value(response.data);
 }
 
 Future<dynamic> postDioWithOutProfileCode(String url, dynamic criteria) async {
   Dio dio = new Dio();
   var response = await dio.post(url, data: criteria);
-  // print(response.data['objectData'].toString());
+
   return Future.value(response.data['objectData']);
 }
 
@@ -867,10 +855,9 @@ Future<dynamic> postDioMessage(String url, dynamic criteria) async {
     criteria = {'profileCode': profileCode, ...criteria};
   }
   Dio dio = new Dio();
-  print('-----dio criteria-----' + criteria.toString());
-  print('-----dio criteria-----' + url);
+
   var response = await dio.post(url, data: criteria);
-  print('-----dio message-----' + response.data.toString());
+
   return Future.value(response.data['objectData']);
 }
 
@@ -882,15 +869,13 @@ Future<dynamic> postOTPSend(String url, dynamic criteria) async {
   dio.options.headers["api_key"] = "db88c29e14b65c9db353c9385f6e5f28";
   dio.options.headers["secret_key"] = "XpM2EfFk7DKcyJzt";
   var response = await dio.post(serverOTP + url, data: criteria);
-  // print('----------- -----------  ${response.data['result']}');
+
   return Future.value(response.data['result']);
 }
 
 Future<dynamic> postDioCategoryWeMart(String url, dynamic criteria) async {
-  // print(url);
-  // print(criteria);
   final storage = new FlutterSecureStorage();
-  // var platform = Platform.operatingSystem.toString();
+
   final profileCode = await storage.read(key: 'profileCode16');
 
   if (profileCode != '' && profileCode != null) {
@@ -910,8 +895,6 @@ Future<dynamic> postDioCategoryWeMart(String url, dynamic criteria) async {
 }
 
 Future<dynamic> postDioCategoryWeMartNoAll(String url, dynamic criteria) async {
-  // print(url);
-  // print(criteria);
   final storage = new FlutterSecureStorage();
   // var platform = Platform.operatingSystem.toString();
   final profileCode = await storage.read(key: 'profileCode16');

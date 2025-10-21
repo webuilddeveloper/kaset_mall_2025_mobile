@@ -109,15 +109,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _setupFirebaseMessaging();
 
     FirebaseMessaging.instance.getToken().then((token) {
-      // print("FCM Token: $token");
+ 
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // print('Message received in foreground: ${message.notification?.title}');
+
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // print('Notification opened!');
+   
     });
   }
 
@@ -253,7 +253,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             locale: context.locale,
             navigatorKey: navigatorKey,
             theme: ThemeData(
-              primaryColor: const Color(0XFF1b5738),
+              primaryColor: const Color(0xFF09665a),
               primaryColorLight: const Color(0xFF528c6e),
               primaryColorDark: const Color(0xFF9C0000),
               colorScheme: ColorScheme.light(

@@ -8,7 +8,6 @@ import 'package:kasetmall/menu.dart';
 import 'package:kasetmall/widget/header.dart';
 import 'package:kasetmall/widget/input.dart';
 
-
 class RegisterShopPage extends StatefulWidget {
   RegisterShopPage({Key? key}) : super(key: key);
 
@@ -27,13 +26,10 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
   final txtPhone = TextEditingController();
   final txtEmail = TextEditingController();
 
-
-
   late int selectedSexIndex = 0;
   late int selectOccupation = 0;
   bool showConfirmPassword = true;
   bool showPassword = true;
-
 
   @override
   void initState() {
@@ -51,6 +47,8 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
     txtLastName.dispose();
     super.dispose();
   }
+
+  String? selectedValue = '0';
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +68,18 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
             ),
             children: [
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white),
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -81,9 +87,11 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
                       'ข้อมูลทั่วไป',
                       style: TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
                       ),
                     ),
+                    const SizedBox(height: 16),
                     TextRegisterWidget(
                       controller: txtFirstName,
                       title: 'ชื่อร้าน',
@@ -93,6 +101,7 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
                       ),
                       validator: (value) => ValidateRegister.firstName(value),
                     ),
+                    const SizedBox(height: 12),
                     TextRegisterWidget(
                       controller: txtLastName,
                       title: 'รายละเอียดร้าน',
@@ -102,14 +111,56 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
                       ),
                       validator: (value) => ValidateRegister.lastName(value),
                     ),
+                    const SizedBox(height: 12),
                     TextRegisterWidget(
                       controller: txtLastName,
                       title: 'สถานะร้าน',
                       decoration: DecorationRegister.register(
                         context,
-                        hintText: 'กรุณากรอกรายละเอียดร้าน',
+                        hintText: 'กรุณากรอกสถานะร้าน',
                       ),
                       validator: (value) => ValidateRegister.lastName(value),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'ประเภทผู้ขาย',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            activeColor: Color(0xFF09665a),
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('ผู้ขายทั่วไป'),
+                            value: '0',
+                            groupValue: selectedValue,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedValue = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            activeColor: Color(0xFF09665a),
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('SME'),
+                            value: '1',
+                            groupValue: selectedValue,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedValue = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -482,7 +533,6 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
     );
   }
 
-
 //   submitRegister() async {
 //     final result = await postRegister(server + 'register', {
 //       // 'username': txtEmail.text,
@@ -529,7 +579,7 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
 // //                       style: TextStyle(
 // //                         fontSize: 13,
 // //                         fontFamily: 'Kanit',
-// //                         color: Color(0xFFFF7514),
+// //                         color: Color(0xFF09665a),
 // //                         fontWeight: FontWeight.normal,
 // //                       ),
 // //                     ),
@@ -590,7 +640,7 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
 //                       style: TextStyle(
 //                         fontSize: 13,
 //                         fontFamily: 'Kanit',
-//                         color: Color(0xFFFF7514),
+//                         color: Color(0xFF09665a),
 //                         fontWeight: FontWeight.normal,
 //                       ),
 //                     ),
@@ -612,7 +662,7 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
 //                       style: TextStyle(
 //                         fontSize: 13,
 //                         fontFamily: 'Kanit',
-//                         color: Color(0xFFFF7514),
+//                         color: Color(0xFF09665a),
 //                         fontWeight: FontWeight.normal,
 //                       ),
 //                     ),
@@ -660,7 +710,7 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
 //                       style: TextStyle(
 //                         fontSize: 13,
 //                         fontFamily: 'Kanit',
-//                         color: Color(0xFFFF7514),
+//                         color: Color(0xFF09665a),
 //                         fontWeight: FontWeight.normal,
 //                       ),
 //                     ),
@@ -712,7 +762,7 @@ class _RegisterShopPageState extends State<RegisterShopPage> {
                   style: TextStyle(
                     fontSize: 13,
                     fontFamily: 'Kanit',
-                    color: Color(0xFFFF7514),
+                    color: Color(0xFF09665a),
                     fontWeight: FontWeight.normal,
                   ),
                 ),

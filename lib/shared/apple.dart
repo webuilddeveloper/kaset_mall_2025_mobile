@@ -37,7 +37,6 @@ Future<String?> signInWithApple() async {
     ],
     nonce: nonce,
   );
-  // print('appleCredential');
-  // print(appleCredential.identityToken);
+
   return appleCredential.identityToken;
 }

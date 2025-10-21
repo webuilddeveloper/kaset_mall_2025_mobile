@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class MainPopup extends StatefulWidget {
-  MainPopup({ Key? key, this.model, this.nav}) : super(key: key);
+  MainPopup({Key? key, this.model, this.nav}) : super(key: key);
 
   final Future<dynamic>? model;
   final Function(String, String, dynamic, String, String)? nav;
@@ -97,7 +97,7 @@ class _MainPopup extends State<MainPopup> {
               //           borderRadius: BorderRadius.circular(5),
               //           // shape: BoxShape.circle,
               //           color: _current == index
-              //               ? Color(0xFFFF7514)
+              //               ? Color(0xFF09665a)
               //               : Color.fromRGBO(0, 0, 0, 0.4),
               //         ));
               //   }).toList(),

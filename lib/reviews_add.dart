@@ -70,18 +70,18 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
       String fileType = fileName.split('.').last;
       // var id = DateTime.now().millisecondsSinceEpoch;
       setState(() {
-            image = res;
-            loadingImage = false;
-            imageList.add({
-              'value': image,
-              'id': random.nextInt(100),
-              'file': file,
-              'fileName': fileName,
-              'fileType': fileType,
-            });
-            // image = server + res,
-            // showLoadingImage = false,
-          });
+        image = res;
+        loadingImage = false;
+        imageList.add({
+          'value': image,
+          'id': random.nextInt(100),
+          'file': file,
+          'fileName': fileName,
+          'fileType': fileType,
+        });
+        // image = server + res,
+        // showLoadingImage = false,
+      });
     }).catchError((err) {
       setState(() {
         loadingImage = false;
@@ -680,7 +680,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
                     style: TextStyle(
                       fontSize: 13,
                       fontFamily: 'Kanit',
-                      color: Color(0xFFFF7514),
+                      color: Color(0xFF09665a),
                       fontWeight: FontWeight.normal,
                     ),
                   ),

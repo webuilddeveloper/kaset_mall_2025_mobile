@@ -12,6 +12,9 @@ import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/event_calendar_form.dart';
 import 'package:kasetmall/event_calendar_main.dart';
+import 'package:kasetmall/kasetpay/loan/agricultureLoan.dart'
+    show AgricultureLoanPage;
+import 'package:kasetmall/kasetpay/pay/kaset_pay.dart';
 import 'package:kasetmall/news_all.dart';
 import 'package:kasetmall/news_form.dart';
 import 'package:kasetmall/privilege_all.dart';
@@ -23,7 +26,6 @@ import 'package:kasetmall/shared/notification_service.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
 
 // ignore: must_be_immutable
 class HomeCentralPage extends StatefulWidget {
@@ -460,34 +462,150 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
               child: ListView(
                 shrinkWrap: true,
                 physics: ClampingScrollPhysics(),
-                padding: EdgeInsets.only(top: 10),
                 children: [
-                  // Search Bar
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: TextField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        hintText: 'ค้นหาผลิตภัณฑ์สินค้าเกษตร',
-                        prefixIcon: Icon(Icons.search_rounded),
-                        suffixIcon: Image.asset(
-                          'assets/images/kaset/filter.png',
-                          scale: AdaptiveTextSize()
-                              .getadaptiveTextSize(context, 6),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide(
-                            color: Colors.grey,
-                            width: 1,
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              print('.........Kaset Pay clicked');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => KasetPayPage(),
+                                  ));
+                            },
+                            child: Container(
+                              height: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 12),
+                                    child: Image.asset(
+                                      'assets/logo/pay.png',
+                                      color: Theme.of(context).primaryColor,
+                                      width: 35,
+                                      height: 35,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Kaset Pay',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          '฿15,000',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: Theme.of(context).primaryColor,
+                                      size: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                      ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            onTap: () {
+                              print('.........loans clicked');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AgricultureLoanPage(),
+                                  ));
+                            },
+                            child: Container(
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                    color: Theme.of(context).primaryColor),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 12,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'สินเชื่อเพื่อการเกษตร ',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          'อนุมัติทันที',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Theme.of(context).primaryColor,
+                                    size: 16,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 8),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 15),
                     child: ClipRRect(
@@ -500,7 +618,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     ),
                   ),
                   SizedBox(height: 16),
-
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
@@ -510,7 +627,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   ),
                   SizedBox(height: 10),
                   _buildCategory(),
-
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
@@ -520,7 +636,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     ),
                   ),
                   _buildNew(),
-
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
@@ -530,7 +645,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     ),
                   ),
                   _buildEvent(),
-
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
@@ -540,7 +654,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     ),
                   ),
                   _buildForYou(),
-
                   _buildTitle(
                     code: 'product',
                     title: 'สินค้า',
@@ -877,7 +990,6 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                           MaterialPageRoute(
                             builder: (context) => EventCalendarFormPage(
                               model: snapshot.data[index],
-                              // code: model['code'],
                             ),
                           ),
                         );
@@ -1278,7 +1390,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   //                   style: TextStyle(
   //                     fontSize: 13,
   //                     fontFamily: 'Kanit',
-  //                     color: Color(0xFFFF7514),
+  //                     color: Color(0xFF09665a),
   //                     fontWeight: FontWeight.normal,
   //                   ),
   //                 ),
@@ -1298,7 +1410,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   //                   style: TextStyle(
   //                     fontSize: 13,
   //                     fontFamily: 'Kanit',
-  //                     color: Color(0xFFFF7514),
+  //                     color: Color(0xFF09665a),
   //                     fontWeight: FontWeight.normal,
   //                   ),
   //                 ),

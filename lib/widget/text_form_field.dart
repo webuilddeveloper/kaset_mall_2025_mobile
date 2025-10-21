@@ -15,7 +15,7 @@ labelTextFormFieldPasswordOldNew(String lable, bool showSubtitle) {
                 style: TextStyle(
                   fontSize: 15.000, fontFamily: 'Kanit',
                   fontWeight: FontWeight.bold,
-                  // color: Color(0xFFFF7514),
+                  // color: Color(0xFF09665a),
                 ),
               ),
               if (showSubtitle)
@@ -76,7 +76,7 @@ textFormFieldPasswordOldNew(
       }
 
       if (isPassword) {
-       String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
+        String pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$';
         RegExp regex = new RegExp(pattern);
         if (!regex.hasMatch(model)) {
           return 'กรุณากรอกรูปแบบรหัสผ่านให้ถูกต้อง.';
@@ -128,7 +128,7 @@ labelTextFormField(String label) {
       label,
       style: TextStyle(
         fontSize: 15.000, fontFamily: 'Kanit', fontWeight: FontWeight.bold,
-        // color: Color(0xFFFF7514),
+        // color: Color(0xFF09665a),
       ),
     ),
   );

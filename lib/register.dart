@@ -10,7 +10,6 @@ import 'package:kasetmall/register_shop.dart';
 import 'package:kasetmall/widget/header.dart';
 import 'package:kasetmall/widget/input.dart';
 
-
 class RegisterCentralPage extends StatefulWidget {
   RegisterCentralPage({Key? key}) : super(key: key);
 
@@ -70,7 +69,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
   bool showConfirmPassword = true;
   bool showPassword = true;
 
-
   @override
   void initState() {
     super.initState();
@@ -78,7 +76,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     txtPhone.dispose();
     txtEmail.dispose();
     txtPassword.dispose();
@@ -106,9 +103,61 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
             ),
             children: [
               Text(
+                'ข้อมูลผู้ใช้',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              TextRegisterWidget(
+                controller: txtEmail,
+                title: 'อีเมล',
+                decoration: DecorationRegister.register(
+                  context,
+                  hintText: 'กรุณากรอกอีเมล',
+                ),
+                validator: (value) => ValidateRegister.email(value),
+              ),
+              TextRegisterWidget(
+                controller: txtPassword,
+                title: 'รหัสผ่าน',
+                subTitle:
+                    'รหัสผ่านต้องเป็นตัวอักษร a-z, A-Z และ 0-9 ความยาวขั้นต่ำ 8 ตัวอักษร',
+                decoration: DecorationRegister.password(
+                  context,
+                  hintText: 'กรุณากรอกรหัสผ่าน',
+                  suffixTap: () => setState(() {
+                    showPassword = !showPassword;
+                  }),
+                  visibility: showPassword,
+                ),
+                obscureText: showPassword,
+                inputFormatters: InputFormatTemple.password(),
+                validator: (value) => ValidateRegister.password(value),
+              ),
+              TextRegisterWidget(
+                controller: txtConPassword,
+                title: 'ยืนยันรหัสผ่าน',
+                subTitle:
+                    'รหัสผ่านต้องเป็นตัวอักษร a-z, A-Z และ 0-9 ความยาวขั้นต่ำ 8 ตัวอักษร',
+                decoration: DecorationRegister.password(
+                  context,
+                  hintText: 'กรุณายืนยันรหัสผ่าน',
+                  suffixTap: () => setState(() {
+                    showConfirmPassword = !showConfirmPassword;
+                  }),
+                  visibility: showConfirmPassword,
+                ),
+                obscureText: showConfirmPassword,
+                inputFormatters: InputFormatTemple.password(),
+                validator: (value) =>
+                    ValidateRegister.confirmPassword(value, txtPassword.text),
+              ),
+              SizedBox(height: 16),
+              Text(
                 'ข้อมูลส่วนตัว',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -130,6 +179,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                 ),
                 validator: (value) => ValidateRegister.lastName(value),
               ),
+              SizedBox(height: 16),
               TextRegisterWidget(
                 controller: txtPhone,
                 title: 'หมายเลขโทรศัพท์',
@@ -140,7 +190,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                 inputFormatters: InputFormatTemple.phone(),
                 validator: (value) => ValidateRegister.phone(value),
               ),
-
               Container(
                 padding: EdgeInsets.only(top: 10.0, bottom: 15.0),
                 child: Column(
@@ -153,7 +202,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                           style: TextStyle(
                             fontSize: 15,
                             color: Color(0xFF000000),
-                            // fontWeight: FontWeight.w300,
                           ),
                           textAlign: TextAlign.left,
                         ),
@@ -188,8 +236,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                         ),
                         validator: (value) =>
                             ValidateRegister.occupation(value as int? ?? 0),
-                        // validator: (value) =>
-                        //     value == 0 ? 'กรุณาเลือกอาชีพ' : 0,
                         hint: Text(
                           'สังกัดหน่วยงาน',
                           style: TextStyle(
@@ -205,10 +251,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                         onChanged: (Object? newValue) {
                           setState(() async {
                             selectAgency = newValue as int;
-                            print('-------selectAgency-------');
-                            print(selectAgency);
-
-                            print('--------------------------');
                           });
                         },
                         items: _futureAgencyModel.map((item) {
@@ -218,7 +260,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                               style: TextStyle(
                                 fontSize: 15.00,
                                 fontFamily: 'Kanit',
-                                color: Color(0xFF1B6CA8),
                               ),
                             ),
                             value: item['code'],
@@ -227,7 +268,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                       )
                     ]),
               ),
-
               Container(
                 padding: EdgeInsets.only(top: 10.0, bottom: 15.0),
                 child: Column(
@@ -301,7 +341,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                               style: TextStyle(
                                 fontSize: 15.00,
                                 fontFamily: 'Kanit',
-                                color: Color(0xFF1B6CA8),
                               ),
                             ),
                             value: item['code'],
@@ -310,25 +349,22 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                       )
                     ]),
               ),
-
               Container(
                 padding: EdgeInsets.only(left: 15.0, bottom: 5),
                 child: Text(
                   'เพศ',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     color: Color(0xFF000000),
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.left,
                 ),
               ),
               Container(
-                // width: 50,
                 height: 33,
                 margin: EdgeInsets.only(
                   top: 5.0,
-                  bottom: 30,
                 ),
                 padding: EdgeInsets.only(left: 2.0, bottom: 5),
                 child: ListView.builder(
@@ -337,18 +373,14 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                       onTap: () {
-                        // FocusScope.of(context).unfocus();
-                        // widget.onChange(snapshot.data[index]['code']);
                         setState(() {
                           selectedSexIndex = index;
-                          // txtSex = _futureSexModel[index]['code'];
                         });
                       },
                       child: Container(
                         alignment: Alignment.center,
-                        padding: EdgeInsets.all(
-                          5.0,
-                        ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                         margin: EdgeInsets.only(
                           right: 12.0,
                         ),
@@ -356,7 +388,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                           boxShadow: [
                             BoxShadow(
                               color: index == selectedSexIndex
-                                  ? Color(0xFFFBE3E6).withOpacity(0.49)
+                                  ? Color(0xFF09665a).withOpacity(0.49)
                                   : Color(0xFFFFFFFF),
                               spreadRadius: 0,
                             ),
@@ -364,7 +396,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                           borderRadius: new BorderRadius.circular(10.0),
                           border: Border.all(
                             color: index == selectedSexIndex
-                                ? Color(0xFFFBE3E6).withOpacity(0.49)
+                                ? Color(0xFF09665a).withOpacity(0.49)
                                 : Color(0xFF000000).withOpacity(0.50),
                             width: 1,
                           ),
@@ -378,26 +410,16 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                               child: Icon(
                                 _futureSexModel[index]['icon'],
                                 color: index == selectedSexIndex
-                                    ? Color(0xFFDF0B24)
+                                    ? Color(0xFF09665a)
                                     : Color(0xFF000000).withOpacity(0.5),
                                 size: 15,
                               ),
-                              // child: index == selectedSexIndex
-                              //     ? Icon(
-                              //         Icons.(_futureSexModel[index]['icon']),
-                              //         // Icons.check_circle,
-                              //         color: Color(0xFFDF0B24),
-                              //         size: 15,
-                              //       )
-                              //     : SizedBox(
-                              //         height: 0,
-                              //       ),
                             ),
                             Text(
                               _futureSexModel[index]['title'],
                               style: TextStyle(
                                 color: index == selectedSexIndex
-                                    ? Color(0xFFDF0B24)
+                                    ? Color(0xFF09665a)
                                     : Color(0xFF000000).withOpacity(0.5),
                                 fontSize: 13.0,
                                 fontWeight: index == selectedSexIndex
@@ -413,91 +435,17 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                   },
                 ),
               ),
-
               SizedBox(height: 25),
-              Text(
-                'การเข้าใช้',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              TextRegisterWidget(
-                controller: txtEmail,
-                title: 'อีเมล',
-                decoration: DecorationRegister.register(
-                  context,
-                  hintText: 'กรุณากรอกอีเมล',
-                ),
-                validator: (value) => ValidateRegister.email(value),
-              ),
-              TextRegisterWidget(
-                controller: txtPassword,
-                title: 'รหัสผ่าน',
-                subTitle:
-                    'รหัสผ่านต้องเป็นตัวอักษร a-z, A-Z และ 0-9 ความยาวขั้นต่ำ 8 ตัวอักษร',
-                decoration: DecorationRegister.password(
-                  context,
-                  hintText: 'กรุณากรอกรหัสผ่าน',
-                  suffixTap: () => setState(() {
-                    showPassword = !showPassword;
-                  }),
-                  visibility: showPassword,
-                ),
-                obscureText: showPassword,
-                inputFormatters: InputFormatTemple.password(),
-                validator: (value) => ValidateRegister.password(value),
-              ),
-              TextRegisterWidget(
-                controller: txtConPassword,
-                title: 'ยืนยันรหัสผ่าน',
-                subTitle:
-                    'รหัสผ่านต้องเป็นตัวอักษร a-z, A-Z และ 0-9 ความยาวขั้นต่ำ 8 ตัวอักษร',
-                decoration: DecorationRegister.password(
-                  context,
-                  hintText: 'กรุณายืนยันรหัสผ่าน',
-                  suffixTap: () => setState(() {
-                    showConfirmPassword = !showConfirmPassword;
-                  }),
-                  visibility: showConfirmPassword,
-                ),
-                obscureText: showConfirmPassword,
-                inputFormatters: InputFormatTemple.password(),
-                validator: (value) =>
-                    ValidateRegister.confirmPassword(value, txtPassword.text),
-              ),
-              SizedBox(height: 25),
-              // Text(
-              //   'สังกัด',
-              //   style: TextStyle(
-              //     fontSize: 15,
-              //     fontWeight: FontWeight.w500,
-              //   ),
-              // ),
-              // SizedBox(height: 5),
-              // Row(
-              //   children: [
-              //     _buildCategory('สมาชิก ศึกษาภัณฑ์ มอลล์'),
-              //     SizedBox(width: 10),
-              //     _buildCategory('บุคคลทั่วไป'),
-              //   ],
-              // ),
-              // SizedBox(height: 25),
               GestureDetector(
                 onTap: () {
-                  // final form = _formKey.currentState;
-                  // if (form!.validate()) {
-                  //   submitRegister();
-                  // }
-
                   _buildDialogSuccess();
                 },
                 child: Container(
                   height: 50,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Color(0xFFDF0B24),
-                    borderRadius: BorderRadius.circular(25),
+                    color: Color(0xFF09665a),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Text(
                     'สมัครสมาชิก',
@@ -515,7 +463,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
       ),
     );
   }
-
 
 //   submitRegister() async {
 //     final result = await postRegister(server + 'register', {
@@ -569,7 +516,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 //                       style: TextStyle(
 //                         fontSize: 13,
 //                         fontFamily: 'Kanit',
-//                         color: Color(0xFFFF7514),
+//                         color: Color(0xFF09665a),
 //                         fontWeight: FontWeight.normal,
 //                       ),
 //                     ),
@@ -591,7 +538,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 //                       style: TextStyle(
 //                         fontSize: 13,
 //                         fontFamily: 'Kanit',
-//                         color: Color(0xFFFF7514),
+//                         color: Color(0xFF09665a),
 //                         fontWeight: FontWeight.normal,
 //                       ),
 //                     ),
@@ -622,7 +569,6 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 //               child: CupertinoAlertDialog(
 //                 title: new Text(
 //                   result['message'],
-
 //                   style: TextStyle(
 //                     fontSize: 16,
 //                     fontFamily: 'Kanit',
@@ -639,7 +585,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
 //                       style: TextStyle(
 //                         fontSize: 13,
 //                         fontFamily: 'Kanit',
-//                         color: Color(0xFFFF7514),
+//                         color: Color(0xFF09665a),
 //                         fontWeight: FontWeight.normal,
 //                       ),
 //                     ),
@@ -691,7 +637,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                   style: TextStyle(
                     fontSize: 13,
                     fontFamily: 'Kanit',
-                    color: Color(0xFFFF7514),
+                    color: Color(0xFF09665a),
                     fontWeight: FontWeight.normal,
                   ),
                 ),
@@ -711,7 +657,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                   style: TextStyle(
                     fontSize: 13,
                     fontFamily: 'Kanit',
-                    color: Color(0xFFFF7514),
+                    color: Color(0xFF09665a),
                     fontWeight: FontWeight.normal,
                   ),
                 ),
