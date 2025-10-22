@@ -537,7 +537,7 @@ class _UserInformationCentralPageState
                       child: Container(
                         height: 60,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: Theme.of(context).primaryColor,
                           ),
@@ -546,12 +546,12 @@ class _UserInformationCentralPageState
                           children: [
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 8),
+                                  horizontal: 12, vertical: 12),
                               child: Image.asset(
                                 'assets/logo/pay.png',
                                 color: Theme.of(context).primaryColor,
-                                width: 40,
-                                height: 40,
+                                width: 35,
+                                height: 35,
                               ),
                             ),
                             Expanded(
@@ -591,8 +591,11 @@ class _UserInformationCentralPageState
                       ),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(
+                    width: 8,
+                  ),
                   Expanded(
+                    flex: 1,
                     child: GestureDetector(
                       onTap: () {
                         print('.........loans clicked');
@@ -608,13 +611,14 @@ class _UserInformationCentralPageState
                           color: Colors.white,
                           border:
                               Border.all(color: Theme.of(context).primaryColor),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.only(
+                                left: 12,
+                              ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -627,7 +631,6 @@ class _UserInformationCentralPageState
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  SizedBox(height: 2),
                                   Text(
                                     'อนุมัติทันที',
                                     style: TextStyle(
@@ -638,13 +641,10 @@ class _UserInformationCentralPageState
                                 ],
                               ),
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(right: 0),
-                              child: Icon(
-                                Icons.arrow_forward_ios,
-                                color: Theme.of(context).primaryColor,
-                                size: 16,
-                              ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Theme.of(context).primaryColor,
+                              size: 16,
                             ),
                           ],
                         ),
@@ -653,7 +653,6 @@ class _UserInformationCentralPageState
                   ),
                 ],
               ),
-
               _rowTitle(Icons.assignment_outlined, 'รายการสั่งซื้อของฉัน',
                   callback: () => {}),
               _orderList(),

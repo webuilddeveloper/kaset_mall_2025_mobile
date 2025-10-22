@@ -183,6 +183,7 @@ class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
           ],
           elevation: 0,
           backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
           toolbarHeight: 50,
           flexibleSpace: Container(

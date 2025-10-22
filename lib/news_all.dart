@@ -210,6 +210,7 @@ class _NewsAllPageState extends State<NewsAllPage> {
           ],
           elevation: 0,
           backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
           toolbarHeight: 50,
           flexibleSpace: Container(

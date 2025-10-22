@@ -38,6 +38,7 @@ class _NotificationCentralPage extends State<NotificationCentralPage> {
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
           toolbarHeight: AdaptiveTextSize().getadaptiveTextSize(context, 50),
           flexibleSpace: Container(

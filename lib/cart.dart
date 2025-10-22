@@ -214,6 +214,7 @@ class _CartCentralPageState extends State<CartCentralPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         toolbarHeight: AdaptiveTextSize().getadaptiveTextSize(context, 50),
         flexibleSpace: Container(
@@ -943,6 +944,4 @@ class _CartCentralPageState extends State<CartCentralPage> {
           );
         });
   }
-
- 
 }
