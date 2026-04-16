@@ -23,7 +23,7 @@ FirebaseOptions firebaseOption = FirebaseOptions(
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // ตรวจสอบว่า Firebase ถูก initialize หรือยัง
-  // await Firebase.initializeApp(options: firebaseOption);
+  // await Firebase.initializeApp(options: firebaseOption);clea
 
   print('Handling a background message: ${message.messageId}');
   NotificationService.showNotification(message);

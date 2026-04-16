@@ -15,7 +15,7 @@ import 'dart:io';
 
 const appName = 'SUKSAPAN Mall';
 const versionName = '0.0.1';
-const versionNumber = 001;
+const versionNumber = 12;
 
 // flutter build apk --build-name=1.0.0 --build-number=1
 // flutter build appbundle
