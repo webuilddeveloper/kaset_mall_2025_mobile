@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -12,9 +13,6 @@ import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/event_calendar_form.dart';
 import 'package:kasetmall/event_calendar_main.dart';
-import 'package:kasetmall/kasetpay/loan/agricultureLoan.dart'
-    show AgricultureLoanPage;
-import 'package:kasetmall/kasetpay/pay/kaset_pay.dart';
 import 'package:kasetmall/news_all.dart';
 import 'package:kasetmall/news_form.dart';
 import 'package:kasetmall/privilege_all.dart';
@@ -24,7 +22,6 @@ import 'package:kasetmall/product_from.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/notification_service.dart';
 
-import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 // ignore: must_be_immutable
@@ -264,153 +261,61 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
+      // extendBody: true,
       backgroundColor: Colors.white,
+
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        toolbarHeight: (MediaQuery.of(context).size.height /
-                MediaQuery.of(context).size.width) +
-            AdaptiveTextSize().getadaptiveTextSize(context, 60),
-        flexibleSpace: Container(
-          color: Colors.white,
-          child: Container(
-            margin:
-                EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10),
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Stack(
+        titleSpacing: 0,
+        title: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Lottie.asset('assets/lotties/bee.json'),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () async {
-                        // Check if user has previously logged in
-                        // final prefs = await SharedPreferences.getInstance();
-                        // final String? savedCardId =
-                        //     prefs.getString('saved_card_id');
-
-                        // if (savedCardId != null && savedCardId.isNotEmpty) {
-                        // User has logged in before, navigate directly to PurchaseMenuPage
-                        // Navigator.pushReplacement(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => PurchaseMenuPage(
-                        //       cardid: savedCardId,
-                        //     ),
-                        //   ),
-                        // );
-                        // }
-                        // else {
-                        // First time login, go to verification screen
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => IDVerificationScreen(),
-                        //   ),
-                        // );
-                        // }
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'สวัสดีตอนเช้า',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF000000),
-                            ),
-                            textScaleFactor: ScaleSize.textScaleFactor(context),
-                          ),
-                          Text(
-                            'คุณสมศักดิ์ เกษตร',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF000000),
-                            ),
-                            textScaleFactor: ScaleSize.textScaleFactor(context),
-                          ),
-                        ],
-                      ),
+                Container(
+                  height: 42,
+                  width: 42,
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    'assets/images/kaset/logo_kaset.png',
+                    width: 45,
+                    height: 45,
+                    // color: const Color(0xFF2E7D32),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    'เกษตร Mall',
+                    style: TextStyle(
+                      color: Color(0xFF1B5E20),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                     ),
-                    SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: () {
-                        // if (profileCode == '') {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (BuildContext context) => LoginCentralPage(),
-                        //     ),
-                        //   );
-                        // } else if (verifyPhonePage == 'false') {
-                        //   _showVerifyCheckDialog();
-                        // } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CartCentralPage(),
-                          ),
-                        ).then((value) => _getCountItemInCart());
-                        // }
-                      },
-                      child: Stack(
-                        children: [
-                          Container(
-                            height: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 35),
-                            width: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 35),
-                            padding: EdgeInsets.all(8),
-                            child: Image.asset(
-                              'assets/images/kaset/basket.png',
-                              color: Color(0xFF000000),
-                              scale: AdaptiveTextSize()
-                                  .getadaptiveTextSize(context, 1),
-                            ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              height: AdaptiveTextSize()
-                                  .getadaptiveTextSize(context, 15),
-                              width: AdaptiveTextSize()
-                                  .getadaptiveTextSize(context, 15),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFFe4253f),
-                              ),
-                              child: Text(
-                                amountItemInCart > 99
-                                    ? '99+'
-                                    : amountItemInCart.toString(),
-                                style: TextStyle(
-                                  fontFamily: 'Kanit',
-                                  fontSize: amountItemInCart
-                                              .toString()
-                                              .length <=
-                                          1
-                                      ? 10
-                                      : amountItemInCart.toString().length == 2
-                                          ? 9
-                                          : 8,
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                ),
-                                textScaleFactor:
-                                    ScaleSize.textScaleFactor(context),
-                              ),
-                            ),
-                          ),
-                        ],
+                    textScaleFactor: ScaleSize.textScaleFactor(context),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                _buildAppBarAction(
+                  icon: Icons.shopping_cart_outlined,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CartCentralPage(),
                       ),
-                    ),
-                  ],
+                    ).then((value) => _getCountItemInCart());
+                  },
+                  badge: amountItemInCart > 0
+                      ? amountItemInCart > 99
+                          ? '99+'
+                          : amountItemInCart.toString()
+                      : null,
                 ),
               ],
             ),
@@ -463,161 +368,20 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                 shrinkWrap: true,
                 physics: ClampingScrollPhysics(),
                 children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              print('.........Kaset Pay clicked');
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => KasetPayPage(),
-                                  ));
-                            },
-                            child: Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 12),
-                                    child: Image.asset(
-                                      'assets/logo/pay.png',
-                                      color: Theme.of(context).primaryColor,
-                                      width: 35,
-                                      height: 35,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Kaset Pay',
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        SizedBox(height: 2),
-                                        Text(
-                                          '฿15,000',
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 8),
-                                    child: Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Theme.of(context).primaryColor,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () {
-                              print('.........loans clicked');
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AgricultureLoanPage(),
-                                  ));
-                            },
-                            child: Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Theme.of(context).primaryColor),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 12,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'สินเชื่อเพื่อการเกษตร ',
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        Text(
-                                          'อนุมัติทันที',
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Theme.of(context).primaryColor,
-                                    size: 16,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 15),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(20),
                       child: CarouselBanner(
                         model: _futureBanner,
                         url: 'main/',
-                        height: MediaQuery.of(context).size.height * 0.25,
+                        height: MediaQuery.of(context).size.height * 0.145,
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 8),
+
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
@@ -625,26 +389,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       showAll: false,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 2),
                   _buildCategory(),
-                  GestureDetector(
-                    onTap: () {},
-                    child: _buildTitle(
-                      code: 'news',
-                      title: 'ข่าวสารประชาสัมพันธ์',
-                      showAll: true,
-                    ),
-                  ),
-                  _buildNew(),
-                  GestureDetector(
-                    onTap: () {},
-                    child: _buildTitle(
-                      code: 'event',
-                      title: 'ปฏิทินกิจกรรมที่น่าสนใจ',
-                      showAll: true,
-                    ),
-                  ),
-                  _buildEvent(),
+                  const SizedBox(height: 6),
+                  _buildCouponRow(),
+                  const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {},
                     child: _buildTitle(
@@ -654,17 +403,70 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     ),
                   ),
                   _buildForYou(),
-                  _buildTitle(
-                    code: 'product',
-                    title: 'สินค้า',
-                    showAll: true,
-                  ),
-                  SizedBox(height: 5),
-                  _buildTrending(),
+                  const SizedBox(height: 8),
+                  _buildBestSellerSection(),
+                  // _buildTitle(
+                  //   code: 'product',
+                  //   title: 'สินค้า',
+                  //   showAll: true,
+                  // ),
+                  // SizedBox(height: 5),
+                  // _buildTrending(),
+                  const SizedBox(height: 60),
                 ],
               ),
             ),
           )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBarAction({
+    required IconData icon,
+    required VoidCallback onTap,
+    String? badge,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: 42,
+            width: 42,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEEF7EE),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE1EBE0)),
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFF2E7D32),
+              size: 22,
+            ),
+          ),
+          if (badge != null)
+            Positioned(
+              right: -4,
+              top: -4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8992B),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                child: Text(
+                  badge,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -803,16 +605,21 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
 
         final categories = snapshot.data as List<dynamic>;
 
-        return Container(
-          height: 100,
-          width: double.infinity,
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 16,
-            runSpacing: 12,
-            children: List.generate(categories.length, (i) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: GridView.builder(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: categories.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              mainAxisExtent: 100,
+            ),
+            itemBuilder: (context, i) {
               final item = categories[i];
-
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -821,47 +628,84 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       builder: (_) => ProductAllCentralPage(
                         title: 'สินค้า',
                         mode: true,
-                        typeelect: item['id'], // ส่งค่า id ของหมวดหมู่ที่เลือก
+                        typeelect: item['id'],
                       ),
                     ),
                   );
                 },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircleAvatar(
-                      radius: 35,
-                      backgroundColor: const Color(0xFF09665a),
-                      child: item['img'] == null
-                          ? Image.asset("assets/images/kaset/no-img.png")
-                          : Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Image.asset(
-                                item['img'],
-                                color: Colors.white,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFFE5EEE4)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF143D16).withOpacity(0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 4),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: Container(
+                                height: 65,
+                                width: 65,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF7EE),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                alignment: Alignment.center,
+                                child: item['img'] == null
+                                    ? Image.asset(
+                                        "assets/images/kaset/no-img.png",
+                                        width: 55,
+                                        height: 55,
+                                      )
+                                    : Image.asset(
+                                        item['img'],
+                                        width: 55,
+                                        height: 55,
+                                      ),
                               ),
                             ),
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: 75,
-                      child: Text(
-                        item['name'],
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                            const Spacer(),
+                            Text(
+                              item['name'] ?? '',
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1C1C1A),
+                                height: 1.08,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
-            }),
+            },
           ),
         );
       },
     );
   }
 
+  // ignore: unused_element
   _buildNew() {
     return Container(
       color: Colors.white,
@@ -962,6 +806,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     );
   }
 
+  // ignore: unused_element
   _buildEvent() {
     return Container(
       color: Colors.white,
@@ -1067,14 +912,10 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   _buildForYou() {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.only(
-        top: 10,
-        bottom: 10,
-      ),
       child: Column(
         children: [
           SizedBox(
-            height: 215,
+            height: 220,
             child: FutureBuilder<dynamic>(
               future: _futureModelForYou,
               builder: (context, snapshot) {
@@ -1084,7 +925,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                     scrollDirection: Axis.horizontal,
                     itemCount:
                         snapshot.data.length > 10 ? 10 : snapshot.data.length,
-                    separatorBuilder: (_, __) => SizedBox(width: 14),
+                    separatorBuilder: (_, __) => SizedBox(width: 12),
                     itemBuilder: (context, index) => GestureDetector(
                       onTap: () {
                         // Foryou
@@ -1099,56 +940,97 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                       child: Stack(
                         children: [
                           Container(
-                            width: 145,
+                            width: 152,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: const Color(0xFFE1EBE0),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color(0xFF143D16).withOpacity(0.04),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  height: 145,
-                                  width: 145,
+                                  height: 116,
+                                  width: 152,
                                   decoration: BoxDecoration(
+                                    color: const Color(0xFFF3F7F3),
                                     borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(16),
-                                        topRight: Radius.circular(16)),
+                                      topLeft: Radius.circular(18),
+                                      topRight: Radius.circular(18),
+                                    ),
                                   ),
                                   child: snapshot
                                               .data[index]['imageUrl'].length >
                                           0
                                       ? ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(18),
+                                          ),
                                           child: loadingImageNetwork(
                                             snapshot.data[index]['imageUrl'],
-                                            // snapshot.data[index]['media']
-                                            //     ['data'][0]['thumbnail'],
-                                            fit: BoxFit.contain,
+                                            fit: BoxFit.cover,
                                           ),
                                         )
                                       : Container(
                                           decoration: BoxDecoration(
-                                            // color: Color(0xFF09665a),
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                           ),
                                           child: Image.asset(
                                             'assets/images/kaset/no-img.png',
-                                            fit: BoxFit.contain,
-                                            // color: Colors.white,
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  snapshot.data[index]['title'] ?? '',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(12, 8, 12, 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFBE7C9),
+                                          borderRadius:
+                                              BorderRadius.circular(999),
+                                        ),
+                                        child: Text(
+                                          'สิทธิประโยชน์',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFFC77A1F),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        snapshot.data[index]['title'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF1C1C1A),
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
@@ -1168,9 +1050,286 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     );
   }
 
+  Widget _buildCouponRow() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: GestureDetector(
+        onTap: () {},
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xFFFBFDFB), Color(0xFFF2F8F2)],
+            ),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFE1EBE0)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF143D16).withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                height: 48,
+                width: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFBE7C9),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.local_offer_rounded,
+                  color: Color(0xFFC77A1F),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'คูปองลด 15% วันนี้',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1C1C1A),
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'กดรับไว้ก่อน ใช้ได้กับสินค้าที่ร่วมรายการ',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: Color(0xFF6E6C61),
+                        height: 1.15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Color(0xFFC77A1F),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Text(
+                  'กดรับ',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBestSellerSection() {
+    final items = _futureProductHot.isNotEmpty
+        ? _futureProductHot.take(6).toList()
+        : mockProductList.take(6).toList();
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.only(top: 4, bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'สินค้าขายดี',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1C1C1A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: GridView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: items.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                mainAxisExtent: 175,
+              ),
+              itemBuilder: (context, index) {
+                return _buildMiniProductCard(items[index]);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniProductCard(dynamic product) {
+    final image = (product['image'] ?? '').toString();
+    final hasImage = image.isNotEmpty;
+    final price = product['price'];
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductFormCentralPage(model: product),
+          ),
+        ).then((_) => _getCountItemInCart());
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0xFFE1EBE0)),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF143D16).withOpacity(0.05),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18),
+              ),
+              child: SizedBox(
+                height: 104,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (hasImage)
+                      loadingImageNetwork(image, fit: BoxFit.cover)
+                    else
+                      Image.asset(
+                        'assets/images/kaset/no-img.png',
+                        fit: BoxFit.cover,
+                      ),
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                      child: Container(
+                        color: Colors.white.withOpacity(0.14),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          color: Colors.white.withOpacity(0.08),
+                          child: Center(
+                            child: hasImage
+                                ? loadingImageNetwork(image,
+                                    fit: BoxFit.contain)
+                                : Image.asset(
+                                    'assets/images/kaset/no-img.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 10,
+                      top: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8992B),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text(
+                          'ขายดี',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product['name'] ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1C1C1A),
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '฿${price ?? '-'}',
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF2E7D32),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   late bool isBestSeller;
   String _filterSelected = '0';
 
+  // ignore: unused_element
   _buildTrending() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -1567,17 +1726,25 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   // }
 
   final List<Map<String, dynamic>> mockCategories = [
-    {'id': '1', 'name': 'พรรณพืช', 'img': "assets/images/kaset/pngegg.png"},
-    {'id': '2', 'name': 'เครื่องมือ', 'img': "assets/images/kaset/tractor.png"},
+    {
+      'id': '1',
+      'name': 'พรรณพืช',
+      'img': "assets/images/kaset/category_basket.png"
+    },
+    {
+      'id': '2',
+      'name': 'เครื่องมือ',
+      'img': "assets/images/kaset/category_tools.png"
+    },
     {
       'id': '3',
       'name': 'อาหารสัตว์',
-      'img': "assets/images/kaset/pet-bowl.png"
+      'img': "assets/images/kaset/category_feed.png"
     },
     {
       'id': '4',
       'name': 'เคมีภัณฑ์',
-      'img': "assets/images/kaset/fertilizer.png"
+      'img': "assets/images/kaset/category_fertilizer.png"
     },
   ];
   final List<Map<String, dynamic>> mockProductList = [
@@ -1862,16 +2029,16 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_250621859.png',
       'stock': 10,
     },
-    // {
-    //   'id': 27,
-    //   'name': 'เครื่องเก็บเกี่ยวข้าว Combine Harvester',
-    //   'type': '2',
-    //   'price': 950000.0,
-    //   'description':
-    //       'เครื่องเก็บเกี่ยวข้าวอัตโนมัติ ทำงานได้รวดเร็ว ลดแรงงาน ประหยัดเวลา เหมาะกับไร่นาขนาดใหญ่',
-    //   'image': 'https://www.agriculture.com/images/harvester.png',
-    //   'stock': 2,
-    // },
+    {
+      'id': 27,
+      'name': 'เครื่องเก็บเกี่ยวข้าว Combine Harvester',
+      'type': '2',
+      'price': 950000.0,
+      'description':
+          'เครื่องเก็บเกี่ยวข้าวอัตโนมัติ ทำงานได้รวดเร็ว ลดแรงงาน ประหยัดเวลา เหมาะกับไร่นาขนาดใหญ่',
+      'image': 'https://www.agriculture.com/images/harvester.png',
+      'stock': 2,
+    },
     {
       'id': 28,
       'name': 'ระบบน้ำหยดอัตโนมัติ Smart Drip',
@@ -2014,5 +2181,4 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       'stock': 2,
     },
   ];
-
 }

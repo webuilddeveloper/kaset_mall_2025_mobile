@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:ui';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:kasetmall/component/carousel_form.dart';
@@ -194,15 +195,35 @@ class _CarouselBanner extends State<CarouselBanner>
                       },
                     ),
                     items: snapshot.data.map<Widget>((document) {
-                      return Container(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: loadingImageNetwork(
-                            document['imageUrl'],
-                            fit: BoxFit.fitWidth,
-                            height: double.infinity,
-                            width: double.infinity,
-                          ),
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            loadingImageNetwork(
+                              document['imageUrl'],
+                              fit: BoxFit.cover,
+                              height: double.infinity,
+                              width: double.infinity,
+                            ),
+                            BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+                              child: Container(
+                                color: Colors.white.withValues(alpha: 0.28),
+                              ),
+                            ),
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: loadingImageNetwork(
+                                  document['imageUrl'],
+                                  fit: BoxFit.contain,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     }).toList(),

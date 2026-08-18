@@ -1,27 +1,23 @@
 // ignore_for_file: unnecessary_null_comparison, deprecated_member_use
 
-import 'dart:convert';
-import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:intl/intl.dart';
-import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/home.dart';
-import 'package:kasetmall/main_popup/dialog_main_popup.dart';
 import 'package:kasetmall/notification/notification.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/user_information.dart';
+
 import 'cart.dart';
 
 class MenuCentralPage extends StatefulWidget {
   const MenuCentralPage({
-    Key? key,
+    super.key,
     this.pageIndex = 0,
     this.commercialOrganization = '0',
-  }) : super(key: key);
+  });
+
   final int pageIndex;
   final String commercialOrganization;
 
@@ -30,105 +26,80 @@ class MenuCentralPage extends StatefulWidget {
 }
 
 class _MenuCentralPageState extends State<MenuCentralPage> {
-  final storage = new FlutterSecureStorage();
-  late Future<dynamic> _futureMainPopUp;
+  final storage = const FlutterSecureStorage();
   int _currentPage = 0;
-  late TextEditingController searchController;
   List<Widget> _widgetOptions = <Widget>[];
   dynamic profile = {'firstName': '', 'lastName': '', 'imageUrl': ''};
-  String? profileCode = '';
-  late PageController pageController;
-  var home;
-  bool hiddenMainPopUp = false;
   late DateTime currentBackPressTime;
   int notiCount = 3;
 
   @override
   void initState() {
-    // _callReadPolicy();
-    onSetPage();
-    home = HomeCentralPage(changePage: _changePage);
-
-    _futureMainPopUp = postDio('${mainPopupHomeApi}read', {'limit': 10});
-    _getProfile();
-    searchController = TextEditingController(text: '');
+    super.initState();
+    _currentPage = widget.pageIndex.clamp(0, 3);
     _widgetOptions = <Widget>[
-      home,
+      HomeCentralPage(changePage: _changePage),
       CartCentralPage(changePage: _changePage),
-      NotificationCentralPage(),
+      const NotificationCentralPage(),
       UserInformationCentralPage(),
     ];
-    pageController = new PageController(
-      initialPage: _currentPage,
-    );
-    _buildMainPopUp();
+    _getProfile();
     _setupInteractedMessage();
-    super.initState();
   }
 
   Future<void> _setupInteractedMessage() async {
-    // กรณีที่ 1: แอปถูกปิด (Terminated) และเปิดขึ้นมาจากการกด Notification
-    // getInitialMessage จะคืนค่า RemoteMessage ที่ทำให้แอปเปิดขึ้นมา
-    RemoteMessage? initialMessage =
+    final RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     }
 
-    // กรณีที่ 2: แอปอยู่เบื้องหลัง (Background) และเปิดขึ้นมาจากการกด Notification
-    // onMessageOpenedApp เป็น Stream ที่จะส่ง RemoteMessage มาเมื่อเกิด event
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
-  /// ฟังก์ชันจัดการข้อมูลจาก RemoteMessage และสั่งให้ Navigator วิ่งไปหน้าอื่น
   void _handleMessage(RemoteMessage message) {
-    // ตรวจสอบข้อมูลจาก 'data' payload
     if (message.data['screen'] == 'NotificationCentralPage') {
-      // ดึงค่า product_id ออกมา (ถ้ามี)
-      // final productId = message.data['product_id'];
-
-      // ใช้ Navigator วิ่งไปยังหน้าที่ต้องการ
-      _onItemTapped(1);
+      _onItemTapped(2);
     }
   }
 
   void _changePage(int index) {
-    setState(() {
-      _currentPage = index;
-      pageController.jumpToPage(index);
-    });
+    _onItemTapped(index);
   }
 
-  onSetPage() {
+  void _onItemTapped(int index) {
     setState(() {
-      _currentPage = widget.pageIndex != null ? widget.pageIndex : 0;
+      _currentPage = index;
     });
   }
 
   _getProfile() async {
-    profileCode = (await storage.read(key: 'profileCode10'));
-    String? imageUrl = await storage.read(key: 'profileImageUrl');
-    String? firstName = await storage.read(key: 'profileFirstName');
-    String? lastName = await storage.read(key: 'profileLastName');
+    final imageUrl = await storage.read(key: 'profileImageUrl');
+    final firstName = await storage.read(key: 'profileFirstName');
+    final lastName = await storage.read(key: 'profileLastName');
+
     setState(() {
       profile = {
         'firstName': firstName,
         'lastName': lastName,
-        'imageUrl': imageUrl
+        'imageUrl': imageUrl,
       };
-      profileCode = profileCode;
     });
+
     await _insertToken();
   }
 
   _insertToken() async {
-    FirebaseMessaging.instance.getToken().then(
-      (token) {
-        postDio(server_we_build + 'notificationV2/m/insertTokenDevice',
-            {"token": token, "profileCode": profileCode});
-      },
-    );
+    final token = await FirebaseMessaging.instance.getToken();
+    final profileCode = await storage.read(key: 'profileCode10');
+
+    if (token != null) {
+      postDio(
+        server_we_build + 'notificationV2/m/insertTokenDevice',
+        {"token": token, "profileCode": profileCode},
+      );
+    }
   }
 
   @override
@@ -136,67 +107,92 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     return WillPopScope(
       onWillPop: confirmExit,
       child: Scaffold(
-        extendBody: true,
-        body: PageView(
-          controller: pageController,
-          physics: NeverScrollableScrollPhysics(),
-          children: _widgetOptions,
-        ),
-        bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 2,
-                ),
-              ],
+        // extendBody: true,
+        backgroundColor: const Color(0xFFF7FAF7),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Container(color: Colors.white),
             ),
-            height: AdaptiveTextSize().getadaptiveTextSize(
-                context, 35 + MediaQuery.of(context).padding.top),
-            width: double.infinity,
-            child: Stack(
-              children: [
-                ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 0.5, sigmaY: 0.5),
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 0),
+                child: IndexedStack(
+                  index: _currentPage,
+                  children: _widgetOptions,
+                ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 20,
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.94),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: const Color(0xFFE6ECE8)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 20,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buttonBottomBar(
-                            'assets/images/kaset/home-menu.png', '', 0),
-                        _buttonBottomBar(
-                            'assets/images/kaset/basket.png', '', 1),
-                        _buttonBottomBar(
-                            'assets/images/kaset/notification.png', '', 2,
-                            isNoti: true, notiCount: notiCount),
-                        _buttonBottomBar(
-                            (profile['imageUrl'] ?? "") == ''
-                                ? 'assets/images/kaset/user.png'
-                                : profile['imageUrl'],
-                            '',
-                            5,
-                            network: (profile['imageUrl'] ?? "") == ''
-                                ? false
-                                : true),
+                        _NavItem(
+                          label: 'หน้าแรก',
+                          icon: Icons.home_outlined,
+                          activeIcon: Icons.home,
+                          active: _currentPage == 0,
+                          onTap: () => _onItemTapped(0),
+                        ),
+                        _NavItem(
+                          label: 'ตะกร้า',
+                          icon: Icons.shopping_cart_outlined,
+                          activeIcon: Icons.shopping_cart,
+                          active: _currentPage == 1,
+                          onTap: () => _onItemTapped(1),
+                        ),
+                        _NavItem(
+                          label: 'แจ้งเตือน',
+                          icon: Icons.notifications_none_outlined,
+                          activeIcon: Icons.notifications,
+                          active: _currentPage == 2,
+                          onTap: () => _onItemTapped(2),
+                          badgeCount: notiCount,
+                        ),
+                        _NavItem(
+                          label: 'โปรไฟล์',
+                          icon: Icons.person_outline,
+                          activeIcon: Icons.person,
+                          active: _currentPage == 3,
+                          onTap: () => _onItemTapped(3),
+                          networkImage: (profile['imageUrl'] ?? '').toString(),
+                        ),
                       ],
                     ),
                   ),
-                ),
-              ],
-            )),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Future<bool> confirmExit() {
-    DateTime now = DateTime.now();
+    final now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       toastFail(
         context,
@@ -208,341 +204,92 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     }
     return Future.value(true);
   }
-
-  // _buttonBottomBar(String image, String title, int index,
-  //     {bool network = false, bool isNoti = false, int notiCount = 0}) {
-  //   bool hasSelected = _currentPage == index;
-  //   return
-  //       // Expanded(
-  //       //   flex: 1,
-  //       //   child:
-  //       InkWell(
-  //     onTap: () => _onItemTapped(index),
-  //     child: Padding(
-  //       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-  //       // padding: EdgeInsets.symmetric(vertical: 25),
-  //       child: Container(
-  //         child: Column(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             Stack(
-  //               children: [
-  //                 if (network)
-  //                   ClipRRect(
-  //                     borderRadius: BorderRadius.circular(40),
-  //                     child: loadingImageNetwork(
-  //                       image,
-  //                       height:
-  //                           AdaptiveTextSize().getadaptiveTextSize(context, 20),
-  //                       width:
-  //                           AdaptiveTextSize().getadaptiveTextSize(context, 20),
-  //                     ),
-  //                   ),
-  //                 if (!network)
-  //                   Image.asset(
-  //                     image,
-  //                     height:
-  //                         AdaptiveTextSize().getadaptiveTextSize(context, 30),
-  //                     width:
-  //                         AdaptiveTextSize().getadaptiveTextSize(context, 30),
-  //                     color:
-  //                         hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
-  //                   ),
-  //                 isNoti && notiCount > 0 ? Positioned(
-  //                   top: 0,
-  //                   right: 0,
-  //                   child: AnimatedContainer(
-  //                     duration: const Duration(milliseconds: 300),
-  //                     decoration: BoxDecoration(
-  //                       shape: BoxShape.circle,
-  //                       color: Color(0xFFa7141c),
-  //                     ),
-  //                     width: 16.0,
-  //                     height: 16.0,
-  //                     child: Center(
-  //                       child: Text(
-  //                         '${notiCount}',
-  //                         style: TextStyle().copyWith(
-  //                           color: Colors.white,
-  //                           fontSize: 10.0,
-  //                           fontFamily: 'Sarabun',
-  //                           fontWeight: FontWeight.normal,
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ) : Container()
-  //               ],
-  //             ),
-  //             Text(
-  //               title,
-  //               style: TextStyle(
-  //                 fontSize: 11,
-  //                 color: hasSelected ? Color(0xFF09665a) : Color(0xFFA89F9D),
-  //                 fontWeight: hasSelected ? FontWeight.bold : FontWeight.normal,
-  //               ),
-  //               textScaleFactor: ScaleSize.textScaleFactor(context),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   // );
-  // }
-
-  _buttonBottomBar(
-    String image,
-    String title,
-    int index, {
-    bool network = false,
-    bool isNoti = false,
-    int notiCount = 0,
-  }) {
-    bool hasSelected = _currentPage == index;
-    return _ShakeButton(
-      image: image,
-      title: title,
-      index: index,
-      network: network,
-      isNoti: isNoti,
-      notiCount: notiCount,
-      hasSelected: hasSelected,
-      onTap: () => _onItemTapped(index),
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      pageController.jumpToPage(index);
-      if (index == 0 && _currentPage == 0) {
-        _getProfile();
-        _buildMainPopUp();
-        home.getState().onRefresh();
-      }
-      _currentPage = index;
-    });
-  }
-
-  _buildMainPopUp() async {
-    var result = await postDio('${mainPopupHomeApi}read', {'limit': 100});
-
-    if (result.length > 0) {
-      var valueStorage = await storage.read(key: 'mainPopupDDPM');
-      var dataValue;
-      if (valueStorage != null) {
-        dataValue = json.decode(valueStorage);
-      } else {
-        dataValue = null;
-      }
-
-      var now = new DateTime.now();
-      DateTime date = new DateTime(now.year, now.month, now.day);
-
-      if (dataValue != null) {
-        var index = dataValue.indexWhere(
-          (c) =>
-              // c['username'] == userData.username &&
-              c['date'].toString() ==
-                  DateFormat("ddMMyyyy").format(date).toString() &&
-              c['boolean'] == "true",
-        );
-
-        if (index == -1) {
-          setState(() {
-            hiddenMainPopUp = false;
-          });
-          return showDialog(
-            barrierDismissible: false, // close outside
-            context: context,
-            builder: (_) {
-              return WillPopScope(
-                onWillPop: () {
-                  return Future.value(false);
-                },
-                child: MainPopupDialog(
-                  model: _futureMainPopUp,
-                  type: 'mainPopup',
-                ),
-              );
-            },
-          );
-        } else {
-          setState(() {
-            hiddenMainPopUp = true;
-          });
-        }
-      } else {
-        setState(() {
-          hiddenMainPopUp = false;
-        });
-        return showDialog(
-          barrierDismissible: false, // close outside
-          context: context,
-          builder: (_) {
-            return WillPopScope(
-              onWillPop: () {
-                return Future.value(false);
-              },
-              child: MainPopupDialog(
-                model: _futureMainPopUp,
-                type: 'mainPopup',
-              ),
-            );
-          },
-        );
-      }
-    }
-  }
 }
 
-class _ShakeButton extends StatefulWidget {
-  final String image;
-  final String title;
-  final int index;
-  final bool network;
-  final bool isNoti;
-  final int notiCount;
-  final bool hasSelected;
-  final VoidCallback onTap;
-
-  const _ShakeButton({
-    Key? key,
-    required this.image,
-    required this.title,
-    required this.index,
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.label,
+    required this.icon,
+    required this.activeIcon,
+    required this.active,
     required this.onTap,
-    this.network = false,
-    this.isNoti = false,
-    this.notiCount = 0,
-    this.hasSelected = false,
-  }) : super(key: key);
+    this.badgeCount = 0,
+    this.networkImage = '',
+  });
 
-  @override
-  State<_ShakeButton> createState() => _ShakeButtonState();
-}
-
-class _ShakeButtonState extends State<_ShakeButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _offsetAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 350),
-      vsync: this,
-    );
-
-    _offsetAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0, end: -6), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: -6, end: 6), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 6, end: -3), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -3, end: 0), weight: 1),
-    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  void _onTap() {
-    HapticFeedback.mediumImpact(); // สั่นเครื่องเบาๆ
-    _controller.forward(from: 0); // สั่นเฉพาะปุ่มนี้
-    widget.onTap(); // เปลี่ยนหน้า
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final String label;
+  final IconData icon;
+  final IconData activeIcon;
+  final bool active;
+  final VoidCallback onTap;
+  final int badgeCount;
+  final String networkImage;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _onTap,
-      child: AnimatedBuilder(
-        animation: _offsetAnimation,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(_offsetAnimation.value, 0),
-            child: Padding(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+    final color = active ? const Color(0xFF13714C) : const Color(0xFF6C756F);
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: active ? const Color(0xFFF2F6F3) : Colors.transparent,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      // รูปภาพ
-                      widget.network
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(40),
-                              child: loadingImageNetwork(
-                                widget.image,
-                                height: AdaptiveTextSize()
-                                    .getadaptiveTextSize(context, 20),
-                                width: AdaptiveTextSize()
-                                    .getadaptiveTextSize(context, 20),
-                              ),
-                            )
-                          : Image.asset(
-                              widget.image,
-                              height: AdaptiveTextSize()
-                                  .getadaptiveTextSize(context, 30),
-                              width: AdaptiveTextSize()
-                                  .getadaptiveTextSize(context, 30),
-                              color: widget.hasSelected
-                                  ? const Color(0xFF09665a)
-                                  : const Color(0xFFA89F9D),
-                            ),
-
-                      // 🔴 Badge แจ้งเตือน
-                      if (widget.isNoti && widget.notiCount > 0)
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFFa7141c),
-                            ),
-                            width: 16.0,
-                            height: 16.0,
-                            child: Center(
-                              child: Text(
-                                '${widget.notiCount}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10.0,
-                                  fontFamily: 'Sarabun',
-                                ),
-                              ),
-                            ),
+                  if (networkImage.isNotEmpty)
+                    CircleAvatar(
+                      radius: 12,
+                      backgroundColor: Colors.white,
+                      backgroundImage: NetworkImage(networkImage),
+                    )
+                  else
+                    Icon(active ? activeIcon : icon, color: color, size: 24),
+                  if (badgeCount > 0)
+                    Positioned(
+                      right: -6,
+                      top: -6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8992B),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: Colors.white, width: 1.2),
+                        ),
+                        child: Text(
+                          '$badgeCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Kanit',
                           ),
                         ),
-                    ],
-                  ),
-
-                  // ชื่อด้านล่าง
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: widget.hasSelected
-                          ? const Color(0xFF09665a)
-                          : const Color(0xFFA89F9D),
-                      fontWeight: widget.hasSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      ),
                     ),
-                    textScaleFactor: ScaleSize.textScaleFactor(context),
-                  ),
                 ],
               ),
-            ),
-          );
-        },
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontFamily: 'Kanit',
+                  fontSize: 11,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
