@@ -1,562 +1,459 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kasetmall/component/key_search.dart';
-import 'package:kasetmall/component/loading_image_network.dart';
-import 'package:kasetmall/component/material/loading_tween.dart';
-import 'package:kasetmall/privilege_form.dart';
-import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/shared/extension.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:kasetmall/shared/app_bar.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 
-// ignore: must_be_immutable
 class PrivilegeAllPage extends StatefulWidget {
-  PrivilegeAllPage({Key? key, @required this.title, required this.mode})
-      : super(key: key);
-  final String? title;
-  late bool mode;
+  const PrivilegeAllPage({
+    super.key,
+    required this.title,
+    this.savedOnly = false,
+    this.orderSubtotal,
+    this.orderKeywords = const <String>[],
+    this.selectable = false,
+  });
+
+  final String title;
+  final bool savedOnly;
+  final int? orderSubtotal;
+  final List<String> orderKeywords;
+  final bool selectable;
 
   @override
   State<PrivilegeAllPage> createState() => _PrivilegeAllPageState();
 }
 
 class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
-  final GlobalKey<ScaffoldState> _key = GlobalKey();
-  final storage = new FlutterSecureStorage();
-  Future<dynamic>? _futureModel;
-  RefreshController? _refreshController;
-  TextEditingController? _searchController;
-  TextEditingController txtPriceMin = TextEditingController();
-  TextEditingController txtPriceMax = TextEditingController();
-  bool changeToListView = false;
-  int amountItemInCart = 0;
-  String profileCode = "";
-  String verifyPhonePage = '';
-  String orderKey = '';
-  bool changOrderKey = false;
-  String orderBy = '';
-  String filterType = '';
-  int page = 1;
-  int total_page = 0;
-  bool loadProduct = true;
-  String? emailProfile;
-  bool isMain = true;
-  String categorySelected = '';
-  String keySearch = '';
-  bool isHighlight = false;
-  bool hideSearch = true;
+  int _filterIndex = 0;
+  Future<List<Map<String, dynamic>>>? _futureCoupons;
 
   @override
   void initState() {
-    _refreshController = new RefreshController();
-    _searchController = TextEditingController();
-    // _getCountItemInCart();
-    _callRead();
-    txtPriceMin.text = '';
-    txtPriceMax.text = '';
     super.initState();
+    _reloadCoupons();
   }
 
-  @override
-  void dispose() {
-    _searchController?.dispose();
-    _refreshController?.dispose();
-    super.dispose();
+  void _reloadCoupons() {
+    _futureCoupons = CouponStore.getAllCoupons();
   }
 
-  _callRead() async {
-    setState(() {
-      loadProduct = true;
-      _futureModel = postObjectData(privilegeApi + '/read',
-          {"keySearch": keySearch, "category": categorySelected});
-
-      // Timer(
-      //   Duration(seconds: 1),
-      //   () => {
-      //     setState(
-      //       () {
-      //         _listModelMore.length == 0 ? loadProduct = false : true;
-      //       },
-      //     ),
-      //   },
-      // );
-    });
+  Future<void> _saveCoupon(String id) async {
+    await CouponStore.saveCoupon(id);
+    setState(_reloadCoupons);
   }
 
-  // business logic.
-  void _onRefresh() async {
-    setState(() {
-      orderKey = '';
-      orderBy = '';
-      txtPriceMin.text = '';
-      txtPriceMax.text = '';
-      loadProduct = true;
-      _futureModel = null;
-    });
-    _callRead();
-    _refreshController?.refreshCompleted();
+  bool _matchesKeywords(Map<String, dynamic> coupon) {
+    if (widget.orderKeywords.isEmpty) return true;
+
+    final couponKeywords = (coupon['eligibleKeywords'] as List<dynamic>?)
+            ?.map((e) => e.toString().toLowerCase())
+            .toList() ??
+        const <String>[];
+    if (couponKeywords.isEmpty) return true;
+
+    final orderKeywords =
+        widget.orderKeywords.map((e) => e.toString().toLowerCase()).toList();
+    for (final keyword in couponKeywords) {
+      if (orderKeywords.any((value) => value.contains(keyword))) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  void _onLoading() async {
-    setState(
-      () {
-        // loadProduct = true;
-        if (widget.mode) {
-          // _listModelMore = [];
-          // _futureModel = postProductHotSale(
-          //   server_we_build + 'm/Product/readProductHot',
-          //   {
-          //     // "per_page": "$_limit",
-          //     "order_key": "$orderKey",
-          //     "order_by": "$orderBy",
-          //     "min_price": "${txtPriceMin.text}",
-          //     "max_price": "${txtPriceMax.text}",
-          //     // "page": "$page",
-          //   },
-          // );
+  bool _isEligible(Map<String, dynamic> coupon) {
+    final subtotal = widget.orderSubtotal;
+    if (subtotal == null) return true;
 
-          // _futureModel.then((value) async => {
-          //       await setState(() {
-          //         // total_page = value[0]['total_pages'],
-          //         // _listModelMore = [..._listModelMore, ...value],
-          //         _listModelMore = [...value];
-          //         _filterSelected == 'เกี่ยวข้อง'
-          //             ? null
-          //             : _listModelMore.shuffle();
-          //         _listModelMore.length == 0 ? loadProduct = false : true;
-          //       })
-          //     });
-        } else {
-          // if (_listModelMore.length < 20) {
-          if (page < total_page) {
-            page += 1;
-            if (changOrderKey) {
-              page = 0;
-              // itemProductCount = 0;
-            }
-            _futureModel = post(
-              privilegeApi + '/read',
-              {},
-            );
-            changOrderKey = false;
-            _refreshController?.loadComplete();
-          } else {
-            // _refreshController.loadNoData();
-          }
-          // } else {
-          //   _refreshController.loadNoData();
-          // }
-        }
-      },
+    final minimumOrderTotal =
+        int.tryParse(coupon['minimumOrderTotal']?.toString() ?? '') ?? 0;
+    if (subtotal < minimumOrderTotal) return false;
+
+    return _matchesKeywords(coupon);
+  }
+
+  List<Map<String, dynamic>> _applyFilter(List<Map<String, dynamic>> items) {
+    final savedItems =
+        widget.savedOnly ? items.where((item) => item['isSaved'] == true).toList() : items;
+
+    if (widget.selectable) {
+      return savedItems;
+    }
+
+    switch (_filterIndex) {
+      case 1:
+        return savedItems.where((item) => item['isSaved'] != true).toList();
+      case 2:
+        return savedItems.where((item) => item['isSaved'] == true).toList();
+      default:
+        return savedItems;
+    }
+  }
+
+  Widget _buildFilterBar() {
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildEmptyState() {
+    final title = widget.selectable
+        ? 'ยังไม่มีคูปองที่ใช้ได้'
+        : 'ยังไม่มีคูปองที่เก็บไว้';
+    final subtitle = widget.selectable
+        ? 'กลับไปเก็บคูปองที่หน้า Home หรือปรับยอดสั่งซื้อให้ตรงเงื่อนไข'
+        : 'กลับไปเก็บคูปองที่หน้า Home ได้ทันที';
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 82,
+              height: 82,
+              decoration: BoxDecoration(
+                color: AppColors.tintGreenSoft,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: const Icon(
+                Icons.local_offer_outlined,
+                color: AppColors.primary,
+                size: 38,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 44,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'กลับหน้าก่อนหน้า',
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  _addLog(param) async {
-    await postObjectData(server_we_build + 'log/logGoods/create', {
-      "username": emailProfile ?? "",
-      "profileCode": profileCode,
-      "platform": Platform.isAndroid
-          ? "android"
-          : Platform.isIOS
-              ? "ios"
-              : "other",
-      "prodjctId": param['id'] ?? "",
-      "title": param['name'] ?? "",
-      "categoryId": param['category']['data']['id'] ?? "",
-      "category": param['category']['data']['name'] ?? "",
-    });
+  Widget _buildCouponCard(Map<String, dynamic> coupon) {
+    final isSaved = coupon['isSaved'] == true;
+    final isEligible = _isEligible(coupon);
+    final showSelectableMode = widget.selectable && widget.orderSubtotal != null;
+    final disabledTint = const Color(0xFFF3F4F6);
+    final disabledBorder = const Color(0xFFE5E7EB);
+    final disabledText = const Color(0xFF9CA3AF);
+    final selectedBackground =
+        showSelectableMode && !isEligible ? disabledTint : Colors.white;
+    final selectedBorder =
+        showSelectableMode && !isEligible ? disabledBorder : AppColors.border;
+    final titleColor =
+        showSelectableMode && !isEligible ? disabledText : AppColors.textPrimary;
+    final mainColor =
+        showSelectableMode && !isEligible ? disabledText : AppColors.primary;
+    final tagBackground =
+        showSelectableMode && !isEligible ? disabledBorder : AppColors.accent;
+    final tagTextColor =
+        showSelectableMode && !isEligible ? disabledText : Colors.white;
+    final statusBackground = showSelectableMode && !isEligible
+        ? disabledBorder
+        : (isEligible ? AppColors.tintGreenSoft : AppColors.accentTint);
+    final statusTextColor = showSelectableMode && !isEligible
+        ? disabledText
+        : (isEligible ? AppColors.primary : AppColors.accentHover);
+
+    final card = Container(
+      decoration: BoxDecoration(
+        color: selectedBackground,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: selectedBorder),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF143D16).withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius:
+                const BorderRadius.horizontal(left: Radius.circular(14)),
+            child: Container(
+              width: 84,
+              height: double.infinity,
+              color: showSelectableMode && !isEligible
+                  ? disabledTint
+                  : AppColors.tintGreenSoft,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(
+                      Icons.local_offer_rounded,
+                      color: mainColor,
+                      size: 34,
+                    ),
+                  ),
+                  Positioned(
+                    left: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: tagBackground,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        coupon['tag'] ?? 'คูปอง',
+                        style: TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                          color: tagTextColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                          child: Text(
+                            coupon['name'] ?? '',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: titleColor,
+                              height: 1.2,
+                            ),
+                          ),
+                      ),
+                      if (showSelectableMode)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusBackground,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            isEligible ? 'ใช้ได้' : 'ใช้ไม่ได้',
+                            style: TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w700,
+                              color: statusTextColor,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    coupon['discount'] ?? '',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w800,
+                      color: mainColor,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'หมดอายุ ${coupon['expiry'] ?? '-'}',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 11.5,
+                      color: showSelectableMode && !isEligible
+                          ? disabledText
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  if (showSelectableMode) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      'ขั้นต่ำ ${coupon['minimumOrderTotal'] != null ? '฿${coupon['minimumOrderTotal']}' : '-'}',
+                      style: TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 11.5,
+                        color: showSelectableMode && !isEligible
+                            ? disabledText
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  if (!showSelectableMode)
+                    SizedBox(
+                      width: 96,
+                      height: 30,
+                      child: ElevatedButton(
+                        onPressed:
+                            isSaved ? null : () => _saveCoupon(coupon['id']),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isSaved ? AppColors.tintGreenSoft : AppColors.primary,
+                          foregroundColor:
+                              isSaved ? AppColors.primary : Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: isSaved ? AppColors.border : AppColors.primary,
+                            ),
+                          ),
+                          ),
+                          child: Text(
+                          isSaved ? 'เก็บแล้ว ✓' : 'เก็บคูปอง',
+                          style: const TextStyle(
+                            fontFamily: 'Kanit',
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(
+                          isEligible
+                              ? Icons.chevron_right_rounded
+                              : Icons.block_rounded,
+                          color: isEligible ? AppColors.primary : disabledText,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isEligible ? 'กดเพื่อใช้คูปอง' : 'ยังใช้ไม่ได้',
+                          style: TextStyle(
+                            fontFamily: 'Kanit',
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            color: isEligible ? AppColors.primary : disabledText,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (showSelectableMode) {
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEligible ? () => Navigator.pop(context, coupon) : null,
+          borderRadius: BorderRadius.circular(16),
+          child: card,
+        ),
+      );
+    }
+
+    return card;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        key: _key,
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          actions: <Widget>[
-            new Container(),
-          ],
-          elevation: 0,
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent,
-          automaticallyImplyLeading: false,
-          toolbarHeight: 50,
-          flexibleSpace: Container(
-            color: Colors.transparent,
-            child: Container(
-              margin:
-                  EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10),
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.arrow_back_ios),
-                        Text(
-                          widget.title!,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.start,
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        body: Column(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 5),
-                tabCategory(),
-                SizedBox(height: 5),
-                KeySearch(
-                  show: hideSearch,
-                  onKeySearchChange: (String val) {
-                    setState(() {
-                      keySearch = val;
-                      _callRead();
-                    });
-                  },
-                ),
-              ],
-            ),
-            Expanded(
-              child: _buildMain(),
-            ),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: KasetAppBar(
+        title: widget.title,
+        showBackButton: true,
       ),
-    );
-  }
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _futureCoupons,
+        builder: (context, snapshot) {
+          final items = snapshot.data ?? const <Map<String, dynamic>>[];
+          final filtered = _applyFilter(items);
 
-  _buildMain() {
-    return SmartRefresher(
-      enablePullDown: true,
-      enablePullUp: widget.mode ? false : true,
-      header: WaterDropHeader(
-        complete: Container(
-          child: Text(''),
-        ),
-        completeDuration: Duration(milliseconds: 0),
-      ),
-      footer: CustomFooter(
-        builder: (BuildContext? context, LoadStatus? mode) {
-          Widget body;
-          TextStyle styleText = TextStyle(
-            color: Color(0xFFDF0B24),
-          );
-          if (mode == LoadStatus.idle) {
-            body = Text("pull up load", style: styleText);
-          } else if (mode == LoadStatus.loading) {
-            body = CupertinoActivityIndicator();
-          } else if (mode == LoadStatus.failed) {
-            body = Text("Load Failed!Click retry!", style: styleText);
-          } else if (mode == LoadStatus.canLoading) {
-            body = Text("release to load more", style: styleText);
-          } else {
-            body = Text("No more Data", style: styleText);
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
-          return Container(
-            alignment: Alignment.center,
-            child: body,
+
+              return Column(
+            children: [
+              _buildFilterBar(),
+              Expanded(
+                child: filtered.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final itemHeight = widget.selectable ? 140.0 : 122.0;
+                          return SizedBox(
+                            height: itemHeight,
+                            child: _buildCouponCard(filtered[index]),
+                          );
+                        },
+                      ),
+              ),
+            ],
           );
         },
       ),
-      controller: _refreshController!,
-      onRefresh: _onRefresh,
-      onLoading:
-          widget.mode ? (() => _refreshController?.loadComplete()) : _onLoading,
-      child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: FutureBuilder(
-          future: _futureModel,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data.length > 0) {
-                return _buildListView(snapshot.data['objectData']);
-              } else {
-                return Container(
-                  height: 165,
-                  child: Center(
-                    child: Text('ไม่มีข่าวประชาสัมพันธ์'),
-                  ),
-                );
-              }
-            } else {
-              return _buildLoading();
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  _buildListView(List<dynamic> param) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      padding: EdgeInsets.symmetric(vertical: 10),
-      itemBuilder: (context, index) => _buildCardList(param[index]),
-      separatorBuilder: (_, __) => SizedBox(height: 10),
-      itemCount: param.length,
-    );
-  }
-
-  _buildCardList(dynamic param) {
-    return GestureDetector(
-      onTap: () {
-        _addLog(param);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PrivilegeForm(model: param),
-          ),
-        );
-      },
-      child: IntrinsicHeight(
-          // height: 165,
-          child: Container(
-        padding: EdgeInsets.only(
-          left: 15,
-          // top: 15,
-          right: 15,
-          // bottom: 15,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              alignment: Alignment.topCenter,
-              height: 115,
-              width: 165,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(9),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: loadingImageNetwork(
-                    param['imageUrl'],
-                    // width: 80,
-                    // height: 80,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    param['title'],
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Expanded(child: SizedBox()),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      children: [
-                        Text(
-                          dateStringToDate(param['createDate']),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      )),
-    );
-  }
-
-  tabCategory() {
-    return FutureBuilder<dynamic>(
-      future: postCategory(
-        '${privilegeCategoryApi}read',
-        {'skip': 0, 'limit': 100},
-      ),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData) {
-          return Container(
-            height: 40.0,
-            padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-            margin: EdgeInsets.symmetric(horizontal: 10.0),
-            decoration: new BoxDecoration(
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.grey.withOpacity(0.5),
-              //     spreadRadius: 0,
-              //     blurRadius: 7,
-              //     offset: Offset(0, 3), // changes position of shadow
-              //   ),
-              // ],
-              borderRadius: new BorderRadius.circular(6.0),
-              color: Colors.white,
-            ),
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: snapshot.data.length,
-              separatorBuilder: (context, index) {
-                return SizedBox(
-                  width: 10,
-                );
-              },
-              itemBuilder: (BuildContext context, int index) {
-                return GestureDetector(
-                  onTap: () {
-                    if (snapshot.data[index]['code'] != '') {
-                      setState(() {
-                        keySearch = '';
-                        isMain = false;
-                        isHighlight = false;
-                        categorySelected = snapshot.data[index]['code'];
-                      });
-                    } else {
-                      setState(() {
-                        isHighlight = true;
-                        categorySelected = '';
-                        isMain = true;
-                      });
-                    }
-                    setState(() {
-                      categorySelected = snapshot.data[index]['code'];
-                      _callRead();
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: categorySelected == snapshot.data[index]['code']
-                          ? Theme.of(context).primaryColor
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          width: 1, color: Theme.of(context).primaryColor),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 5.0,
-                    ),
-                    child: Text(
-                      snapshot.data[index]['title'],
-                      style: TextStyle(
-                        color: categorySelected == snapshot.data[index]['code']
-                            ? Colors.white
-                            : Theme.of(context).primaryColor,
-                        // decoration: index == selectedIndex
-                        //     ? TextDecoration.underline
-                        //     : null,
-                        fontSize: 15,
-                        fontWeight:
-                            categorySelected == snapshot.data[index]['code']
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                        // letterSpacing: 1.2,
-                        fontFamily: 'Kanit',
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        } else {
-          return Container(
-            height: 45.0,
-            padding: EdgeInsets.only(left: 5.0, right: 5.0),
-            margin: EdgeInsets.symmetric(horizontal: 30.0),
-            decoration: new BoxDecoration(
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.grey.withOpacity(0.5),
-              //     spreadRadius: 0,
-              //     blurRadius: 7,
-              //     offset: Offset(0, 3), // changes position of shadow
-              //   ),
-              // ],
-              borderRadius: new BorderRadius.circular(6.0),
-              color: Colors.white,
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildLoading() {
-    return ListView.separated(
-      padding: EdgeInsets.only(top: 16),
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      itemCount: 4,
-      separatorBuilder: (context, index) => SizedBox(
-        height: 16,
-      ),
-      itemBuilder: (context, index) => IntrinsicHeight(
-          // height: 165,
-          child: Container(
-        padding: EdgeInsets.only(
-          left: 15,
-          // top: 15,
-          right: 15,
-          // bottom: 15,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LoadingTween(
-              height: 165,
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LoadingTween(
-                    height: 40,
-                  ),
-                  Expanded(child: SizedBox()),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      children: [
-                        LoadingTween(
-                          height: 17,
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      )),
     );
   }
 }

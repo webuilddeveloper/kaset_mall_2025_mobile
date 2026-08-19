@@ -1,17 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
-import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:kasetmall/menu.dart';
+import 'package:kasetmall/policy.dart';
 import 'package:kasetmall/register.dart';
-import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/shared/apple.dart';
-import 'package:kasetmall/shared/facebook_firebase.dart';
-import 'package:kasetmall/shared/google.dart';
-import 'package:kasetmall/shared/line.dart';
+import 'package:kasetmall/shared/app_theme.dart';
 import 'package:kasetmall/widget/text_field.dart';
 
 DateTime now = new DateTime.now();
@@ -29,18 +23,22 @@ class LoginCentralPage extends StatefulWidget {
 
 class _LoginCentralPageState extends State<LoginCentralPage> {
   final storage = new FlutterSecureStorage();
+  bool _isProcessing = false;
+  static const String _agencyName = 'องค์การตลาดเพื่อเกษตรกร (อตก.)';
 
   final txtUsername = TextEditingController();
   final txtPassword = TextEditingController();
-  bool showVisibility = false;
-  bool statusVisibility = true;
+
+  static const Color kPrimary = AppColors.primary;
+  static const Color kPrimaryDark = AppColors.primaryDark;
+  static const Color kAccent = AppColors.accent;
+  static const Color kBorder = AppColors.border;
+  static const Color kMuted = AppColors.textSecondary;
+  static const Color kText = AppColors.textPrimary;
 
   @override
   void initState() {
     setState(() {});
-
-    final random = Random();
-    selectedAgency = mockAgencyList[random.nextInt(mockAgencyList.length)];
 
     super.initState();
   }
@@ -60,12 +58,18 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
 
   _buildBackground() {
     return Container(
-      // decoration: BoxDecoration(
-      //   image: DecorationImage(
-      //     image: AssetImage("assets/bg_login.png"),
-      //     fit: BoxFit.cover,
-      //   ),
-      // ),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFEEF7EE),
+            Color(0xFFFAFCF8),
+            Colors.white,
+          ],
+          stops: [0.0, 0.28, 0.55],
+        ),
+      ),
       child: _buildScaffold(),
     );
   }
@@ -73,827 +77,441 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
   _buildScaffold() {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: InkWell(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Container(
-            decoration: BoxDecoration(
-                // image: DecorationImage(
-                //   image: AssetImage("assets/bg_login.png"),
-                //   fit: BoxFit.cover,
-                // ),
-                // color: Colors.white
-                ),
-            child: SafeArea(
-              child: Center(
-                child: ListView(
-                  padding: EdgeInsets.only(
-                    top: 70,
-                    left: 15,
-                    right: 15,
-                    bottom: 20 + MediaQuery.of(context).padding.bottom,
-                  ),
-                  children: [
-                    Center(
-                      child: Image.asset(
-                        "assets/images/kaset/logo_kaset.png",
-                        // fit: BoxFit.contain,
-                        // height: 150,
-                        width: 150,
-                      ),
-                    ),
-                    Container(
-                      // width: 100,
-                      margin: EdgeInsets.only(top: 40),
-                      padding: EdgeInsets.all(30),
-                      // constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width + 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(19),
-                        // color: Colors.white.withOpacity(0.63),
-                        color: Theme.of(context)
-                            .primaryColorLight
-                            .withOpacity(0.3),
-                        // border: Border.all(
-                        //   // width: 1,
-                        //   // color: Theme.of(context).accentColor,
-                        // ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'เข้าสู่ระบบ ',
-                            style: TextStyle(
-                              fontSize: 27,
-                              fontFamily: 'Kanit',
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          SizedBox(height: 10.0),
-                          labelTextField(
-                            'อีเมล',
-                            Icon(
-                              Icons.person,
-                              color: Colors.black,
-                              size: 20.00,
-                            ),
-                          ),
-                          SizedBox(height: 5.0),
-                          textFieldCentral(
-                            txtUsername,
-                            null,
-                            'อีเมล',
-                            'อีเมล',
-                            true,
-                            false,
-                          ),
-                          SizedBox(height: 15.0),
-                          labelTextField(
-                            'รหัสผ่าน',
-                            Icon(
-                              Icons.lock,
-                              color: Colors.black,
-                              size: 20.00,
-                            ),
-                          ),
-                          SizedBox(height: 5.0),
-                          textFieldCentral(
-                            txtPassword,
-                            null,
-                            'รหัสผ่าน',
-                            'รหัสผ่าน',
-                            true,
-                            true,
-                          ),
-                          SizedBox(
-                            height: 30.0,
-                          ),
-                          _buildLoginButton(),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: _rowLongLine(
-                              '  หรือท่านอาจจะ  ',
-                              Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                // InkWell(
-                                //   onTap: () {
-                                //     Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(
-                                //         builder: (context) =>
-                                //             ForgotPasswordCentralPage(),
-                                //       ),
-                                //     );
-                                //   },
-                                //   child: Container(
-                                //     padding: const EdgeInsets.symmetric(
-                                //       horizontal: 15.0,
-                                //       vertical: 3,
-                                //     ),
-                                //     decoration: BoxDecoration(
-                                //       borderRadius: BorderRadius.circular(30.0),
-                                //       border: Border.all(
-                                //         color: Color(0xFFC0BFBF),
-                                //       ),
-                                //       color: Colors.white,
-                                //     ),
-                                //     child: Text(
-                                //       "ลืมรหัสผ่าน",
-                                //       style: TextStyle(
-                                //         fontSize: 15,
-                                //         fontFamily: 'Kanit',
-                                //         color: Color(0xFFC0BFBF),
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            RegisterCentralPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 25.0,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      border: Border.all(
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                    child: Text(
-                                      "สมัครสมาชิก",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Kanit',
-                                        color: Color(0xFFFFFFFF),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            RegisterCentralPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 13.0,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      border: Border.all(
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                      color: Colors.white,
-                                    ),
-                                    child: Text(
-                                      "เข้าร่วมเป็นร้านค้า",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Kanit',
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-                      child: _rowLongLine(
-                        '  เข้าสู่ระบบผ่าน  ',
-                        Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        new Container(
-                          alignment: new FractionalOffset(0.5, 0.5),
-                          height: 50.0,
-                          width: 50.0,
-                          child: new IconButton(
-                            onPressed: () async {
-                              _callLoginFacebook();
-                            },
-                            icon: new Image.asset(
-                              "assets/logo/login_facebook.png",
-                            ),
-                            padding: new EdgeInsets.all(5.0),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          alignment: FractionalOffset(0.5, 0.5),
-                          height: 50.0,
-                          width: 50.0,
-                          child: IconButton(
-                            onPressed: () async {
-                              // var obj = await loginGoogle();
-                              var accessToken = await getAccessTokenG();
-                              loginWithSsp(accessToken, "google");
-
-                              // var obj = await signInWithGoogle();
-
-                              // loginWithSsp(accessToken.value, "google");
-                              // if (obj != null) {
-                              //   var model = {
-                              //     "username": obj.user.email,
-                              //     "email": obj.user.email,
-                              //     "imageUrl": obj.user.photoURL != null
-                              //         ? obj.user.photoURL
-                              //         : '',
-                              //     "firstName": obj.user.displayName,
-                              //     "lastName": '',
-                              //     "googleID": obj.user.uid
-                              //   };
-
-                              //   Dio dio = new Dio();
-                              //   var response = await dio.post(
-                              //     '${server}m/v2/register/google/login',
-                              //     data: model,
-                              //   );
-
-                              //   await storage.write(
-                              //     key: 'categorySocial',
-                              //     value: 'Google',
-                              //   );
-
-                              //   await storage.write(
-                              //     key: 'imageUrlSocial',
-                              //     value: obj.user.photoURL != null
-                              //         ? obj.user.photoURL
-                              //         : '',
-                              //   );
-
-                              //   createStorageApp(
-                              //     model: response.data['objectData'],
-                              //     category: 'google',
-                              //   );
-
-                              //   Navigator.pushReplacement(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //       builder: (context) => MenuCentralPage(),
-                              //     ),
-                              //   );
-                              // }
-                            },
-                            icon: new Image.asset(
-                              "assets/logo/login_google.png",
-                            ),
-                            padding: new EdgeInsets.all(5.0),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          alignment: new FractionalOffset(0.5, 0.5),
-                          height: 50.0,
-                          width: 50.0,
-                          child: IconButton(
-                            onPressed: () async {
-                              await loginLine();
-                              var accessToken = await getAccessTokenL();
-                              loginWithSsp(accessToken?.value, "line");
-
-                              // final idToken = obj.accessToken.idToken;
-                              // final userEmail = (idToken != null)
-                              //     ? idToken['email'] != null
-                              //         ? idToken['email']
-                              //         : ''
-                              //     : '';
-                              // if (obj != null) {
-                              //   var model = {
-                              //     "username":
-                              //         (userEmail != '' && userEmail != null)
-                              //             ? userEmail
-                              //             : obj.userProfile.userId,
-                              //     "email": userEmail,
-                              //     "imageUrl": (obj.userProfile.pictureUrl != '' &&
-                              //             obj.userProfile.pictureUrl != null)
-                              //         ? obj.userProfile.pictureUrl
-                              //         : '',
-                              //     "firstName": obj.userProfile.displayName,
-                              //     "lastName": '',
-                              //     "lineID": obj.userProfile.userId
-                              //   };
-                              //   Dio dio = new Dio();
-                              //   var response = await dio.post(
-                              //     '${server}m/v2/register/line/login',
-                              //     data: model,
-                              //   );
-                              //   await storage.write(
-                              //     key: 'categorySocial',
-                              //     value: 'Line',
-                              //   );
-                              //   await storage.write(
-                              //     key: 'imageUrlSocial',
-                              //     value: (obj.userProfile.pictureUrl != '' &&
-                              //             obj.userProfile.pictureUrl != null)
-                              //         ? obj.userProfile.pictureUrl
-                              //         : '',
-                              //   );
-                              //   createStorageApp(
-                              //     model: response.data['objectData'],
-                              //     category: 'line',
-                              //   );
-                              //   Navigator.pushReplacement(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //       builder: (context) => MenuCentralPage(),
-                              //     ),
-                              //   );
-                              // }
-                            },
-                            icon: new Image.asset(
-                              "assets/logo/login_line.png",
-                            ),
-                            padding: new EdgeInsets.all(5.0),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        if (Platform.isIOS)
-                          Container(
-                            alignment: new FractionalOffset(0.5, 0.5),
-                            height: 50.0,
-                            width: 50.0,
-                            child: new IconButton(
-                              onPressed: () async {
-                                String? accessToken = await signInWithApple();
-                                if (accessToken != null) {
-                                  loginWithSsp(accessToken, "apple");
-                                } else {
-                                  print(
-                                      "Apple sign-in failed: No access token received.");
-                                }
-                              },
-                              icon: new Image.asset(
-                                "assets/images/kaset/apple_circle.png",
-                              ),
-                              padding: new EdgeInsets.all(5.0),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )),
+      backgroundColor: Colors.transparent,
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTopHeader(),
+                const SizedBox(height: 26),
+                _buildLoginCard(),
+                const SizedBox(height: 18),
+                _buildFooterNote(),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  _rowLongLine(String title, Color color) {
+  Widget _buildTopHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Expanded(
-          child: Container(
-            height: 1,
-            color: color,
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: kBorder),
+            boxShadow: [
+              BoxShadow(
+                color: kPrimary.withValues(alpha: 0.10),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(9),
+          child: Image.asset(
+            "assets/images/kaset/logo_kaset.png",
+            fit: BoxFit.contain,
           ),
         ),
-        Text(
-          ' ${title} ',
-          style: TextStyle(
-            fontSize: 13.00,
-            fontFamily: 'Kanit',
-            color: color,
-          ),
-        ),
-        Expanded(
-          child: Container(
-            height: 1,
-            color: color,
+        const SizedBox(width: 14),
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'เกษตร Mall',
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: kPrimaryDark,
+                  height: 1.1,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'เข้าสู่ระบบเพื่อเริ่มใช้งาน',
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
+                  color: kMuted,
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Map<String, dynamic>? selectedAgency;
-  // Mock list หน่วยงาน (เหมือนมาจาก API)
-  final List<Map<String, dynamic>> mockAgencyList = [
-    {'code': 10, 'title': 'กรมส่งเสริมการเกษตร'},
-    {'code': 20, 'title': 'กรมวิชาการเกษตร'},
-    {'code': 30, 'title': 'กรมปศุสัตว์'},
-    {'code': 40, 'title': 'กรมประมง'},
-    {'code': 50, 'title': 'กรมชลประทาน'},
-    {'code': 60, 'title': 'กรมหม่อนไหม'},
-    {'code': 70, 'title': 'กรมพัฒนาที่ดิน'},
-    {'code': 80, 'title': 'กรมป่าไม้'},
-    {'code': 90, 'title': 'กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช'},
-    {'code': 100, 'title': 'สำนักงานเศรษฐกิจการเกษตร (สศก.)'},
-    {'code': 110, 'title': 'องค์การตลาดเพื่อเกษตรกร (อตก.)'},
-    {'code': 120, 'title': 'สถาบันวิจัยและพัฒนาการเกษตร'},
-    {'code': 130, 'title': 'ศูนย์วิจัยและพัฒนาการเกษตรภูมิภาค'},
-  ];
+  Widget _buildLoginCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: kBorder),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF143D16).withValues(alpha: 0.06),
+            blurRadius: 26,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'เข้าสู่ระบบ',
+            style: TextStyle(
+              fontSize: 23,
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.w700,
+              color: kText,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'กรอกข้อมูลเพื่อเข้าสู่ระบบสมาชิก',
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: 'Kanit',
+              color: kMuted,
+            ),
+          ),
+          const SizedBox(height: 20),
+          labelTextField(
+            'อีเมล',
+            const Icon(
+              Icons.person_outline,
+              color: kPrimary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(height: 6),
+          _buildInputWrapper(
+            child: textFieldCentral(
+              txtUsername,
+              null,
+              'อีเมล',
+              'อีเมล',
+              true,
+              false,
+            ),
+          ),
+          const SizedBox(height: 16),
+          labelTextField(
+            'รหัสผ่าน',
+            const Icon(
+              Icons.lock_outline,
+              color: kPrimary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(height: 6),
+          _buildInputWrapper(
+            child: textFieldCentral(
+              txtPassword,
+              null,
+              'รหัสผ่าน',
+              'รหัสผ่าน',
+              true,
+              true,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Text(
+                'ลืมรหัสผ่าน?',
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: kPrimary,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          _buildLoginButton(),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: Container(height: 1, color: kBorder)),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  'หรือ',
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 12.5,
+                    color: kMuted,
+                  ),
+                ),
+              ),
+              Expanded(child: Container(height: 1, color: kBorder)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildThaiDButton(),
+          const SizedBox(height: 16),
+          Center(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => RegisterCentralPage(),
+                  ),
+                );
+              },
+              child: RichText(
+                text: const TextSpan(
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 13.5,
+                    color: kMuted,
+                  ),
+                  children: [
+                    TextSpan(text: 'ยังไม่มีบัญชีใช่ไหม? '),
+                    TextSpan(
+                      text: 'สมัครสมาชิก',
+                      style: TextStyle(
+                        color: kPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputWrapper({required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FBF9),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: kBorder),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildFooterNote() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 2, bottom: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(
+              Icons.verified_outlined,
+              size: 14,
+              color: kAccent,
+            ),
+            SizedBox(width: 6),
+            Text(
+              'มั่นใจในสินค้าคุณภาพจาก อ.ต.ก.',
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 12.5,
+                color: kMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   _buildLoginButton() {
-    return Material(
-      // elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: Theme.of(context).primaryColor,
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
-        height: 40,
-        onPressed: () async {
-          // loginWithGuest();
-          await new FlutterSecureStorage()
-              .write(key: 'firstName', value: 'สมศักดิ์');
-          await new FlutterSecureStorage()
-              .write(key: 'lastName', value: 'ศักดิ์สม');
-
-          await new FlutterSecureStorage()
-              .write(key: 'Agency', value: '${selectedAgency?['title']}');
-
-          await Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => MenuCentralPage()),
-              (route) => false);
-        },
-        child: new Text(
-          'เข้าสู่ระบบ',
-          style: new TextStyle(
-            fontSize: 18.0,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Kanit',
+    return Container(
+      width: double.infinity,
+      height: 46,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16), color: kPrimary),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(30),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(30),
+          onTap: () async {
+            await _startAuthFlow(source: 'password');
+          },
+          child: const Center(
+            child: Text(
+              'เข้าสู่ระบบ ',
+              style: TextStyle(
+                fontSize: 17,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Kanit',
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  //login username / password
-  // Future<dynamic> login() async {
-  //   if ((_username == null || _username == '') && _category == 'guest') {
-  //     return showDialog(
-  //       barrierDismissible: false,
-  //       context: context,
-  //       builder: (BuildContext context) => new CupertinoAlertDialog(
-  //         title: new Text(
-  //           'กรุณากรอกอีเมล',
-  //           style: TextStyle(
-  //             fontSize: 16,
-  //             fontFamily: 'Kanit',
-  //             color: Colors.black,
-  //             fontWeight: FontWeight.normal,
-  //           ),
-  //         ),
-  //         content: Text(" "),
-  //         actions: [
-  //           CupertinoDialogAction(
-  //             isDefaultAction: true,
-  //             child: new Text(
-  //               "ตกลง",
-  //               style: TextStyle(
-  //                 fontSize: 13,
-  //                 fontFamily: 'Kanit',
-  //                 color: Color(0xFF000070),
-  //                 fontWeight: FontWeight.normal,
-  //               ),
-  //             ),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       ),
-  //     );
-  //   } else if ((_password == null || _password == '') && _category == 'guest') {
-  //     return showDialog(
-  //       barrierDismissible: false,
-  //       context: context,
-  //       builder: (BuildContext context) => new CupertinoAlertDialog(
-  //         title: new Text(
-  //           'กรุณากรอกรหัสผ่าน',
-  //           style: TextStyle(
-  //             fontSize: 16,
-  //             fontFamily: 'Kanit',
-  //             color: Colors.black,
-  //             fontWeight: FontWeight.normal,
-  //           ),
-  //         ),
-  //         content: Text(" "),
-  //         actions: [
-  //           CupertinoDialogAction(
-  //             isDefaultAction: true,
-  //             child: new Text(
-  //               "ตกลง",
-  //               style: TextStyle(
-  //                 fontSize: 13,
-  //                 fontFamily: 'Kanit',
-  //                 color: Color(0xFF000070),
-  //                 fontWeight: FontWeight.normal,
-  //               ),
-  //             ),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       ),
-  //     );
-  //   } else {
-  //     final response = await postLogin(server + 'token', {
-  //       'email': _username.toString(),
-  //       'password': _password.toString(),
-  //       'device_name': "mobile"
-  //     });
-  //     if (response['token'] != null) {
-  //       FocusScope.of(context).unfocus();
-  //       new TextEditingController().clear();
-  //       final result = await getUser(server + 'users/me');
-  //       createStorageApp(
-  //           model: result, category: 'guest', token: response['token']);
-  //       if (result['phone_verified'] == false) {
-  //         showDialog(
-  //             barrierDismissible: false,
-  //             context: context,
-  //             builder: (BuildContext context) {
-  //               return WillPopScope(
-  //                 onWillPop: () {
-  //                   return Future.value(false);
-  //                 },
-  //                 child: CupertinoAlertDialog(
-  //                   title: new Text(
-  //                     'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-  //                     style: TextStyle(
-  //                       fontSize: 16,
-  //                       fontFamily: 'Kanit',
-  //                       color: Colors.black,
-  //                       fontWeight: FontWeight.normal,
-  //                     ),
-  //                   ),
-  //                   content: Text(" "),
-  //                   actions: [
-  //                     CupertinoDialogAction(
-  //                       isDefaultAction: true,
-  //                       child: new Text(
-  //                         "ตกลง",
-  //                         style: TextStyle(
-  //                           fontSize: 13,
-  //                           fontFamily: 'Kanit',
-  //                           color: Color(0xFF09665a),
-  //                           fontWeight: FontWeight.normal,
-  //                         ),
-  //                       ),
-  //                       onPressed: () {
-  //                         Navigator.pushReplacement(
-  //                           context,
-  //                           MaterialPageRoute(
-  //                             builder: (context) => VerifyPhonePage(),
-  //                           ),
-  //                         );
-  //                       },
-  //                     ),
-  //                     CupertinoDialogAction(
-  //                       isDefaultAction: false,
-  //                       child: new Text(
-  //                         "ไม่ใช่ตอนนี้",
-  //                         style: TextStyle(
-  //                           fontSize: 13,
-  //                           fontFamily: 'Kanit',
-  //                           color: Color(0xFF09665a),
-  //                           fontWeight: FontWeight.normal,
-  //                         ),
-  //                       ),
-  //                       onPressed: () {
-  //                         Navigator.pushAndRemoveUntil(
-  //                             context,
-  //                             MaterialPageRoute(
-  //                                 builder: (context) => MenuCentralPage()),
-  //                             (route) => false);
-  //                       },
-  //                     ),
-  //                   ],
-  //                 ),
-  //               );
-  //             });
-  //       } else {
-  //         _updateToken('${result['id']}');
-  //         Navigator.pushReplacement(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => MenuCentralPage(),
-  //           ),
-  //         );
-  //       }
-  //     } else {
-  //       showDialog(
-  //         barrierDismissible: false,
-  //         context: context,
-  //         builder: (BuildContext context) => new CupertinoAlertDialog(
-  //           title: new Text(
-  //             'อีเมล/รหัสผ่าน ไม่ถูกต้อง',
-  //             style: TextStyle(
-  //               fontSize: 16,
-  //               fontFamily: 'Kanit',
-  //               color: Colors.black,
-  //               fontWeight: FontWeight.normal,
-  //             ),
-  //           ),
-  //           content: Text(" "),
-  //           actions: [
-  //             CupertinoDialogAction(
-  //               isDefaultAction: true,
-  //               child: new Text(
-  //                 "ตกลง",
-  //                 style: TextStyle(
-  //                   fontSize: 13,
-  //                   fontFamily: 'Kanit',
-  //                   color: Color(0xFF000070),
-  //                   fontWeight: FontWeight.normal,
-  //                 ),
-  //               ),
-  //               onPressed: () {
-  //                 FocusScope.of(context).unfocus();
-  //                 new TextEditingController().clear();
-  //                 Navigator.of(context).pop();
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     }
-  //   }
-  // }
-
-  // _updateToken(profileCode) async {
-  //   FirebaseMessaging.instance.getToken().then(
-  //     (token) {
-  //       postDio(server_we_build + 'notificationV2/m/updateTokenDevice',
-  //           {"token": token, "profileCode": profileCode});
-  //     },
-  //   );
-  // }
-
-  Future<dynamic> loginWithSsp(accessToken, String type) async {
-    // final accessToken = obj.accessToken.idToken;
-
-    final response = await postLoginSocial(server + 'auth/token/' + type,
-        {'access_token': accessToken.toString(), 'device_name': "mobile"});
-    if (response['token'] != null) {
-      final result = await getUser(server + 'users/me');
-      createStorageApp(
-        model: result,
-        category: type,
-        token: response['token'],
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MenuCentralPage(),
+  Widget _buildThaiDButton() {
+    return GestureDetector(
+      onTap: _isProcessing ? null : () => _startAuthFlow(source: 'thaid'),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 180),
+        opacity: _isProcessing ? 0.65 : 1,
+        child: Container(
+          width: double.infinity,
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: kBorder),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  "assets/images/kaset/icon_thaid.png",
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'เข้าสู่ระบบด้วย ThaiD',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Kanit',
+                  color: kText,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
-      );
-      // if (result['phone_verified'] == false) {
-      //   showDialog(
-      //       barrierDismissible: false,
-      //       context: context,
-      //       builder: (BuildContext context) {
-      //         return WillPopScope(
-      //           onWillPop: () {
-      //             return Future.value(false);
-      //           },
-      //           child: CupertinoAlertDialog(
-      //             title: new Text(
-      //               'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-      //               style: TextStyle(
-      //                 fontSize: 16,
-      //                 fontFamily: 'Kanit',
-      //                 color: Colors.black,
-      //                 fontWeight: FontWeight.normal,
-      //               ),
-      //             ),
-      //             content: Text(" "),
-      //             actions: [
-      //               CupertinoDialogAction(
-      //                 isDefaultAction: true,
-      //                 child: new Text(
-      //                   "ตกลง",
-      //                   style: TextStyle(
-      //                     fontSize: 13,
-      //                     fontFamily: 'Kanit',
-      //                     color: Color(0xFF09665a),
-      //                     fontWeight: FontWeight.normal,
-      //                   ),
-      //                 ),
-      //                 onPressed: () {
-      //                   Navigator.pushReplacement(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => VerifyPhonePage(),
-      //                     ),
-      //                   );
-      //                 },
-      //               ),
-      //             ],
-      //           ),
-      //         );
-      //       });
-      // } else {
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => MenuCentralPage(),
-      //     ),
-      //   );
-      // }
-    }
+      ),
+    );
   }
 
-  //login guest
-  void loginWithGuest() async {
-    setState(() {});
-    // login();
-  }
+  Future<void> _startAuthFlow({required String source}) async {
+    if (_isProcessing) return;
 
-  TextStyle style = TextStyle(
-    fontFamily: 'Kanit',
-    fontSize: 18.0,
-  );
+    setState(() {
+      _isProcessing = true;
+    });
 
-  _callLoginFacebook() async {
-    // String obj = await facebookSignIn();
-    var accessToken = await getAccessTokenF();
-    loginWithSsp(accessToken, "facebook");
-    // var obj = await signInWithFacebook();
-    // if (obj != null) {
-    //   var model = {
-    //     "username": obj.user.email,
-    //     "email": obj.user.email,
-    //     "imageUrl":
-    //         obj.user.photoURL != null ? obj.user.photoURL + "?width=9999" : '',
-    //     "firstName": obj.user.displayName,
-    //     "lastName": '',
-    //     "facebookID": obj.user.uid
-    //   };
-    //   Dio dio = new Dio();
-    //   var response = await dio.post(
-    //     '${server}m/v2/register/facebook/login',
-    //     data: model,
-    //   );
-    //   await storage.write(
-    //     key: 'categorySocial',
-    //     value: 'Facebook',
-    //   );
-    //   await storage.write(
-    //     key: 'imageUrlSocial',
-    //     value:
-    //         obj.user.photoURL != null ? obj.user.photoURL + "?width=9999" : '',
-    //   );
-    //   createStorageApp(
-    //     model: response.data['objectData'],
-    //     category: 'facebook',
-    //   );
-    //   if (obj != null) {
-    //     Navigator.pushReplacement(
-    //       context,
-    //       MaterialPageRoute(
-    //         builder: (context) => PdpaPage(),
-    //       ),
-    //     );
-    //   }
-    // }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return WillPopScope(
+          onWillPop: () => Future.value(false),
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 26,
+                  vertical: 24,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(
+                      color: kPrimary,
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      source == 'thaid'
+                          ? 'กำลังเชื่อมต่อ ThaiD...'
+                          : 'กำลังเข้าสู่ระบบ...',
+                      style: const TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 14,
+                        color: kText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+
+    if (!mounted) return;
+    setState(() {
+      _isProcessing = false;
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PolicyCentralPage(
+          source: source,
+          pendingProfile: {
+            'firstName': 'สมศักดิ์',
+            'lastName': 'ศักดิ์สม',
+            'profileFirstName': 'สมศักดิ์',
+            'profileLastName': 'ศักดิ์สม',
+            'profileCode10': 'mock-user',
+            'token': 'mock-token',
+            'agency': _agencyName,
+          },
+        ),
+      ),
+    );
   }
 }

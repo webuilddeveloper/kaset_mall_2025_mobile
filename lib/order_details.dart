@@ -1,2447 +1,874 @@
-// ignore_for_file: deprecated_member_use
-
-import 'dart:async';
-
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/payment_status.dart';
-import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/widget/scroll_behavior.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../shared/extension.dart';
-import '../widget/header.dart';
+import 'package:kasetmall/shared/app_bar.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/mock_store.dart';
+import 'package:kasetmall/to_rate.dart';
 
 class OrderDetailsPage extends StatefulWidget {
-  OrderDetailsPage({Key? key, this.model, this.statusText, this.modePage})
-      : super(key: key);
-  final model;
+  const OrderDetailsPage({
+    Key? key,
+    this.orderId,
+    this.model,
+    this.statusText,
+    this.modePage,
+  }) : super(key: key);
+
+  final String? orderId;
+  final dynamic model;
   final String? statusText;
   final String? modePage;
+
   @override
   State<OrderDetailsPage> createState() => _OrderDetailsPageState();
 }
 
 class _OrderDetailsPageState extends State<OrderDetailsPage> {
-  String? get modePage => widget.modePage;
-  bool loading = true;
-  dynamic modelAboutUs;
-  dynamic modelProduct = {};
-  String nowDayOfWeek = '';
-  String lat = '13.7910237';
-  String lng = '100.600868';
-  String phone = '02 538 3020';
-  dynamic subDistrict;
-  dynamic district;
-  dynamic province;
-  DateTime? now;
-  int qty = 0;
-  final storage = new FlutterSecureStorage();
-  String profileCode = "";
-  String? emailProfile;
-  dynamic model = [
-    {
-      'title':
-          'กลับมาอีกครั้ง งานสัปดาห์หนังสือแห่งชาติ ปี 2565 วันที่ 26 มี.ค. - 6',
-      'imageUrl': 'assets/images/bg-news.jpeg',
-    },
-    {
-      'title':
-          'กลับมาอีกครั้ง งานสัปดาห์หนังสือแห่งชาติ ปี 2565 วันที่ 26 มี.ค. - 6',
-      'imageUrl': 'assets/images/bg-news.jpeg',
-    },
-    {
-      'title':
-          'กลับมาอีกครั้ง งานสัปดาห์หนังสือแห่งชาติ ปี 2565 วันที่ 26 มี.ค. - 6',
-      'imageUrl': 'assets/images/bg-news.jpeg',
-    }
-  ];
+  final NumberFormat _moneyFormat = NumberFormat('#,###', 'th_TH');
+  bool _loading = true;
+  Map<String, dynamic>? _order;
+
+  int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
+  }
+
+  String _money(int value) => '${_moneyFormat.format(value)} บาท';
 
   @override
   void initState() {
-    setState(() {
-      modelProduct = widget.model;
-      // modelProduct['order_details']['data'].forEach((element) => {
-      //       qty += ((element['quantity'] ?? 0) as num).toInt(),
-      //     });
-      // modelProduct['qty'] = qty;
-      // readAddress();
-      // _callReadProfileCode();
-      Timer(
-        Duration(seconds: 1),
-        () {
-          setState(
-            () {
-              loading = false;
-            },
-          );
-        },
-      );
-    });
-    // _readAboutUs();
-
-    now = DateTime.now();
-    nowDayOfWeek = DateFormat('EEEE').format(now!);
-    // _futureNews = postDio(newsApi + 'read', {});
     super.initState();
+    _loadOrder();
   }
 
+  Future<void> _loadOrder() async {
+    Map<String, dynamic>? order;
+    final orderId = widget.orderId ??
+        (widget.model is Map
+            ? (widget.model['id'] ?? widget.model['code'])?.toString()
+            : null);
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+    if (orderId != null) {
+      order = await OrderStore.getOrderById(orderId);
+    }
 
-  readAddress() async {
+    order ??= _normalizeLegacyOrder();
+
+    if (!mounted) return;
     setState(() {
-      get(server + 'provinces').then((value) => {
-            province = value.firstWhere(
-                (x) => x['id'] == int.parse(modelProduct['province'])),
-          });
-      get(server + 'provinces/' + modelProduct['province'] + '/districts')
-          .then((value) => {
-                district = value.firstWhere(
-                    (x) => x['id'] == int.parse(modelProduct['amphoe'])),
-              });
-      get(server +
-              'provinces/' +
-              modelProduct['province'] +
-              '/districts/' +
-              modelProduct['amphoe'] +
-              '/sub-districts')
-          .then((value) => {
-                subDistrict = value.firstWhere(
-                    (x) => x['id'] == int.parse(modelProduct['tambon'])),
-              });
+      _order = order;
+      _loading = false;
     });
   }
 
-  readProduct(param) async {
-    var result;
-    await get(server + 'products/' + param).then((value) => {
-          setState(
-            () {
-              result = value;
-            },
-          )
-        });
-    return result;
+  Map<String, dynamic> _normalizeLegacyOrder() {
+    final raw = widget.model;
+    if (raw is Map<String, dynamic>) {
+      final qty = _toInt(raw['qty'] ?? raw['quantity'] ?? 1).clamp(1, 999);
+      final price = _toInt(raw['price'] ?? raw['priceTotal'] ?? 0);
+      final shipping = _toInt(raw['shipping'] ?? 0);
+      final discount = _toInt(raw['discount'] ?? 0);
+      final subtotal = _toInt(raw['priceTotal'] ?? (price * qty));
+      final grandTotal =
+          _toInt(raw['grandTotal'] ?? subtotal + shipping - discount);
+
+      return {
+        'id': (raw['id'] ??
+                raw['code'] ??
+                'legacy_${DateTime.now().millisecondsSinceEpoch}')
+            .toString(),
+        'orderNo': (raw['orderNo'] ??
+                raw['code'] ??
+                'KM${DateTime.now().millisecondsSinceEpoch}')
+            .toString(),
+        'status': _statusFromLegacy(),
+        'items': [
+          {
+            'id': (raw['id'] ?? raw['code'] ?? 'legacy_item').toString(),
+            'name': raw['title']?.toString() ?? 'รายการสินค้า',
+            'image':
+                raw['imageUrl']?.toString() ?? raw['image']?.toString() ?? '',
+            'price': price == 0 ? subtotal : price,
+            'qty': qty,
+          }
+        ],
+        'subtotal': subtotal,
+        'shippingFee': shipping,
+        'discount': discount,
+        'grandTotal': grandTotal,
+        'couponName': raw['couponName'],
+        'couponId': raw['couponId'],
+        'shippingMethod': raw['shippingMethod'] ?? 'จัดส่งมาตรฐาน',
+        'paymentMethod': 'QR Code',
+        'address': raw['address'] == null
+            ? null
+            : Map<String, dynamic>.from(raw['address'] as Map),
+        'createdAt':
+            raw['purchaseDate']?.toString() ?? DateTime.now().toIso8601String(),
+        'paidAt': raw['paidDate']?.toString(),
+        'preparedAt': raw['preparedAt']?.toString(),
+        'shippedAt': raw['shipped_at']?.toString(),
+        'completedAt': raw['completedAt']?.toString(),
+      };
+    }
+
+    return {
+      'id': 'legacy_${DateTime.now().millisecondsSinceEpoch}',
+      'orderNo': 'KM${DateTime.now().millisecondsSinceEpoch}',
+      'status': 'pendingPayment',
+      'items': const <Map<String, dynamic>>[],
+      'subtotal': 0,
+      'shippingFee': 0,
+      'discount': 0,
+      'grandTotal': 0,
+      'paymentMethod': 'QR Code',
+      'address': null,
+      'createdAt': DateTime.now().toIso8601String(),
+    };
+  }
+
+  String _statusFromLegacy() {
+    final mode = widget.modePage?.toString();
+    if (mode == '0') return 'pendingPayment';
+    if (mode == '10') return 'preparing';
+    if (mode == '20') return 'shipping';
+    if (mode == '30') return 'completed';
+
+    final text = (widget.statusText ?? '').toLowerCase();
+    if (text.contains('ชำระ')) return 'pendingPayment';
+    if (text.contains('เตรียม')) return 'preparing';
+    if (text.contains('จัดส่ง')) return 'shipping';
+    if (text.contains('สำเร็จ')) return 'completed';
+    return 'pendingPayment';
+  }
+
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'pendingPayment':
+        return 'รอชำระเงิน';
+      case 'preparing':
+        return 'กำลังจัดเตรียม';
+      case 'shipping':
+        return 'กำลังจัดส่ง';
+      case 'completed':
+        return 'สำเร็จ';
+      case 'reviewed':
+        return 'รีวิวแล้ว';
+      default:
+        return widget.statusText ?? 'คำสั่งซื้อ';
+    }
+  }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'pendingPayment':
+        return AppColors.accentHover;
+      case 'preparing':
+        return AppColors.primary;
+      case 'shipping':
+        return AppColors.infoBlue;
+      case 'completed':
+      case 'reviewed':
+        return AppColors.primaryDark;
+      default:
+        return AppColors.textSecondary;
+    }
+  }
+
+  IconData _statusIcon(String status) {
+    switch (status) {
+      case 'pendingPayment':
+        return Icons.payments_rounded;
+      case 'preparing':
+        return Icons.inventory_2_rounded;
+      case 'shipping':
+        return Icons.local_shipping_rounded;
+      case 'completed':
+      case 'reviewed':
+        return Icons.verified_rounded;
+      default:
+        return Icons.receipt_long_rounded;
+    }
+  }
+
+  List<Map<String, dynamic>> _timeline(String status) {
+    final stages = [
+      {'title': 'รอชำระเงิน', 'key': 'pendingPayment'},
+      {'title': 'กำลังจัดเตรียม', 'key': 'preparing'},
+      {'title': 'กำลังจัดส่ง', 'key': 'shipping'},
+      {'title': 'สำเร็จ', 'key': 'completed'},
+    ];
+    final currentIndex = stages.indexWhere((item) => item['key'] == status);
+    return stages.asMap().entries.map((entry) {
+      final index = entry.key;
+      final item = entry.value;
+      return {
+        ...item,
+        'done': currentIndex > index,
+        'active': currentIndex == index,
+        'pending': currentIndex < index,
+      };
+    }).toList();
+  }
+
+  Widget _sectionCard({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF143D16).withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+              color: valueColor ?? AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeline(String status) {
+    final timeline = _timeline(status);
+    return _sectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'สถานะคำสั่งซื้อ',
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              _buildCompactStatusAction(status),
+            ],
+          ),
+          const SizedBox(height: 14),
+          for (int i = 0; i < timeline.length; i++) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: timeline[i]['done'] == true ||
+                            timeline[i]['active'] == true
+                        ? AppColors.primary
+                        : AppColors.tintGreenSoft,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: timeline[i]['done'] == true ||
+                              timeline[i]['active'] == true
+                          ? AppColors.primary
+                          : AppColors.border,
+                    ),
+                  ),
+                  child: Icon(
+                    timeline[i]['done'] == true
+                        ? Icons.check_rounded
+                        : timeline[i]['active'] == true
+                            ? Icons.circle
+                            : Icons.radio_button_unchecked_rounded,
+                    size: 12,
+                    color: timeline[i]['done'] == true ||
+                            timeline[i]['active'] == true
+                        ? Colors.white
+                        : AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 1),
+                    child: Text(
+                      timeline[i]['title'].toString(),
+                      style: TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 14,
+                        fontWeight: timeline[i]['active'] == true
+                            ? FontWeight.w700
+                            : FontWeight.w600,
+                        color: timeline[i]['done'] == true ||
+                                timeline[i]['active'] == true
+                            ? AppColors.textPrimary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (i != timeline.length - 1)
+              Padding(
+                padding: const EdgeInsets.only(left: 10.5),
+                child: Container(
+                  width: 1.5,
+                  height: 26,
+                  color: timeline[i]['done'] == true
+                      ? AppColors.primary
+                      : AppColors.border,
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactStatusAction(String status) {
+    if (status == 'reviewed' || status == 'completed') {
+      return const SizedBox.shrink();
+    }
+
+    final label = status == 'pendingPayment'
+        ? 'ย้ายไปเตรียม'
+        : status == 'preparing'
+            ? 'ย้ายไปจัดส่ง'
+            : 'ย้ายไปสำเร็จ';
+
+    return TextButton(
+      onPressed: () async {
+        if (status == 'pendingPayment') {
+          final now = DateTime.now().toIso8601String();
+          await OrderStore.updateOrderStatus(
+            _order!['id'].toString(),
+            'preparing',
+            paidAt: now,
+            preparedAt: now,
+          );
+        } else if (status == 'preparing') {
+          final now = DateTime.now().toIso8601String();
+          await OrderStore.updateOrderStatus(
+            _order!['id'].toString(),
+            'shipping',
+            shippedAt: now,
+          );
+        } else if (status == 'shipping') {
+          final now = DateTime.now().toIso8601String();
+          await OrderStore.updateOrderStatus(
+            _order!['id'].toString(),
+            'completed',
+            completedAt: now,
+          );
+        }
+        if (!mounted) return;
+        await _loadOrder();
+      },
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        foregroundColor: AppColors.primary,
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontFamily: 'Kanit',
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItemCard(Map<String, dynamic> item) {
+    final qty = _toInt(item['qty']);
+    final price = _toInt(item['price']);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.tintGreenSoft,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: 54,
+              height: 54,
+              color: Colors.white,
+              child: loadingImageNetwork(
+                item['image']?.toString() ?? '',
+                fit: BoxFit.cover,
+                width: 54,
+                height: 54,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['name']?.toString() ?? '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'จำนวน $qty ชิ้น',
+                  style: const TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 12.5,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            _money(price * qty),
+            style: const TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopSummary(Map<String, dynamic> order) {
+    final status = order['status'].toString();
+    final label = _statusLabel(status);
+    final color = _statusColor(status);
+    final items = (order['items'] as List<dynamic>? ?? const [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+    return _sectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.tintGreenSoft,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  _statusIcon(status),
+                  color: color,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'เลขที่คำสั่งซื้อ',
+                      style: const TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 12.5,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      order['orderNo']?.toString() ?? '-',
+                      style: const TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.tintGreenSoft,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'ยอดรวมทั้งหมด',
+                        style: TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 12.5,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _money(_toInt(order['grandTotal'])),
+                        style: const TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 19,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildInfoRow('สินค้าทั้งหมด', '${items.length} รายการ'),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildInfoRow(
+                  'วิธีชำระ',
+                  order['paymentMethod']?.toString() ?? 'QR Code',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddressCard(Map<String, dynamic>? address) {
+    if (address == null) {
+      return _sectionCard(
+        child: const Text(
+          'ยังไม่มีที่อยู่จัดส่ง',
+          style: TextStyle(
+            fontFamily: 'Kanit',
+            fontSize: 14,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      );
+    }
+
+    final parts = [
+      address['houseNo'],
+      address['road'],
+      address['subDistrict'],
+      address['district'],
+      address['province'],
+      address['postalCode'],
+    ]
+        .where((value) => (value ?? '').toString().isNotEmpty)
+        .map((value) => value.toString())
+        .toList();
+
+    return _sectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'ที่อยู่จัดส่ง',
+            style: TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            address['recipientName']?.toString() ?? '',
+            style: const TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 14.5,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            address['phone']?.toString() ?? '',
+            style: const TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 12.5,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            parts.join(' '),
+            style: const TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 13,
+              height: 1.45,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          if ((address['note'] ?? '').toString().isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'หมายเหตุ: ${address['note']}',
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 12.5,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(Map<String, dynamic> order) {
+    return _sectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'สรุปรายการ',
+            style: TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildInfoRow('ราคาสินค้า', _money(_toInt(order['subtotal']))),
+          _buildInfoRow('ค่าจัดส่ง', _money(_toInt(order['shippingFee']))),
+          _buildInfoRow(
+            'ส่วนลดคูปอง',
+            '- ${_money(_toInt(order['discount']))}',
+            valueColor: AppColors.primary,
+          ),
+          const Divider(height: 24, color: AppColors.border),
+          _buildInfoRow(
+            'ยอดรวม',
+            _money(_toInt(order['grandTotal'])),
+            valueColor: AppColors.primaryDark,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActions(Map<String, dynamic> order) {
+    final status = order['status'].toString();
+    if (status != 'pendingPayment' && status != 'completed') {
+      return const SizedBox.shrink();
+    }
+
+    if (status == 'completed') {
+      return SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ToRateCentralPage(
+                  highlightOrderId: order['id'].toString(),
+                ),
+              ),
+            ).then((_) => _loadOrder());
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+          child: const Text(
+            'กดรับสินค้า',
+            style: TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 15.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PaymentStatusCentralPage(
+                orderId: order['id'].toString(),
+              ),
+            ),
+          ).then((_) => _loadOrder());
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Text(
+          'ชำระเงินตอนนี้',
+          style: TextStyle(
+            fontFamily: 'Kanit',
+            fontSize: 15.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
-      backgroundColor: Colors.white,
-      appBar: headerCentral(context, title: 'รายละเอียดคำสั่งซื้อ'),
-      // AppBar(
-      //   elevation: 0,
-      //   backgroundColor: Colors.white,
-      //   automaticallyImplyLeading: false,
-      //   toolbarHeight: 10,
-      // ),
-      body: ScrollConfiguration(
-          behavior: CsBehavior(),
-          child: loading == true
-              ? Center(
-                  child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                ))
-              : modePage == '0'
-                  ? mode0()
-                  : modePage == '10'
-                      ? mode10()
-                      : modePage == '20'
-                          ? mode20()
-                          : mode30()),
-    );
-  }
-
-  void launchURLMap(String lat, String lng) async {
-    String homeLat = lat;
-    String homeLng = lng;
-
-    final String googleMapslocationUrl =
-        "https://www.google.com/maps/search/?api=1&query=" +
-            homeLat +
-            ',' +
-            homeLng;
-
-    final String encodedURl = Uri.encodeFull(googleMapslocationUrl);
-
-    if (await canLaunch(encodedURl)) {
-      await launch(encodedURl);
-    } else {
-      throw 'Could not launch $encodedURl';
-    }
-  }
-
-  mode0() {
-    return ListView(
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom,
-      ),
-      children: [
-        Container(
-          padding: const EdgeInsets.only(right: 15, left: 15, bottom: 15),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: AppColors.background,
+      appBar: const KasetAppBar(title: 'รายละเอียดคำสั่งซื้อ'),
+      body: _loading || _order == null
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
+          : Column(
               children: [
-                Container(
-                  child: Text(
-                    'รายละเอียดรายการ',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        // alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFBE3E6),
-                          borderRadius: BorderRadius.all(Radius.circular(25)),
-                        ),
-                        child: Text(
-                          'รอชำระเงิน',
-                          style: TextStyle(
-                              fontSize: 13,
-                              // fontWeight: FontWeight.bold,
-                              color: Color(0xFFDF0B24)),
-                          textAlign: TextAlign.end,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Flexible(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          toPay(modelProduct['code']);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          // primary: Color.fromARGB(255, 208, 141, 147),
-                          backgroundColor: Color(0xFFDF0B24),
-                          // backgroundColor: Colors.teal,
-                          side: BorderSide(
-                              color: Color(0xFFDF0B24),
-                              width: 1,
-                              style: BorderStyle.solid),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                          ),
-                        ),
-                        child: Text(
-                          'ชำระเงินตอนนี้',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            color: Color(0xFFFFFFFF),
-                            fontWeight: FontWeight.normal,
-                            fontFamily: 'Kanit',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          'วันที่ทำรายการ',
-                          style:
-                              TextStyle(fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          // dateTimeThai(modelProduct['ordered_at']),
-                          modelProduct['purchaseDate'] ?? '',
-                          style: TextStyle(
-                            fontSize: 13,
-                            // fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          'TaxID',
-                          style:
-                              TextStyle(fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          (modelProduct['taxId'] ?? '-'),
-                          style: TextStyle(
-                            fontSize: 13,
-                            // fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ]),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'ที่อยู่จัดส่ง',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Container(
-                child: Text(
-                  modelProduct['name'] ?? '',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    // color: Color(0xFF707070)
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  modelProduct['phone'] ?? '',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF707070),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  (modelProduct['address']['no'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['subDistrict'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['district'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['province'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['postNo'] ?? ''),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0xFF707070),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Container(
-                child: Text(
-                  'รายการสั่งซื้อ',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Container(
-                child: _buildListProduct(
-                  modelProduct,
-                ),
-                // ListView.separated(
-                //   shrinkWrap: true,
-                //   physics: ClampingScrollPhysics(),
-                //   padding: EdgeInsets.zero,
-                //   itemBuilder: (context, index) => _buildListProduct(
-                //     modelProduct['order_details']['data'][index],
-                //   ),
-                //   separatorBuilder: (_, __) => SizedBox(height: 10),
-                //   itemCount: modelProduct['order_details']['data'].length,
-                // ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'สรุปค่าใช้จ่าย',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'การชำระเงิน',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    // alignment: Alignment.centerRight,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFBE3E6),
-                      borderRadius: BorderRadius.all(Radius.circular(25)),
-                    ),
-                    child: Text(
-                      'รอชำระเงิน',
-                      style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                          color: Color(0xFFDF0B24)),
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              // for (var i = 0;
-              //     i < modelProduct['order_details']['data'].length;
-              //     i++)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ยอดสินค้า',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['price'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ค่าจัดส่ง',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['shipping'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ส่วนลด',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat((modelProduct['discount'] ?? 0).toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ยอดรวมทั้งสิ้น',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  mode10() {
-    return ListView(
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom,
-      ),
-      children: [
-        Container(
-          padding: const EdgeInsets.only(right: 15, left: 15, bottom: 15),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  child: Text(
-                    'รายละเอียดรายการ',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Flexible(
-                    //   child: Container(
-                    //     child: Text(
-                    //       'หมายเลขติดตามพัสดุ',
-                    //       style: TextStyle(
-                    //         fontSize: 13,
-                    //         fontWeight: FontWeight.bold,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    // SizedBox(
-                    //   width: 10,
-                    // ),
-                    Flexible(
-                      child: Container(
-                        // alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFBE3E6).withOpacity(0.5),
-                          borderRadius: BorderRadius.all(Radius.circular(25)),
-                        ),
-                        child: Text(
-                          // 'พัสดุจะถูกส่งมอบให้บริษัทขนส่งภายในวันที่ ${dateThai(modelProduct['shipped_at']).toString()}',
-                          'พัสดุจะถูกส่งมอบให้บริษัทขนส่งภายในวันที่ ${modelProduct['shipped_at']}',
-                          style: TextStyle(
-                              fontSize: 13,
-                              // fontWeight: FontWeight.bold,
-                              color: Color(0xFFDF0B24).withOpacity(0.5)),
-                          textAlign: TextAlign.end,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                modelProduct['receipt'] != null
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: Container(
-                              child: Text(
-                                'ใบเสร็จ',
-                                style: TextStyle(
-                                    fontSize: 13, color: Color(0xFF707070)
-                                    // fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                // primary: Color.fromARGB(255, 208, 141, 147),
-                                backgroundColor: Color(0xFF09665a),
-                                // backgroundColor: Colors.teal,
-                                side: BorderSide(
-                                    color: Color(0xFF09665a),
-                                    width: 1,
-                                    style: BorderStyle.solid),
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(40)),
-                                ),
-                              ),
-                              child: Text(
-                                'ใบเสร็จสินค้า',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  color: Color(0xFFFFFFFF),
-                                  fontWeight: FontWeight.normal,
-                                  fontFamily: 'Kanit',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : SizedBox(),
-                modelProduct['receipt_shipping'] != null
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: Container(
-                              child: Text(
-                                'ใบเสร็จค่าขนส่ง',
-                                style: TextStyle(
-                                    fontSize: 13, color: Color(0xFF707070)),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF09665a),
-                                side: BorderSide(
-                                    color: Color(0xFF09665a),
-                                    width: 1,
-                                    style: BorderStyle.solid),
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(40)),
-                                ),
-                              ),
-                              child: Text(
-                                'ใบเสร็จค่าขนส่ง',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  color: Color(0xFFFFFFFF),
-                                  fontWeight: FontWeight.normal,
-                                  fontFamily: 'Kanit',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : SizedBox(),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          'วันที่สั่งซื้อ',
-                          style:
-                              TextStyle(fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          // dateTimeThai(modelProduct['purchaseDate']),
-                          modelProduct['purchaseDate'],
-                          style: TextStyle(
-                            fontSize: 13,
-                            // fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          'วันที่ชำระเงิน',
-                          style:
-                              TextStyle(fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          // dateTimeThai(modelProduct['paidDate']),
-                          modelProduct['paidDate'],
-                          style: TextStyle(
-                            fontSize: 13,
-                            // fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          'TaxID',
-                          style:
-                              TextStyle(fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Container(
-                        child: Text(
-                          (modelProduct['taxId'] ?? '-').toString(),
-                          style: TextStyle(
-                            fontSize: 13,
-                            // fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ]),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'ที่อยู่จัดส่ง',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Container(
-                child: Text(
-                  modelProduct['name'] ?? '',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    // color: Color(0xFF707070)
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  modelProduct['phone'] ?? '',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF707070),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  (modelProduct['address']['no'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['subDistrict'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['district'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['province'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['postNo'] ?? ''),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0xFF707070),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Container(
-                child: Text(
-                  'รายการสั่งซื้อ',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Container(
-                child: _buildListProduct(
-                  modelProduct,
-                ),
-                // ListView.separated(
-                //   shrinkWrap: true,
-                //   physics: ClampingScrollPhysics(),
-                //   padding: EdgeInsets.zero,
-                //   itemBuilder: (context, index) => _buildListProduct(
-                //     modelProduct['order_details']['data'][index],
-                //   ),
-                //   separatorBuilder: (_, __) => SizedBox(height: 10),
-                //   itemCount: modelProduct['order_details']['data'].length,
-                // ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'สรุปค่าใช้จ่าย',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'การชำระเงิน',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      'QR Payment',
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF09665a)),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              // for (var i = 0;
-              //     i < modelProduct['order_details']['data'].length;
-              //     i++)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ยอดสินค้า',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['price'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ค่าจัดส่ง',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['shipping'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ส่วนลด',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat((modelProduct['discount'] ?? 0).toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ยอดรวมทั้งสิ้น',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  mode20() {
-    return ListView(
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom,
-      ),
-      children: [
-        Container(
-          padding: const EdgeInsets.only(right: 15, left: 15, bottom: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'รายละเอียดรายการ',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    // alignment: Alignment.centerRight,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFBE3E6).withOpacity(0.5),
-                      borderRadius: BorderRadius.all(Radius.circular(25)),
-                    ),
-                    child: Text(
-                      'ท่านจะได้รับพัสดุภายในวันที่ ${modelProduct['destination_shipped_at']}',
-                      style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                          color: Color(0xFFDF0B24).withOpacity(0.5)),
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      child: Text(
-                        'ติดตามพัสดุ',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Flexible(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // modelProduct['tracking_code'] != null
-                              //     ? launchInWebViewWithJavaScript(
-                              //         'https://ems.thaiware.com/${modelProduct['tracking_code']}')
-                              //     : null;
-                            },
-                            style: ElevatedButton.styleFrom(
-                              // primary: Color.fromARGB(255, 208, 141, 147),
-                              backgroundColor: Color(0xFF09665a),
-                              // backgroundColor: Colors.teal,
-                              side: BorderSide(
-                                  color: Color(0xFF09665a),
-                                  width: 1,
-                                  style: BorderStyle.solid),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
-                              ),
-                            ),
-                            child: Text(
-                              'ติดตามพัสดุ',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                color: Color(0xFFFFFFFF),
-                                fontWeight: FontWeight.normal,
-                                fontFamily: 'Kanit',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      child: Text(
-                        'หมายเลขพัสดุ',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Flexible(
-                            child: GestureDetector(
-                          // onTap: () async => await FlutterClipboard.copy(
-                          //         modelProduct['tracking_code'] ?? "")
-                          //     .then(
-                          //   (value) =>
-                          //       toastFail(context, text: '✓  คัดลอกสำเร็จ'),
-                          // ),
-                          child: Image.asset(
-                            'assets/images/kaset/copy_clipboard.png',
-                            height: 25,
-                            width: 25,
-                          ),
-                        )),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Flexible(
-                          child: Container(
-                            child: Text(
-                              modelProduct['trackingCode'] ?? "",
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF09665a)),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        'วันที่ทำรายการ',
-                        style: TextStyle(fontSize: 13, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        modelProduct['purchaseDate'],
-                        style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        'วันที่ชำระเงิน',
-                        style: TextStyle(fontSize: 13, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        modelProduct['paidDate'],
-                        style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        'TaxID',
-                        style: TextStyle(fontSize: 13, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        (modelProduct['taxId'] ?? '-').toString(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              modelProduct['receipt'] != null
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            child: Text(
-                              'ใบเสร็จ',
-                              style: TextStyle(
-                                  fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF09665a),
-                              side: BorderSide(
-                                  color: Color(0xFF09665a),
-                                  width: 1,
-                                  style: BorderStyle.solid),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
-                              ),
-                            ),
-                            child: Text(
-                              'ใบเสร็จสินค้า',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                color: Color(0xFFFFFFFF),
-                                fontWeight: FontWeight.normal,
-                                fontFamily: 'Kanit',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : SizedBox(),
-              modelProduct['receiptShipping'] != null
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            child: Text(
-                              'ใบเสร็จค่าขนส่ง',
-                              style: TextStyle(
-                                  fontSize: 13, color: Color(0xFF707070)),
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF09665a),
-                              side: BorderSide(
-                                  color: Color(0xFF09665a),
-                                  width: 1,
-                                  style: BorderStyle.solid),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
-                              ),
-                            ),
-                            child: Text(
-                              'ใบเสร็จค่าขนส่ง',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                color: Color(0xFFFFFFFF),
-                                fontWeight: FontWeight.normal,
-                                fontFamily: 'Kanit',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : SizedBox(),
-            ],
-          ),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'ที่อยู่จัดส่ง',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Container(
-                child: Text(
-                  modelProduct['name'] ?? '',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    // color: Color(0xFF707070)
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  modelProduct['phone'] ?? '',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF707070),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  (modelProduct['address']['no'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['subDistrict'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['district'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['province'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['postNo'] ?? ''),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0xFF707070),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Container(
-                child: Text(
-                  'รายการสั่งซื้อ',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              _buildListProduct(
-                modelProduct,
-              ),
-              // Container(
-              //   child: ListView.separated(
-              //     shrinkWrap: true,
-              //     physics: ClampingScrollPhysics(),
-              //     padding: EdgeInsets.zero,
-              //     itemBuilder: (context, index) => _buildListProduct(
-              //       modelProduct['order_details']['data'][index],
-              //     ),
-              //     separatorBuilder: (_, __) => SizedBox(height: 10),
-              //     itemCount: modelProduct['order_details']['data'].length,
-              //   ),
-              // ),
-            ],
-          ),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'สรุปค่าใช้จ่าย',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'การชำระเงิน',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      'QR Payment',
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF09665a)),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              // for (var i = 0;
-              //     i < modelProduct['order_details']['data'].length;
-              //     i++)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ยอดสินค้า',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ค่าจัดส่ง',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['shipping'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ส่วนลด',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat((modelProduct['discount'] ?? 0).toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ยอดรวมทั้งสิ้น',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  mode30() {
-    return ListView(
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom,
-      ),
-      children: [
-        Container(
-          // height: 200,
-          // decoration: BoxDecoration(
-          //   image: DecorationImage(
-          //     image: AssetImage("assets/bg_order_details.png"),
-          //     fit: BoxFit.fitWidth,
-          //   ),
-          // ),
-          // margin: const EdgeInsets.only(top: 15),
-          padding:
-              const EdgeInsets.only(top: 15, right: 15, left: 15, bottom: 15),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  child: Text(
-                    'จัดส่งสำเร็จ',
-                    style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF09665a)),
-                  ),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Container(
-                  child: Text(
-                    'ขอบคุณที่ไว้วางใจที่ซื้อสินค้ากับเรา \nเราจะรอท่านกลับมาอีกครั้ง',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                //           Material(
-                // // elevation: 5.0,
-                // // borderRadius: BorderRadius.circular(30.0),
-                // shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(22.0) ),
-                // color: Color(0XFFE00923),
-                // child:
-                //           MaterialButton(
-                //             color: Color(0XFFE00923),
-                //             // shape:
-                //   minWidth: MediaQuery.of(context).size.width,
-                //   // height: 40,
-                //   onPressed: () {
-                //     // loginWithGuest();
-                //   },
-                //   child: new Text(
-                //     'ซื้ออีกครั้ง',
-                //     style: new TextStyle(
-                //       fontSize: 18.0,
-                //       color: Color(0xFFDF0B24),
-                //       fontWeight: FontWeight.normal,
-                //       fontFamily: 'Kanit',
-                //     ),
-                //   ),
-                // ),
-                //           )
-
-                // Center(
-                //   child: Container(
-                //     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 7),
-                //     decoration: BoxDecoration(
-                //       border: Border.all(width: 1, color: Color(0xFFDF0B24),style: BorderStyle.solid),
-                //       borderRadius: BorderRadius.all(Radius.circular(50))
-                //     ),
-                //     child: Text(
-                //       'ซื้ออีกครั้ง',
-                //       style: TextStyle(
-                //         fontSize: 15,
-                //         fontWeight: FontWeight.w400,
-                //         color: Color(0xFFDF0B24)
-                //       ),
-                //     ),
-                //   ),
-                // ),
-              ]),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          padding: const EdgeInsets.only(right: 15, left: 15, bottom: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'รายละเอียดรายการ',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        'หมายเลขติดตามพัสดุ',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // SizedBox(
-                  //   width: 10,
-                  // ),
-                  Flexible(
-                    flex: 2,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Flexible(
-                            child: GestureDetector(
-                          // onTap: () async => await FlutterClipboard.copy(
-                          //         modelProduct['tracking_code'] ?? "")
-                          //     .then(
-                          //   (value) =>
-                          //       toastFail(context, text: '✓  คัดลอกสำเร็จ'),
-                          // ),
-                          child: Image.asset(
-                            'assets/images/kaset/copy_clipboard.png',
-                            height: 25,
-                            width: 25,
-                          ),
-                        )),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Flexible(
-                          child: Container(
-                            child: Text(
-                              modelProduct['trackingCode'] ?? "",
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF09665a)),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        'วันที่ทำรายการ',
-                        style: TextStyle(fontSize: 13, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        // dateTimeThai(modelProduct['ordered_at']),
-                        modelProduct['purchaseDate'],
-                        style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        'วันที่ชำระเงิน',
-                        style: TextStyle(fontSize: 13, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        // dateTimeThai(modelProduct['paid_at']),
-                        modelProduct['paidDate'],
-                        style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        'TaxID',
-                        style: TextStyle(fontSize: 13, color: Color(0xFF707070)
-                            // fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        (modelProduct['taxId'] ?? '-').toString(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          // fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              modelProduct['receipt'] != null
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            child: Text(
-                              'ใบเสร็จ',
-                              style: TextStyle(
-                                  fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF09665a),
-                              side: BorderSide(
-                                  color: Color(0xFF09665a),
-                                  width: 1,
-                                  style: BorderStyle.solid),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
-                              ),
-                            ),
-                            child: Text(
-                              'ใบเสร็จสินค้า',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                color: Color(0xFFFFFFFF),
-                                fontWeight: FontWeight.normal,
-                                fontFamily: 'Kanit',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : SizedBox(),
-              modelProduct['receiptShipping'] != null
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            child: Text(
-                              'ใบเสร็จค่าขนส่ง',
-                              style: TextStyle(
-                                  fontSize: 13, color: Color(0xFF707070)
-                                  // fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF09665a),
-                              side: BorderSide(
-                                  color: Color(0xFF09665a),
-                                  width: 1,
-                                  style: BorderStyle.solid),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
-                              ),
-                            ),
-                            child: Text(
-                              'ใบเสร็จค่าขนส่ง',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                color: Color(0xFFFFFFFF),
-                                fontWeight: FontWeight.normal,
-                                fontFamily: 'Kanit',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : SizedBox(),
-            ],
-          ),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'ที่อยู่จัดส่ง',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Container(
-                child: Text(
-                  modelProduct['name'] ?? '',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    // color: Color(0xFF707070)
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  modelProduct['phone'] ?? '',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF707070),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Container(
-                child: Text(
-                  (modelProduct['no'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['subDistrict'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['district'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['province'] ?? '') +
-                      ' ' +
-                      (modelProduct['address']['postNo'] ?? ''),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0xFF707070),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Container(
-                child: Text(
-                  'รายการสั่งซื้อ',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Container(
-                child: _buildListProduct(
-                  modelProduct,
-                ),
-                // ListView.separated(
-                //   shrinkWrap: true,
-                //   physics: ClampingScrollPhysics(),
-                //   padding: EdgeInsets.zero,
-                //   itemBuilder: (context, index) => _buildListProduct(
-                //     modelProduct['order_details']['data'][index],
-                //   ),
-                //   separatorBuilder: (_, __) => SizedBox(height: 10),
-                //   itemCount: modelProduct['order_details']['data'].length,
-                // ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          color: Color(0xFFF7F7F7),
-          child: SizedBox(height: 10),
-        ),
-        Container(
-          color: Color(0xFFFFFFFF),
-          padding:
-              const EdgeInsets.only(right: 15, left: 15, top: 15, bottom: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Text(
-                  'สรุปค่าใช้จ่าย',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'การชำระเงิน',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      'QR Payment',
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF09665a)),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      // 'ยอดสินค้า ชิ้นที่ ${(i + 1).toString()}',
-                      'ยอดสินค้า',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['price'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ค่าจัดส่ง',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['shipping'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ส่วนลด',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF707070)
-                          // fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat((modelProduct['discount'] ?? 0).toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 14,
-                        // fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    child: Text(
-                      'ยอดรวมทั้งสิ้น',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Text(
-                      '${moneyFormat(modelProduct['priceTotal'].toString())} บาท',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  rowBusinessHours(String day, String time) {
-    Color color = day == nowDayOfWeek ? Color(0xFF09665a) : Color(0xFF707070);
-    return Row(
-      children: [
-        Container(
-          height: 10,
-          width: 10,
-          decoration: BoxDecoration(
-            color: day == nowDayOfWeek ? Color(0xFF09665a) : Colors.transparent,
-            borderRadius: BorderRadius.circular(100),
-          ),
-        ),
-        SizedBox(width: 5),
-        Container(
-          width: 80,
-          child: Text(
-            day,
-            style: TextStyle(
-              fontSize: 13,
-              color: color,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            time,
-            style: TextStyle(
-              fontSize: 13,
-              color: color,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  _buildListProduct(param) {
-    print(param);
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () async {
-            // var models = {};
-            // models['product']['data'] = param['product']['data'];
-            // models['product_variant']['data'] = param['product_variant']['data'];
-            // models['media']['data'] = param['media']['data'];
-
-            // var productModel =
-            //     await readProduct(param['product']['data']['id']);
-            // await _addLog(productModel);
-            // await Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (_) => ProductFormCentralPage(
-            //       model: productModel,
-            //     ),
-            //   ),
-            // );
-          },
-          child: Container(
-            // padding: EdgeInsets.only(top: 10, bottom: 5),
-            child: Row(
-              children: [
-                // InkWell(
-                //   onTap: () {
-                //     // _getProductById(param['product']['data']['id']);
-                //     // Navigator.pop(context);
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (_) => OrderDetailsPage(
-                //           model: param,
-                //         ),
-                //       ),
-                //     );
-                //   },
-                //   child:
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: Image.asset(
-                      param['imageUrl'],
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    )
-                    // loadingImageNetwork(
-                    //   param['imageUrl'],
-                    //   width: 80,
-                    //   height: 80,
-                    //   fit: BoxFit.cover,
-                    // ),
-                    ),
-                // ),
-                SizedBox(width: 10),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                     children: [
-                      SizedBox(
-                        // height: 80,
+                      _buildTopSummary(_order!),
+                      const SizedBox(height: 14),
+                      _buildTimeline(_order!['status'].toString()),
+                      const SizedBox(height: 14),
+                      _sectionCard(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              param['title'],
+                            const Text(
+                              'รายการสินค้า',
                               style: TextStyle(
-                                fontSize: 13,
-                                overflow: TextOverflow.ellipsis,
+                                fontFamily: 'Kanit',
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
                               ),
-                              maxLines: 2,
                             ),
+                            const SizedBox(height: 12),
+                            for (final item in (_order!['items']
+                                        as List<dynamic>? ??
+                                    const [])
+                                .map(
+                                    (e) => Map<String, dynamic>.from(e as Map)))
+                              _buildItemCard(item),
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
-                      SizedBox(
-                        height: 20,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                '${moneyFormat(param['price'].toString())} บาท',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              'จำนวน ' + param['qty'].toString(),
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
+                      const SizedBox(height: 14),
+                      _buildAddressCard(
+                        _order!['address'] == null
+                            ? null
+                            : Map<String, dynamic>.from(
+                                _order!['address'] as Map),
+                      ),
+                      const SizedBox(height: 14),
+                      _buildSummaryCard(_order!),
+                      const SizedBox(height: 14),
                     ],
                   ),
-                )
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: _buildActions(_order!),
+                ),
               ],
             ),
-          ),
-        ),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //   children: [
-
-        //   ],
-        // ),
-        SizedBox(height: 10),
-      ],
-    );
-  }
-
-  toPay(order_id) {
-    dynamic modelData = {
-      'payment_type': '3',
-      // 'order_id': 'order_BYW95EGWJDN6VK'
-      'order_id': order_id
-    };
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PaymentStatusCentralPage(model: modelData),
-      ),
     );
   }
 }

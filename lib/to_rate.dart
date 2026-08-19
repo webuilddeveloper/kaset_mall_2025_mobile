@@ -1,284 +1,362 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
+import 'package:kasetmall/order_details.dart';
 import 'package:kasetmall/reviews_add.dart';
-import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/widget/header.dart';
-
+import 'package:kasetmall/shared/app_bar.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 
 class ToRateCentralPage extends StatefulWidget {
-  const ToRateCentralPage({Key? key}) : super(key: key);
+  const ToRateCentralPage({Key? key, this.highlightOrderId}) : super(key: key);
+
+  final String? highlightOrderId;
 
   @override
   State<ToRateCentralPage> createState() => _ToRateCentralPageState();
 }
 
 class _ToRateCentralPageState extends State<ToRateCentralPage> {
-  bool loading = false;
-  late List<dynamic> modelUsersMeReviews;
-  bool resultOrderId = false;
-  bool resultProductId = false;
-  String result = '';
+  final NumberFormat _moneyFormat = NumberFormat('#,###', 'th_TH');
+  late Future<List<Map<String, dynamic>>> _futureOrders;
 
-  List<dynamic> orderModel = [
-    {
-      "code": "1",
-      "title": "ปุ๋ยเคมี",
-      "price": 99000,
-      "qty": "2",
-      "discount": 0,
-      "priceTotal": 203000,
-      "shipping": 5000,
-      "imageUrl":
-          "https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png",
-      "purchaseDate": "10/10/2568 10:30:00",
-      "paidDate": "10/10/2568 10:35:00",
-      "destination_shipped_at": "15/10/2568",
-      "trackingCode": "ES83990293818",
-      "receiptShipping": "receiptShipping.pdf",
-      "receipt": "receipt.pdf",
-      "taxId": "1004293962218",
-      "phone": "0999999999",
-      "name": "สมศักดิ์ ศักดิ์สม",
-      "shipped_at": "15/10/2568",
-      "address": {
-        "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
-        "subDistrict": "จอมพล",
-        "district": "จตุจักร",
-        "province": "กรุงเทพมหานครฯ",
-        "postNo": "10900"
-      },
-      "status": "30"
-    }
-  ];
+  int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
+  }
+
+  String _money(int value) => '${_moneyFormat.format(value)} บาท';
+
+  Future<List<Map<String, dynamic>>> _loadOrders() async {
+    final pending = await OrderStore.getOrdersByStatus('completed');
+    final reviewed = await OrderStore.getOrdersByStatus('reviewed');
+    final all = [...pending, ...reviewed];
+    all.sort((a, b) {
+      final aReviewed = a['status']?.toString() == 'reviewed';
+      final bReviewed = b['status']?.toString() == 'reviewed';
+      if (aReviewed == bReviewed) return 0;
+      return aReviewed ? 1 : -1;
+    });
+    return all;
+  }
 
   @override
   void initState() {
-    // _futureModel = Future.value(toRate);
-    // read();
     super.initState();
+    _futureOrders = _loadOrders();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  Future<void> _reload() async {
+    setState(() {
+      _futureOrders = _loadOrders();
+    });
   }
 
-  read() async {
-    // modelUsersMeReviews = await get(server + 'users/me/reviews');
-    modelUsersMeReviews =
-        await get(server + 'users/me/order-details/review-pending');
-    return get(server + 'users/me/order-details/review-pending');
+  Widget _emptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 86,
+              height: 86,
+              decoration: BoxDecoration(
+                color: AppColors.tintGreenSoft,
+                borderRadius: BorderRadius.circular(26),
+              ),
+              child: const Icon(
+                Icons.star_border_rounded,
+                color: AppColors.primary,
+                size: 46,
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'ยังไม่มีรายการให้คะแนน',
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'เมื่อคำสั่งซื้อเสร็จสิ้นและยังไม่ได้รีวิว จะมาแสดงที่หน้านี้',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 13,
+                height: 1.45,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(Map<String, dynamic> order) {
+    final items = (order['items'] as List<dynamic>? ?? const []);
+    final total = _toInt(order['grandTotal']);
+    final isHighlighted = order['id'].toString() == widget.highlightOrderId;
+    final status = order['status'].toString();
+    final isReviewed = status == 'reviewed';
+
+    final firstItem =
+        items.isNotEmpty ? Map<String, dynamic>.from(items.first as Map) : null;
+    final reviewProduct = firstItem == null
+        ? <String, dynamic>{}
+        : {
+            'code': firstItem['id']?.toString() ?? order['id'].toString(),
+            'title': firstItem['name']?.toString() ?? '',
+            'imageUrl': firstItem['image']?.toString() ?? '',
+            'price': firstItem['price'] ?? 0,
+            'qty': firstItem['qty'] ?? 1,
+          };
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isReviewed
+            ? const Color(0xFFF7FBF7)
+            : isHighlighted
+                ? AppColors.tintGreenSoft
+                : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isReviewed
+              ? AppColors.border
+              : isHighlighted
+                  ? AppColors.primary
+                  : AppColors.border,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF143D16).withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OrderDetailsPage(orderId: order['id'].toString()),
+            ),
+          ).then((_) => _reload());
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isReviewed
+                        ? AppColors.tintGreenSoft
+                        : AppColors.accentTint,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    isReviewed ? 'รีวิวแล้ว' : 'รอรีวิว',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: isReviewed ? AppColors.primary : AppColors.accentHover,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  order['orderNo']?.toString() ?? '-',
+                  style: const TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: 68,
+                    height: 68,
+                    color: AppColors.tintGreenSoft,
+                    child: loadingImageNetwork(
+                      firstItem != null
+                          ? firstItem['image']?.toString() ?? ''
+                          : '',
+                      fit: BoxFit.cover,
+                      width: 68,
+                      height: 68,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        firstItem != null
+                            ? firstItem['name']?.toString() ?? ''
+                            : 'คำสั่งซื้อ',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          height: 1.25,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${items.length} รายการ · ${_money(total)}',
+                        style: const TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 12.5,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'ยอดรวม ${_money(total)}',
+                    style: const TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: isReviewed
+                        ? null
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ReviewsAddPage(
+                                  orderId: order['id'].toString(),
+                                  modelProductData: reviewProduct,
+                                  modelMediaData: reviewProduct,
+                                ),
+                              ),
+                            ).then((_) => _reload());
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          isReviewed ? AppColors.tintGreenSoft : AppColors.primary,
+                      foregroundColor:
+                          isReviewed ? AppColors.textSecondary : Colors.white,
+                      elevation: 0,
+                      disabledBackgroundColor: AppColors.tintGreenSoft,
+                      disabledForegroundColor: AppColors.textSecondary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      isReviewed ? 'รีวิวแล้ว' : 'ให้คะแนน',
+                      style: const TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: headerCentral(context, title: 'ที่ต้องรีวิว'),
-      body: _buildListOrder(orderModel),
-      // FutureBuilder<dynamic>(
-      //   future: read(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.hasData) {
-      //       if (snapshot.data.length > 0) {
-      //         return _buildListOrder(snapshot.data);
-      //       } else {
-      //         return Center(
-      //           child: Text('ยังไม่มีสินค้าที่ต้องรีวิว'),
-      //         );
-      //       }
-      //     } else if (snapshot.hasError) {
-      //       if (snapshot.data == null){
-      //         return Center(
-      //           child: Text('ยังไม่มีสินค้าที่ต้องรีวิว'),
-      //         );
-      //       }else {
-      //         return DataError();
-      //       }
-      //     } else {
-      //       return Center(
-      //         child: CircularProgressIndicator(),
-      //       );
-      //     }
-      //   },
-      // ),
-    );
-  }
+      backgroundColor: AppColors.background,
+      appBar: const KasetAppBar(title: 'รอรีวิว'),
+      body: SafeArea(
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _futureOrders,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
 
-  Widget _buildListOrder(List<dynamic> param) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 10),
-      itemBuilder: (context, index) => _buildItem(param[index]),
-      separatorBuilder: (_, __) => Container(
-        height: 10,
-        color: Color(0xFFF7F7F7),
-      ),
-      itemCount: param.length,
-    );
-  }
+            final orders = snapshot.data ?? const <Map<String, dynamic>>[];
+            if (orders.isEmpty) {
+              return _emptyState();
+            }
 
-  // _buildOrder(dynamic param) {
-  //   return Container(
-  //     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-  //     color: Colors.white,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.end,
-  //       children: [
-  //         _buildItem(
-  //             // param['id'],
-  //             param,
-  //           ),
-  //         // ListView.separated(
-  //         //   shrinkWrap: true,
-  //         //   physics: ClampingScrollPhysics(),
-  //         //   padding: EdgeInsets.zero,
-  //         //   itemBuilder: (context, index) => _buildItem(
-  //         //     param['id'],
-  //         //     param[index],
-  //         //   ),
-  //         //   separatorBuilder: (_, __) => SizedBox(height: 20),
-  //         //   itemCount: param.length,
-  //         // ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // _buildListCategory(dynamic param) {
-  //   return Column(
-  //     children: [
-  //       SizedBox(height: 5),
-  //       Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           Text(
-  //             param['title'],
-  //             style: TextStyle(
-  //               fontSize: 17,
-  //               fontWeight: FontWeight.w500,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //       SizedBox(height: 10),
-  //       ListView.separated(
-  //         shrinkWrap: true,
-  //         physics: ClampingScrollPhysics(),
-  //         padding: EdgeInsets.zero,
-  //         itemBuilder: (context, index) => _buildItem(param['items'][index]),
-  //         separatorBuilder: (_, __) => SizedBox(height: 10),
-  //         itemCount: param['items'].length,
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildItem(dynamic param) {
-    // resultOrderId =
-    //     modelUsersMeReviews.any((e) => e['orderId'] == orderId);
-
-    // resultProductId = modelUsersMeReviews.any(
-    //     (e) => e['product']['data']['id'] == param['product']['data']['id']);
-
-    // if (resultOrderId && resultProductId) {
-    //   result = 'true';
-    // }
-    return
-        // InkWell(
-        //   onTap: () {
-        //     // Navigator.push(
-        //     //       context,
-        //     //       MaterialPageRoute(
-        //     //         builder: (_) => OrderDetailsPage(
-        //     //           model: param,
-        //     //         ),
-        //     //       ),
-        //     //     );
-        //   },
-        //   child:
-        Column(
-      children: [
-        SizedBox(
-          height: 80,
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  param['imageUrl'],
-                  height: 80,
-                  width: 80,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        param['title'],
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: 13,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+            return RefreshIndicator(
+              onRefresh: _reload,
+              color: AppColors.primary,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                children: [
+                  const Text(
+                    'รายการที่ส่งมอบแล้วและรอการประเมิน',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
-                    GestureDetector(
-                      onTap: result != 'true'
-                          ? () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReviewsAddPage(
-                                    orderId: param['code'],
-                                    modelProductData: param,
-                                    modelMediaData: param,
-                                  ),
-                                ),
-                              )
-                          : null,
-                      child: Container(
-                        alignment: Alignment.centerRight,
-                        width: double.infinity,
-                        child: Container(
-                          height: 25,
-                          padding: EdgeInsets.symmetric(horizontal: 28),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: result != 'true'
-                                  ? Color(0xFFDF0B24)
-                                  : Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: Text(
-                            'รีวิว',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: result != 'true'
-                                  ? Color(0xFFDF0B24)
-                                  : Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'ช่วยให้ร้านค้าและสินค้าได้รับคะแนนจากประสบการณ์จริงของคุณ',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 12.5,
+                      color: AppColors.textSecondary,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 14),
+                  for (final order in orders) _buildOrderCard(order),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
-      ],
+      ),
     );
-
-    // );
   }
-  //
 }

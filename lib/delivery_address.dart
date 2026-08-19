@@ -1,69 +1,310 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kasetmall/delivery_address_add.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
-
-import '../shared/api_provider.dart';
-import '../widget/header.dart';
+import 'package:kasetmall/shared/app_bar.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 
 class DeliveryAddressCentralPage extends StatefulWidget {
-  DeliveryAddressCentralPage({Key? key, this.notChange = false})
-      : super(key: key);
+  const DeliveryAddressCentralPage({super.key, this.notChange = false});
 
-  final notChange;
+  final bool notChange;
 
   @override
-  _DeliveryAddressCentralPageState createState() =>
+  State<DeliveryAddressCentralPage> createState() =>
       _DeliveryAddressCentralPageState();
 }
 
-class _DeliveryAddressCentralPageState
-    extends State<DeliveryAddressCentralPage> {
-  late Future<dynamic> _futureModel;
-  ScrollController scrollController = new ScrollController();
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
-  bool latestCard = false;
+class _DeliveryAddressCentralPageState extends State<DeliveryAddressCentralPage> {
+  Future<List<Map<String, dynamic>>>? _futureAddresses;
 
   @override
   void initState() {
-    _callRead();
     super.initState();
+    _reload();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _reload() {
+    _futureAddresses = AddressStore.getAddresses();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: headerCentral(context, title: 'ที่อยู่จัดส่ง'),
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Expanded(child: _buildSmartRefresher(_buildCreditCard())),
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              15,
-              0,
-              15,
-              MediaQuery.of(context).padding.bottom + 10,
+  Future<void> _refresh() async {
+    setState(_reload);
+  }
+
+  String _buildAddressLine(Map<String, dynamic> item) {
+    final parts = [
+      item['houseNo'],
+      item['road'],
+      item['subDistrict'],
+      item['district'],
+      item['province'],
+      item['postalCode'],
+    ].where((value) => (value ?? '').toString().isNotEmpty).map((e) => e.toString()).toList();
+    return parts.join(' ');
+  }
+
+  Future<void> _openForm({Map<String, dynamic>? address}) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DeliveryAddressAddCentralPage(address: address),
+      ),
+    );
+    if (result == 'success') {
+      await _refresh();
+    }
+  }
+
+  Future<void> _setDefault(String id) async {
+    await AddressStore.setDefault(id);
+    await _refresh();
+  }
+
+  Future<void> _deleteAddress(String id) async {
+    await AddressStore.deleteAddress(id);
+    await _refresh();
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 84,
+              height: 84,
+              decoration: BoxDecoration(
+                color: AppColors.tintGreenSoft,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: const Icon(
+                Icons.location_on_outlined,
+                color: AppColors.primary,
+                size: 38,
+              ),
             ),
-            child: _buildButton(
-              'เพิ่มที่อยู่',
-              callback: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DeliveryAddressAddCentralPage(),
+            const SizedBox(height: 14),
+            const Text(
+              'ยังไม่มีที่อยู่บันทึกไว้',
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'เพิ่มที่อยู่เพื่อใช้ในการสั่งซื้อและจัดส่ง',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 44,
+              child: ElevatedButton(
+                onPressed: () => _openForm(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
-              ).then(
-                (value) => {
-                  if (value == 'success') _onRefresh(),
-                },
+                child: const Text(
+                  'เพิ่มที่อยู่',
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItem(Map<String, dynamic> item) {
+    final isDefault = item['isDefault'] == true;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDefault ? AppColors.primary : AppColors.border,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF143D16).withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.tintGreenSoft,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.location_on_outlined,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item['recipientName'] ?? '',
+                            style: const TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        if (isDefault)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.accentTint,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: const Text(
+                              'ค่าเริ่มต้น',
+                              style: TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.accentHover,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      item['phone'] ?? '',
+                      style: const TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _buildAddressLine(item),
+            style: const TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 13.5,
+              height: 1.45,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          if ((item['note'] ?? '').toString().isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              'หมายเหตุ: ${item['note']}',
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 12.5,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _openForm(address: item),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.border),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'แก้ไข',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: isDefault ? null : () => _setDefault(item['id']),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: isDefault ? AppColors.border : AppColors.primary,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    isDefault ? 'ค่าเริ่มต้น' : 'ตั้งเป็นค่าเริ่มต้น',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontWeight: FontWeight.w700,
+                      color:
+                          isDefault ? AppColors.textSecondary : AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: () => _deleteAddress(item['id']),
+              child: const Text(
+                'ลบที่อยู่',
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  color: Colors.red,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
@@ -72,308 +313,67 @@ class _DeliveryAddressCentralPageState
     );
   }
 
-  Widget _buildSmartRefresher(Widget child) {
-    return SmartRefresher(
-      enablePullDown: true,
-      enablePullUp: true,
-      header: WaterDropHeader(
-        complete: Container(
-          child: Text(''),
-        ),
-        completeDuration: Duration(milliseconds: 0),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: KasetAppBar(
+        title: 'ที่อยู่ของฉัน',
+        showBackButton: true,
       ),
-      footer: CustomFooter(
-        builder: (context, mode) {
-          Widget? body;
-          return Container(
-            height: 55.0,
-            child: Center(child: body),
-          );
-        },
-      ),
-      controller: _refreshController,
-      onRefresh: _onRefresh,
-      onLoading: _onLoading,
-      child: child,
-    );
-  }
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _futureAddresses,
+        builder: (context, snapshot) {
+          final items = snapshot.data ?? const [];
 
-  _buildCreditCard() {
-    return FutureBuilder<dynamic>(
-      future: _futureModel,
-      // ignore: missing_return
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snap) {
-        if (snap.hasData) {
-          if (snap.data.length > 0) {
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              padding: EdgeInsets.only(
-                left: 15,
-                right: 15,
-                bottom: MediaQuery.of(context).padding.bottom + 50,
-                top: 10,
-              ),
-              itemCount: snap.data.length,
-              itemBuilder: (context, index) => buildItem(snap.data[index]),
-              separatorBuilder: (BuildContext context, int index) =>
-                  const SizedBox(height: 10),
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
-          } else if (snap.data == null) {
-            return Container(
-              height: 120,
-              child: Center(
-                child: InkWell(
-                  child: Text('ยังไม่มีรายการที่อยู่จัดส่ง',
+          }
+
+          return Column(
+            children: [
+              Expanded(
+                child: items.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (_, index) => _buildItem(items[index]),
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () => _openForm(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'เพิ่มที่อยู่',
                       style: TextStyle(
                         fontFamily: 'Kanit',
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
-              ),
-            );
-          }
-        } else if (snap.hasError) {
-          // return DataError(onTap: () => _callRead());
-          return Center(
-            child: InkWell(
-              child: Text('ยังไม่มีรายการที่อยู่จัดส่ง',
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  )),
-            ),
-          );
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
-    // return Container();
-  }
-
-  Widget _buildButton(title, {required Function callback}) {
-    return InkWell(
-      onTap: () => callback(),
-      child: Container(
-        height: 45,
-        constraints: BoxConstraints(maxWidth: 400, minWidth: 350),
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Color(0XFFDF0B24),
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'Kanit',
-            fontSize: 25,
-            color: Color(0XFFFFFFFF),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  InkWell buildItem(dynamic model) {
-    return InkWell(
-      onTap: () {
-        if (widget.notChange) {
-          Navigator.pop(context, {'status': '1', ...model});
-        } else {
-          changeDefault(model['id'], model['main']);
-        }
-      },
-      child: Slidable(
-        key: const ValueKey(1),
-        closeOnScroll: true,
-        endActionPane: ActionPane(
-          // motion: const ScrollMotion(),
-          extentRatio: 0.3,
-          motion: BehindMotion(),
-          // dismissible: DismissiblePane(onDismissed: () {}),
-          children: [
-            SlidableAction(
-              flex: 2,
-              autoClose: true,
-              onPressed: (BuildContext) {
-                _deleteAddress(model['id']);
-              },
-              backgroundColor: Color(0xFFFE4A49),
-              foregroundColor: Colors.white,
-              icon: Icons.delete,
-              label: 'ลบที่อยู่',
-            ),
-          ],
-        ),
-        child: Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: model['main'] ? Color(0xFF09665a) : Color(0XFFE4E4E4),
-              // color: Color(0XFFE4E4E4),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Column(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        model['name'] ?? "",
-                        style: TextStyle(
-                          fontFamily: 'Kanit',
-                          fontSize: 15,
-                          color: Colors.black,
-                        ),
+                        fontWeight: FontWeight.w700,
                       ),
-                      Text(
-                        ' | ${model['phone'] ?? ""}',
-                        style: TextStyle(
-                          fontFamily: 'Kanit',
-                          fontSize: 15,
-                          color: Color(0XFF707070),
-                        ),
-                      ),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // FocusScope.of(context).unfocus();
-                      // widget.onChange(snapshot.data[index]['code']);
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) =>
-                      //         DeliveryAddressAddCentralPage(code: model['code']),
-                      //   ),
-                      // );
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              DeliveryAddressAddCentralPage(code: model['id']),
-                        ),
-                      );
-                      setState(() {});
-                    },
-                    child: Image.asset(
-                      "assets/logo/edit_address.png",
-                      width: 15,
-                      height: 15,
                     ),
                   ),
-                ],
-              ),
-
-              SizedBox(height: 5),
-              Padding(
-                padding: const EdgeInsets.only(right: 15.0),
-                child: Text(
-                  (model['address'] ?? "") +
-                      " " +
-                      (model['tambon']['data']["name_th"] ?? "") +
-                      " " +
-                      (model['amphoe']['data']["name_th"] ?? "") +
-                      " " +
-                      (model['province']['data']["name_th"] ?? "") +
-                      " " +
-                      (model['tambon']['data']["zip"] ?? ""),
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 13,
-                    color: Color(0XFF707070),
-                  ),
                 ),
               ),
-              SizedBox(height: 10),
-              // Container(
-              //   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(25.0),
-              //     border: Border.all(
-              //       color: model['isDefault']
-              //           ? Color(0xFF09665a)
-              //           : Color(0XFFE4E4E4),
-              //       // color: Color(0XFF707070),
-              //     ),
-              //   ),
-              //   child: Text(
-              //     model['addressType'] == 0
-              //         ? 'ที่บ้าน'
-              //         : model['addressType'] == 1
-              //             ? 'ที่ทำงาน'
-              //             : 'อื่นๆ',
-              //     style: TextStyle(
-              //       fontFamily: 'Kanit',
-              //       fontSize: 15,
-              //       color: model['isDefault']
-              //           ? Color(0xFF09665a)
-              //           : Color(0XFF707070),
-              //     ),
-              //   ),
-              // ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
-  }
-
-  void _onRefresh() async {
-    _callRead();
-
-    // if failed,use refreshFailed()
-    _refreshController.refreshCompleted();
-    // _refreshController.loadComplete();
-  }
-
-  void _onLoading() async {
-    _callRead();
-    await Future.delayed(Duration(milliseconds: 1000));
-    _refreshController.loadComplete();
-  }
-
-  _callRead() {
-    setState(() {
-      _futureModel = get('${server}shipping-addresses');
-    });
-  }
-
-  changeDefault(param, isSelect) async {
-    if (!isSelect) {
-      await put('${server}shipping-addresses/' + param, {
-        "main": true,
-        // 'isDefault': isDefault,
-      });
-      setState(() {
-        _callRead();
-      });
-    }
-  }
-
-  void _deleteAddress(param) async {
-    await delete('${server}shipping-addresses/' + param);
-    setState(() {
-      _callRead();
-    });
   }
 }

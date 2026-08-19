@@ -3,25 +3,25 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:kasetmall/blank_page/blank_loading.dart';
 import 'package:kasetmall/component/gallery_view.dart';
 import 'package:kasetmall/component/link_url_in.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
-import 'package:kasetmall/login.dart';
 import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/app_theme.dart';
 import 'package:kasetmall/shared/extension.dart';
-import 'package:kasetmall/user_profile_form.dart';
+import 'package:kasetmall/shared/login_guard.dart';
+import 'package:kasetmall/shared/mock_store.dart';
+import 'package:kasetmall/shared/app_bar.dart';
 import 'package:kasetmall/widget/data_error.dart';
 import 'package:kasetmall/widget/show_loading.dart';
-import 'package:kasetmall/widget/stack_tap.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:toast/toast.dart';
 
 import 'package:flutter/material.dart';
@@ -53,7 +53,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   Future<dynamic>? _futureComment;
   String? code;
   List urlImage = [];
-  bool like = false;
   dynamic tempData;
   String shopCode = '';
   String shopName = '';
@@ -74,6 +73,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   bool loadingAddCart = false;
   String? profilePhone;
   String? verifyPhone;
+  late final VoidCallback _cartListener;
 
   @override
   void initState() {
@@ -81,6 +81,19 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     read();
     sharedApi();
     _readUser();
+    _cartListener = () {
+      if (mounted) {
+        _readCartCount();
+      }
+    };
+    MockStore.cartVersion.addListener(_cartListener);
+    _readCartCount();
+  }
+
+  @override
+  void dispose() {
+    MockStore.cartVersion.removeListener(_cartListener);
+    super.dispose();
   }
 
   _readUser() async {
@@ -108,7 +121,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     profilePhone = (await storage.read(key: 'profilePhone'));
     verifyPhone = (await storage.read(key: 'phoneVerified'));
     profileCode = (await storage.read(key: 'profileCode10'));
-    getCountItemInCartV2();
+    _readCartCount();
 
     // readFavoriteProduct();
     readGoodsInventory();
@@ -120,7 +133,6 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
         'netPrice': 0,
         'minPrice': 0,
         'maxPrice': 0,
-        'like': false,
         'rating': 0.0,
         ...widget.model
       };
@@ -153,13 +165,11 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   //   });
   // }
 
-  getCountItemInCartV2() async {
-    //get amount item in cart.
-    await get(server + 'carts').then((value) async {
-      if (value != null)
-        setState(() {
-          amountItemInCart = value.length;
-        });
+  Future<void> _readCartCount() async {
+    final items = await CartStore.getCart();
+    if (!mounted) return;
+    setState(() {
+      amountItemInCart = items.length;
     });
   }
 
@@ -187,526 +197,170 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
+        appBar: KasetAppBar(
+          title: 'รายละเอียดสินค้า',
+          showBackButton: true,
+          actions: [
+            KasetAppBarAction(
+              icon: Icons.shopping_cart_outlined,
+              badge: amountItemInCart > 0 ? amountItemInCart : null,
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CartCentralPage(),
+                  ),
+                );
+                await _readCartCount();
+              },
+            ),
+          ],
+        ),
         body: SafeArea(
           child: FutureBuilder<dynamic>(
             future: _futureModel,
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               if (snapshot.hasData) {
-                print('--1---');
-                return Stack(
-                  children: [
-                    buildDetail(snapshot.data[0]),
-                    buildBtnBottom(snapshot.data[0]),
-                  ],
-                );
+                return buildDetail(snapshot.data[0]);
               } else if (snapshot.hasError) {
-                return Stack(
-                  children: [
-                    DataError(onTap: () => read()),
-                    buildBtnHeader(),
-                  ],
-                );
+                return DataError(onTap: () => read());
               } else {
                 if (widget.model != null) {
-                  return Container(
-                    // color: Colors.amber,
-                    height: double.maxFinite,
-                    child: Column(
-                      children: [
-                        // Expanded(
-                        //   flex: 1,
-                        //   child: buildBtnBottom(
-                        //     tempData), // add cart button, buy now button.
-
-                        // ),
-                        Expanded(
-                          child: Stack(children: [
-                            // buildBtnHeaderShare(),
-                            buildDetail(tempData), // detail && same product.
-                            buildBtnHeader(), // back button, cart page button, other button.
-                            // SizedBox(height: 15),
-                          ]),
-                          flex: 12,
-                        ),
-                        buildBtnBottom(tempData)
-                        // Flexible(
-                        //   // flex: 1,
-                        //   child: buildBtnBottom(
-                        //       tempData), // add cart button, buy now button.
-                        // )
-                      ],
-                    ),
-                  );
+                  return buildDetail(tempData);
                 } else {
                   return BlankLoading();
                 }
               }
             },
           ),
-        ));
+        ),
+        bottomNavigationBar: widget.model != null
+            ? buildBtnBottom(tempData ?? widget.model)
+            : null);
   }
 
   buildBtnBottom(model) {
-    return Container(
-      height: AdaptiveTextSize().getadaptiveTextSize(context, 60),
-      width: double.infinity,
-      color: Colors.white,
-      child: model != null &&
-              model['image'] != null &&
-              model['image'].isNotEmpty
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: StackTap(
-                    onTap: () {
-                      // ##### ถูกใจ #####
-                      setState(() => like = !like);
+    final stock = (model?['stock'] ?? 0) as num;
+    final hasStock = stock > 0;
 
-                      // if (profileCode != '' && profileCode != null) {
-                      //   if (profilePhone == null || profilePhone == '') {
-                      //     _dialogCheckPhone();
-                      //   } else if (verifyPhonePage == 'true') {
-                      //     setState(() => like = !like);
-                      //     if (like == true) {
-                      //       postObjectData(
-                      //           server +
-                      //               'products/' +
-                      //               widget.model['id'] +
-                      //               '/favorite',
-                      //           {});
-                      //     } else {
-                      //       delete(
-                      //         server +
-                      //             'products/' +
-                      //             widget.model['id'] +
-                      //             '/favorite',
-                      //       );
-                      //     }
-                      //     ;
-                      //   } else {
-                      //     _dialogCheckVerify();
-                      //   }
-                      // } else {
-                      //   Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (BuildContext context) =>
-                      //           LoginCentralPage(),
-                      //     ),
-                      //   );
-                      // }
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            like
-                                ? 'assets/images/kaset/heart_full.png'
-                                : 'assets/images/kaset/heart.png',
-                            height: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 25),
-                            width: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 25),
-                            color: like ? Colors.red : Color(0xFF09665a),
-                          ),
-                          Text(
-                            'ถูกใจ',
-                            // (MediaQuery.maybeOf(context).size.height / MediaQuery.maybeOf(context).size.width).toString(),
-                            style: TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: 13,
-                              color: like ? Colors.red : Color(0xFF09665a),
-                            ),
-                            textScaleFactor: ScaleSize.textScaleFactor(context),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // ตะกร้า
-                Flexible(
-                  flex: 1,
-                  child: StackTap(
-                    onTap: () => {
-                      buildModal('cart')
-                          .then((value) => getCountItemInCartV2()),
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/kaset/basket.png',
-                            height: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 25),
-                            width: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 25),
-                            color: Color(0xFF09665a),
-                          ),
-                          Text(
-                            'ใส่ตะกร้า',
-                            style: TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: 13,
-                              color: Color(0xFF09665a),
-                            ),
-                            textScaleFactor: ScaleSize.textScaleFactor(context),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                //ชื้อเลย
-                Flexible(
-                  flex: 2,
-                  child: StackTap(
-                    onTap: () => {
-                      buildModal('buy'),
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      alignment: Alignment.center,
-                      color: Color(0xFF09665a),
-                      child: Text(
-                        'ซื้อเลย ',
-                        style: TextStyle(
-                          fontFamily: 'Kanit',
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textScaleFactor: ScaleSize.textScaleFactor(context),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: StackTap(
-                    onTap: () {
-                      if (profileCode != '' && profileCode != null) {
-                        if (profilePhone == null || profilePhone == '') {
-                          _dialogCheckPhone();
-                        } else if (verifyPhonePage == 'true') {
-                          setState(() => like = !like);
-                          if (like == true) {
-                            postObjectData(
-                                server +
-                                    'products/' +
-                                    widget.model['id'] +
-                                    '/favorite',
-                                {});
-                          } else {
-                            delete(
-                              server +
-                                  'products/' +
-                                  widget.model['id'] +
-                                  '/favorite',
-                            );
-                          }
-                          ;
-                        } else {
-                          // _dialogCheckVerify();
-                        }
-                      } else {
-                        Navigator.push(
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: AppColors.border),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 18,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: hasStock
+                    ? () async {
+                        final allowed = await requireLogin(
                           context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                LoginCentralPage(),
-                          ),
+                          title: 'เพิ่มลงตะกร้า',
+                          description:
+                              'ต้องเข้าสู่ระบบก่อนเพื่อเพิ่มสินค้าลงตะกร้า',
+                        );
+                        if (!allowed) return;
+                        await _addCart(
+                          [Map<String, dynamic>.from(model)],
+                          'cart',
                         );
                       }
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            like
-                                ? 'assets/images/kaset/heart_full.png'
-                                : 'assets/images/kaset/heart.png',
-                            height: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 25),
-                            width: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 25),
-                            color: like ? Colors.red : Color(0xFF09665a),
-                          ),
-                          Text(
-                            'ถูกใจ',
-                            style: TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: 13,
-                              color: like ? Colors.red : Color(0xFF09665a),
-                            ),
-                            textScaleFactor: ScaleSize.textScaleFactor(context),
-                          )
-                        ],
+                    : null,
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: AppColors.tintGreenSoft,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 1,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: hasStock
+                      ? () async {
+                          final allowed = await requireLogin(
+                            context,
+                            title: 'ซื้อเลย',
+                            description:
+                                'ต้องเข้าสู่ระบบก่อนเพื่อทำรายการสั่งซื้อ',
+                          );
+                          if (!allowed) return;
+                          buildModal('buy');
+                        }
+                      : null,
+                  borderRadius: BorderRadius.circular(18),
+                  child: SizedBox(
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: hasStock
+                          ? () async {
+                              final allowed = await requireLogin(
+                                context,
+                                title: 'ซื้อเลย',
+                                description:
+                                    'ต้องเข้าสู่ระบบก่อนเพื่อทำรายการสั่งซื้อ',
+                              );
+                              if (!allowed) return;
+                              buildModal('buy');
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            hasStock ? AppColors.primary : Colors.grey.shade300,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        hasStock ? 'ซื้อเลย' : 'สินค้าหมด',
+                        style: const TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
+          ],
+        ),
+      ),
     );
     // );
-  }
-
-  // _dialogCheckVerify() {
-  //   return showDialog(
-  //       barrierDismissible: false,
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return WillPopScope(
-  //           onWillPop: () {
-  //             return Future.value(false);
-  //           },
-  //           child: CupertinoAlertDialog(
-  //             title: new Text(
-  //               'บัญชีนี้ยังไม่ได้ยืนยันเบอร์โทรศัพท์\nกด ตกลง เพื่อยืนยัน',
-  //               style: TextStyle(
-  //                 fontSize: 16,
-  //                 fontFamily: 'Kanit',
-  //                 color: Colors.black,
-  //                 fontWeight: FontWeight.normal,
-  //               ),
-  //             ),
-  //             content: Text(" "),
-  //             actions: [
-  //               CupertinoDialogAction(
-  //                 isDefaultAction: true,
-  //                 child: new Text(
-  //                   "ตกลง",
-  //                   style: TextStyle(
-  //                     fontSize: 13,
-  //                     fontFamily: 'Kanit',
-  //                     color: Color(0xFFc50817),
-  //                     fontWeight: FontWeight.normal,
-  //                   ),
-  //                 ),
-  //                 onPressed: () {
-  //                   Navigator.push(
-  //                     context,
-  //                     MaterialPageRoute(
-  //                       builder: (context) => VerifyPhonePage(),
-  //                     ),
-  //                   );
-  //                 },
-  //               ),
-  //               CupertinoDialogAction(
-  //                 isDefaultAction: false,
-  //                 child: new Text(
-  //                   "ไม่ใช่ตอนนี้",
-  //                   style: TextStyle(
-  //                     fontSize: 13,
-  //                     fontFamily: 'Kanit',
-  //                     color: Color(0xFF000000),
-  //                     fontWeight: FontWeight.normal,
-  //                   ),
-  //                 ),
-  //                 onPressed: () {
-  //                   Navigator.pop(
-  //                     context,
-  //                   );
-  //                 },
-  //               ),
-  //             ],
-  //           ),
-  //         );
-  //       });
-  // }
-
-  _dialogCheckPhone() {
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () {
-              return Future.value(false);
-            },
-            child: CupertinoAlertDialog(
-              title: new Text(
-                'บัญชีนี้ยังไม่ได้เพิ่มเบอร์โทรศัพท์',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Kanit',
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              content: Text(" "),
-              actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: new Text(
-                    "เพิ่ม",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFFc50817),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              UserProfileForm(mode: "addPhone"),
-                        )).then((value) => {read()});
-                  },
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: false,
-                  child: new Text(
-                    "ไม่ใช่ตอนนี้",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      color: Color(0xFF000000),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-                ),
-              ],
-            ),
-          );
-        });
-  }
-
-  Positioned buildBtnHeader() {
-    return Positioned(
-      left: 15,
-      right: 0,
-      // top: MediaQuery.of(context).padding.top + 5,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              // width: 35,
-              // height: 35,
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color(0xFF09665a).withOpacity(0.4),
-              ),
-              child: Icon(
-                Icons.close,
-                size: AdaptiveTextSize().getadaptiveTextSize(context, 25),
-                color: Color(0xFF09665a),
-              ),
-            ),
-          ),
-          // Container(
-          //   height: AdaptiveTextSize().getadaptiveTextSize(context, 42),
-          //   width: AdaptiveTextSize().getadaptiveTextSize(context, 130),
-          //   padding: EdgeInsets.symmetric(horizontal: 10),
-          //   // alignment: Alignment.center,
-          //   decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.horizontal(
-          //         left: Radius.circular(40),
-          //       ),
-          //       gradient: LinearGradient(
-          //         begin: Alignment.topLeft,
-          //         end: Alignment.bottomRight,
-          //         colors: [
-          //           Color(0xFFDF0B24),
-          //           Color(0xFFB80711),
-          //         ],
-          //       )),
-          //   child: Row(
-          //     // crossAxisAlignment: CrossAxisAlignment.center,
-          //     // mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-          //       Icon(
-          //         Icons.check_circle_rounded,
-          //         color: Colors.white,
-          //         size: AdaptiveTextSize().getadaptiveTextSize(context, 20),
-          //       ),
-          //       SizedBox(width: 7),
-          //       Expanded(
-          //         child: Text(
-          //           'เป็นพันธมิตร \nกับองค์การค้า',
-          //           style: TextStyle(
-          //             fontSize: 11,
-          //             color: Colors.white,
-          //             fontWeight: FontWeight.bold,
-          //           ),
-          //           textScaleFactor: ScaleSize.textScaleFactor(context),
-          //         ),
-          //       )
-          //     ],
-          //   ),
-          // )
-        ],
-      ),
-    );
-  }
-
-  Positioned buildBtnHeaderShare() {
-    return Positioned(
-      left: 15,
-      right: 5,
-      top: MediaQuery.of(context).padding.top + 5,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          InkWell(
-            onTap: () {
-              final RenderBox? box = context.findRenderObject() as RenderBox?;
-              if (box != null) {
-                Share.share(
-                  'dlapp.we-builds.com/' +
-                      'ssp-app' +
-                      '?code=' +
-                      '${widget.model['id']}',
-                  subject: '${widget.model?['name']}',
-                  sharePositionOrigin:
-                      box.localToGlobal(Offset.zero) & box.size,
-                );
-              }
-            },
-            child: Container(
-              // width: 35,
-              // height: 35,
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color(0xFFE3E6FE).withOpacity(0.7),
-              ),
-              child: Icon(
-                Icons.share,
-                size: AdaptiveTextSize().getadaptiveTextSize(context, 25),
-                color: Color(0xFF09665a),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   String formatPrice(dynamic price) {
@@ -741,323 +395,288 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
       padding: EdgeInsets.zero,
       children: [
         imageProductView(images),
-        SizedBox(height: 20),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          text: new TextSpan(
-                            children: <TextSpan>[
-                              new TextSpan(
-                                text: '${formatPrice(model?['price'])} บาท',
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontFamily: 'Kanit',
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF09665a),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          '${model?['name']}',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontFamily: 'Kanit',
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textScaleFactor: ScaleSize.textScaleFactor(context),
-                        ),
-                        Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            child: model?['description'] != 'null'
-                                ? Html(
-                                    data: model?['description'] ?? '',
-                                    onLinkTap: (url, attributes, element) {
-                                      if (url != null) {
-                                        launchInWebViewWithJavaScript(url);
-                                      }
-                                    },
-                                  )
-                                : SizedBox()),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              // Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: 15),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       Row(
-              //         children: [
-              //           ratingBar(model['rating']),
-              //           SizedBox(width: 5),
-              //           if (model['rating'] > 0)
-              //             Text(
-              //               double.parse(model['rating'].toString())
-              //                       .toStringAsFixed(1) +
-              //                   '/5',
-              //               style: TextStyle(
-              //                 fontFamily: 'Kanit',
-              //                 fontSize: 14,
-              //                 color: Colors.red,
-              //               ),
-              //             ),
-              //           SizedBox(width: 5),
-              //           Text(
-              //             '(' + model['totalComment'].toString() + ' รีวิว)',
-              //             style: TextStyle(
-              //                 fontFamily: 'Kanit',
-              //                 fontSize: 13,
-              //                 color: Colors.grey[600]),
-              //           ),
-              //         ],
-              //       ),
-              //       Row(
-              //         children: [
-              //           StatefulBuilder(
-              //             builder: (context, setState) {
-              //               return InkWell(
-              //                 onTap: () {
-              //                   setState(() {
-              //                     like = !like;
-              //                   });
-              //                   postDio(
-              //                     server + 'm/like/check',
-              //                     {
-              //                       'reference': model['code'],
-              //                       'isActive': like,
-              //                       'category': model['category'],
-              //                     },
-              //                   );
-              //                 },
-              //                 child: Image.asset(
-              //                   like
-              //                       ? 'assets/images/heart_full.png'
-              //                       : 'assets/images/heart.png',
-              //                   height: 20,
-              //                   width: 20,
-              //                   color: like ? Colors.red : Colors.black,
-              //                 ),
-              //               );
-              //             },
-              //           ),
-              //         ],
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
-              // SizedBox(height: 25),
-
-              FutureBuilder(
-                  future: _futureModel,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Column(
+        Transform.translate(
+          offset: const Offset(0, -18),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Row(
-                          //   children: [
-                          //     Text(
-                          //       'ตัวเลือกสินค้า ',
-                          //       style: TextStyle(
-                          //         fontSize: 15,
-                          //         fontWeight: FontWeight.w500,
-                          //       ),
-                          //       textScaleFactor:
-                          //           ScaleSize.textScaleFactor(context),
-                          //     ),
-                          //     Text(
-                          //       '${snapshot.data?['product_variants']['data'].length} แบบ',
-                          //       style: TextStyle(
-                          //         fontSize: 13,
-                          //         color: Color(0xFF707070),
-                          //         fontWeight: FontWeight.w500,
-                          //       ),
-                          //       textScaleFactor:
-                          //           ScaleSize.textScaleFactor(context),
-                          //     ),
-                          //   ],
-                          // ),
-                          // ),
-                          Container(
-                            height: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 60),
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                            child: ListView.separated(
-                              padding: EdgeInsets.zero,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) => ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // setState(() {
-                                    //   selectedInventory =
-                                    //       snapshot.data?['product_variants']
-                                    //           ['data'][index]['id'];
-                                    //   selectedInventoryModel =
-                                    //       snapshot.data?['product_variants']
-                                    //           ['data'][index];
-                                    //   if (selectedInventoryModel['media_id'] ==
-                                    //       null) {
-                                    //     selectedInventoryModel['url'] = null;
-                                    //   } else {
-                                    //     var url = snapshot.data['media']['data']
-                                    //         .firstWhere((i) =>
-                                    //             i['id'] ==
-                                    //             selectedInventoryModel[
-                                    //                 'media_id']);
-                                    //     selectedInventoryModel['url'] =
-                                    //         url['url'];
-                                    //   }
-                                    // });
-                                    // if (profileCode != '' &&
-                                    //     profileCode != null) {
-                                    // if (profilePhone == null ||
-                                    //     profilePhone == '') {
-                                    //   print('---------- this 1');
-                                    //   _dialogCheckPhone();
-                                    // } else if (verifyPhonePage == 'true') {
-                                    print('---------- this 2');
-                                    buildModal('cart').then(
-                                        (value) => getCountItemInCartV2());
-                                    // }
-                                    // else {
-                                    //   print('---------- this 3');
-                                    //   _dialogCheckVerify();
-                                    // }
-                                    // }
-                                    // else {
-                                    //   print('---------- this 4');
-                                    //   Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //       builder: (BuildContext context) =>
-                                    //           LoginCentralPage(),
-                                    //     ),
-                                    //   );
-                                    // }
-                                  },
-                                  child: snapshot.data['image'].length <= 0
-                                      ? Image.asset(
-                                          'assets/images/kaset/no-img.png',
-                                          // fit: BoxFit.contain,
-                                          width: AdaptiveTextSize()
-                                              .getadaptiveTextSize(context, 50),
-                                          height: AdaptiveTextSize()
-                                              .getadaptiveTextSize(context, 50),
-                                        )
-                                      : _checkImage(snapshot.data?['image']) ==
-                                              null
-                                          ? Image.asset(
-                                              'assets/images/kaset/no-img.png',
-                                              // fit: BoxFit.contain,
-                                              width: AdaptiveTextSize()
-                                                  .getadaptiveTextSize(
-                                                      context, 50),
-                                              height: AdaptiveTextSize()
-                                                  .getadaptiveTextSize(
-                                                      context, 50),
-                                            )
-                                          : loadingImageNetwork(
-                                              _checkImage(
-                                                  snapshot.data?['image']),
-                                              height: AdaptiveTextSize()
-                                                  .getadaptiveTextSize(
-                                                      context, 50),
-                                              width: AdaptiveTextSize()
-                                                  .getadaptiveTextSize(
-                                                      context, 50),
-                                            ),
+                          RichText(
+                            text: new TextSpan(
+                              children: <TextSpan>[
+                                new TextSpan(
+                                  text: '${formatPrice(model?['price'])} บาท',
+                                  style: const TextStyle(
+                                    fontSize: 26,
+                                    fontFamily: 'Kanit',
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primary,
+                                    height: 1,
+                                  ),
                                 ),
-                              ),
-                              separatorBuilder: (_, __) => SizedBox(width: 15),
-                              itemCount: snapshot.data?['image'].length,
+                              ],
                             ),
                           ),
+                          const SizedBox(height: 10),
+                          Text(
+                            '${model?['name']}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Kanit',
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                              height: 1.35,
+                            ),
+                            textScaleFactor: ScaleSize.textScaleFactor(context),
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              child: model?['description'] != 'null'
+                                  ? Html(
+                                      data: model?['description'] ?? '',
+                                      onLinkTap: (url, attributes, element) {
+                                        if (url != null) {
+                                          launchInWebViewWithJavaScript(url);
+                                        }
+                                      },
+                                    )
+                                  : SizedBox()),
                         ],
-                      );
-                    } else {
-                      return Container();
-                    }
-                  }),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                // Padding(
+                //   padding: EdgeInsets.symmetric(horizontal: 15),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       Row(
+                //         children: [
+                //           ratingBar(model['rating']),
+                //           SizedBox(width: 5),
+                //           if (model['rating'] > 0)
+                //             Text(
+                //               double.parse(model['rating'].toString())
+                //                       .toStringAsFixed(1) +
+                //                   '/5',
+                //               style: TextStyle(
+                //                 fontFamily: 'Kanit',
+                //                 fontSize: 14,
+                //                 color: Colors.red,
+                //               ),
+                //             ),
+                //           SizedBox(width: 5),
+                //           Text(
+                //             '(' + model['totalComment'].toString() + ' รีวิว)',
+                //             style: TextStyle(
+                //                 fontFamily: 'Kanit',
+                //                 fontSize: 13,
+                //                 color: Colors.grey[600]),
+                //           ),
+                //         ],
+                //       ),
+                //       Row(
+                //         children: [
+                //           StatefulBuilder(
+                //             builder: (context, setState) {
+                //               return InkWell(
+                //                 onTap: () {
+                //                   setState(() {
+                //                     like = !like;
+                //                   });
+                //                   postDio(
+                //                     server + 'm/like/check',
+                //                     {
+                //                       'reference': model['code'],
+                //                       'isActive': like,
+                //                       'category': model['category'],
+                //                     },
+                //                   );
+                //                 },
+                //                 child: Image.asset(
+                //                   like
+                //                       ? 'assets/images/heart_full.png'
+                //                       : 'assets/images/heart.png',
+                //                   height: 20,
+                //                   width: 20,
+                //                   color: like ? Colors.red : Colors.black,
+                //                 ),
+                //               );
+                //             },
+                //           ),
+                //         ],
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
-              SizedBox(height: 25),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "การจัดส่ง",
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontFamily: 'Kanit',
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textScaleFactor: ScaleSize.textScaleFactor(context),
-                    textAlign: TextAlign.start,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    "(โดยประมาณ)",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      fontWeight: FontWeight.w300,
-                    ),
-                    textScaleFactor: ScaleSize.textScaleFactor(context),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
+                // SizedBox(height: 25),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "แบบธรรมดา (รับภายใน 3-5 วัน)",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF707070),
-                    ),
-                    textScaleFactor: ScaleSize.textScaleFactor(context),
-                    textAlign: TextAlign.start,
-                  ),
-                  Text(
-                    "30 บาท",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'Kanit',
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textScaleFactor: ScaleSize.textScaleFactor(context),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
+                FutureBuilder(
+                    future: _futureModel,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Row(
+                            //   children: [
+                            //     Text(
+                            //       'ตัวเลือกสินค้า ',
+                            //       style: TextStyle(
+                            //         fontSize: 15,
+                            //         fontWeight: FontWeight.w500,
+                            //       ),
+                            //       textScaleFactor:
+                            //           ScaleSize.textScaleFactor(context),
+                            //     ),
+                            //     Text(
+                            //       '${snapshot.data?['product_variants']['data'].length} แบบ',
+                            //       style: TextStyle(
+                            //         fontSize: 13,
+                            //         color: Color(0xFF707070),
+                            //         fontWeight: FontWeight.w500,
+                            //       ),
+                            //       textScaleFactor:
+                            //           ScaleSize.textScaleFactor(context),
+                            //     ),
+                            //   ],
+                            // ),
+                            // ),
+                            Container(
+                              height: AdaptiveTextSize()
+                                  .getadaptiveTextSize(context, 60),
+                              padding: EdgeInsets.symmetric(vertical: 5),
+                              child: ListView.separated(
+                                padding: EdgeInsets.zero,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) => ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // setState(() {
+                                      //   selectedInventory =
+                                      //       snapshot.data?['product_variants']
+                                      //           ['data'][index]['id'];
+                                      //   selectedInventoryModel =
+                                      //       snapshot.data?['product_variants']
+                                      //           ['data'][index];
+                                      //   if (selectedInventoryModel['media_id'] ==
+                                      //       null) {
+                                      //     selectedInventoryModel['url'] = null;
+                                      //   } else {
+                                      //     var url = snapshot.data['media']['data']
+                                      //         .firstWhere((i) =>
+                                      //             i['id'] ==
+                                      //             selectedInventoryModel[
+                                      //                 'media_id']);
+                                      //     selectedInventoryModel['url'] =
+                                      //         url['url'];
+                                      //   }
+                                      // });
+                                      // if (profileCode != '' &&
+                                      //     profileCode != null) {
+                                      // if (profilePhone == null ||
+                                      //     profilePhone == '') {
+                                      //   print('---------- this 1');
+                                      //   _dialogCheckPhone();
+                                      // } else if (verifyPhonePage == 'true') {
+                                      print('---------- this 2');
+                                      buildModal('cart').then(
+                                          (value) => _readCartCount());
+                                      // }
+                                      // else {
+                                      //   print('---------- this 3');
+                                      //   _dialogCheckVerify();
+                                      // }
+                                      // }
+                                      // else {
+                                      //   print('---------- this 4');
+                                      //   Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //       builder: (BuildContext context) =>
+                                      //           LoginCentralPage(),
+                                      //     ),
+                                      //   );
+                                      // }
+                                    },
+                                    child: snapshot.data['image'].length <= 0
+                                        ? Image.asset(
+                                            'assets/images/kaset/no-img.png',
+                                            // fit: BoxFit.contain,
+                                            width: AdaptiveTextSize()
+                                                .getadaptiveTextSize(
+                                                    context, 50),
+                                            height: AdaptiveTextSize()
+                                                .getadaptiveTextSize(
+                                                    context, 50),
+                                          )
+                                        : _checkImage(
+                                                    snapshot.data?['image']) ==
+                                                null
+                                            ? Image.asset(
+                                                'assets/images/kaset/no-img.png',
+                                                // fit: BoxFit.contain,
+                                                width: AdaptiveTextSize()
+                                                    .getadaptiveTextSize(
+                                                        context, 50),
+                                                height: AdaptiveTextSize()
+                                                    .getadaptiveTextSize(
+                                                        context, 50),
+                                              )
+                                            : loadingImageNetwork(
+                                                _checkImage(
+                                                    snapshot.data?['image']),
+                                                height: AdaptiveTextSize()
+                                                    .getadaptiveTextSize(
+                                                        context, 50),
+                                                width: AdaptiveTextSize()
+                                                    .getadaptiveTextSize(
+                                                        context, 50),
+                                              ),
+                                  ),
+                                ),
+                                separatorBuilder: (_, __) =>
+                                    SizedBox(width: 15),
+                                itemCount: snapshot.data?['image'].length,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Container();
+                      }
+                    }),
 
-              SizedBox(height: 25),
-              _buildReview(),
-              buildSameProduct(),
-              Container(
-                height: 80 + MediaQuery.of(context).padding.bottom,
-              ),
-            ],
+                SizedBox(height: 20),
+                Container(height: 8, color: const Color(0xFFF6F8F7)),
+                SizedBox(height: 20),
+                _buildReview(),
+                buildSameProduct(),
+                Container(
+                  height: 80 + MediaQuery.of(context).padding.bottom,
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -1150,6 +769,36 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                     }).toList(),
                   )),
         // buildBtnHeader(), // back button, cart page button, other button.
+        if (listImage.length > 1)
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(listImage.length, (i) {
+                final active = i == _currentImage;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: active ? 16 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: active
+                        ? Colors.white
+                        : Colors.white.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 3,
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
         Positioned(
           bottom: 10,
           right: 10,
@@ -1194,21 +843,22 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'สินค้าที่น่าสนใจ',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                           fontSize: 17,
                           fontFamily: 'Kanit',
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      Text(
+                      const Text(
                         'ดูทั้งหมด',
                         style: TextStyle(
-                          color: Color(0xFF09665a),
+                          color: AppColors.primary,
                           fontSize: 13,
                           fontFamily: 'Kanit',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -1242,11 +892,20 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                                 height: 165,
                                 width: 165,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(9),
+                                  borderRadius: BorderRadius.circular(16),
                                   color: Colors.white,
+                                  border: Border.all(color: AppColors.border),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.04),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(9),
+                                  borderRadius: BorderRadius.circular(16),
                                   child: loadingImageNetwork(
                                     snapshot.data[index]['imageUrl'],
                                     fit: BoxFit.cover,
@@ -1274,567 +933,494 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   }
 
   buildModal(String type) {
+    final pageContext = context;
     setState(() {
       productQty = 1;
       qtyController.text = productQty.toString();
+      loadingAddCart = false;
     });
 
     return showCupertinoModalBottomSheet(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.3),
+      barrierColor: Colors.black.withOpacity(0.32),
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      builder: (sheetContext) {
         return GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
+          onTap: () => FocusScope.of(sheetContext).unfocus(),
           child: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
+            builder: (BuildContext context, StateSetter setModalState) {
               return FutureBuilder(
                 future: _futureProductDetailModel,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data == null) {
-                      return Container();
-                    }
-                    var model = snapshot.data;
-                    if (model['stock'] == null) {
-                      model['stock'] = 0;
-                    }
-                    return Material(
-                      type: MaterialType.transparency,
-                      child: Container(
-                        height:
-                            WidgetsBinding.instance.window.viewInsets.bottom >
-                                    0.0
-                                ? MediaQuery.of(context).size.height
-                                : MediaQuery.of(context).size.height * 0.60,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(40),
-                          ),
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final model = Map<String, dynamic>.from(snapshot.data as Map);
+                  final stock = num.tryParse((model['stock'] ?? 0).toString()) ?? 0;
+                  final canBuy = stock > 0;
+                  final imageUrl = model['image']?.toString() ?? '';
+                  final description = model['description']?.toString() ?? '';
+                  final bottomInset = MediaQuery.of(sheetContext).padding.bottom;
+
+                  return Material(
+                    type: MaterialType.transparency,
+                    child: Container(
+                      height: MediaQuery.of(sheetContext).size.height * 0.84,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(34),
                         ),
-                        child: Scaffold(
-                          body: ShowLoadingWidget(
-                            loading: loadingAddCart,
-                            children: [
-                              Stack(
+                      ),
+                      child: SafeArea(
+                        top: false,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            Container(
+                              width: 54,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: AppColors.border,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Positioned(
-                                    top: AdaptiveTextSize()
-                                        .getadaptiveTextSize(context, 15),
-                                    right: AdaptiveTextSize()
-                                        .getadaptiveTextSize(context, 15),
-                                    child: InkWell(
-                                      onTap: () => Navigator.pop(context),
-                                      child: Container(
-                                        height: AdaptiveTextSize()
-                                            .getadaptiveTextSize(context, 35),
-                                        width: AdaptiveTextSize()
-                                            .getadaptiveTextSize(context, 35),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Color(0xFF09665a),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.tintGreenSoft,
+                                            borderRadius: BorderRadius.circular(999),
+                                          ),
+                                          child: const Text(
+                                            'สรุปรายการ',
+                                            style: TextStyle(
+                                              fontFamily: 'Kanit',
+                                              fontSize: 11.5,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
                                         ),
-                                        child: Icon(
-                                          Icons.clear,
-                                          size: AdaptiveTextSize()
-                                              .getadaptiveTextSize(context, 20),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          model['name'] ?? '',
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontFamily: 'Kanit',
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.textPrimary,
+                                            height: 1.18,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          '${formatPrice(model['price'])} บาท',
+                                          style: const TextStyle(
+                                            fontFamily: 'Kanit',
+                                            fontSize: 26,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.primary,
+                                            height: 1,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          description.isNotEmpty
+                                              ? description
+                                              : 'ตรวจสอบข้อมูลก่อนยืนยันคำสั่งซื้อ',
+                                          style: const TextStyle(
+                                            fontFamily: 'Kanit',
+                                            fontSize: 13.2,
+                                            color: AppColors.textSecondary,
+                                            height: 1.45,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(18),
+                                    child: Container(
+                                      width: 94,
+                                      height: 94,
+                                      color: AppColors.tintGreenSoft,
+                                      child: imageUrl.isNotEmpty
+                                          ? loadingImageNetwork(
+                                              imageUrl,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(
+                                              'assets/images/kaset/no-img.png',
+                                              fit: BoxFit.contain,
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                physics: const BouncingScrollPhysics(),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF8FBF8),
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: AppColors.border,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  'คลังสินค้า',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Kanit',
+                                                    fontSize: 12,
+                                                    color: AppColors.textSecondary,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '$stock ชิ้น',
+                                                  style: const TextStyle(
+                                                    fontFamily: 'Kanit',
+                                                    fontSize: 15,
+                                                    color: AppColors.textPrimary,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 1,
+                                            height: 34,
+                                            color: AppColors.border,
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  'จำนวนที่เลือก',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Kanit',
+                                                    fontSize: 12,
+                                                    color: AppColors.textSecondary,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '${qtyController.text} ชิ้น',
+                                                  style: const TextStyle(
+                                                    fontFamily: 'Kanit',
+                                                    fontSize: 15,
+                                                    color: AppColors.primary,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    const Text(
+                                      'จำนวนที่ต้องการสั่ง',
+                                      style: TextStyle(
+                                        fontFamily: 'Kanit',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: AppColors.border,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          _QtyButton(
+                                            icon: Icons.remove,
+                                            enabled: productQty > 1,
+                                            onTap: () => setModalState(() {
+                                              if (productQty > 1) {
+                                                productQty--;
+                                                qtyController.text =
+                                                    productQty.toString();
+                                              }
+                                            }),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Container(
+                                              height: 48,
+                                              decoration: BoxDecoration(
+                                                color: AppColors.tintGreenSoft,
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                border: Border.all(
+                                                  color: AppColors.border,
+                                                ),
+                                              ),
+                                              alignment: Alignment.center,
+                                              child: TextFormField(
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                textInputAction:
+                                                    TextInputAction.done,
+                                                controller: qtyController,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  fontFamily: 'Kanit',
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.textPrimary,
+                                                ),
+                                                cursorColor: AppColors.primary,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  border: InputBorder.none,
+                                                  contentPadding: EdgeInsets.zero,
+                                                ),
+                                                onChanged: (value) {
+                                                  final qty =
+                                                      int.tryParse(value);
+                                                  if (qty != null && qty > 0) {
+                                                    setModalState(() {
+                                                      productQty = qty;
+                                                    });
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          _QtyButton(
+                                            icon: Icons.add,
+                                            enabled: productQty < stock,
+                                            onTap: () => setModalState(() {
+                                              if (productQty < stock) {
+                                                productQty++;
+                                                qtyController.text =
+                                                    productQty.toString();
+                                              } else {
+                                                Toast.show(
+                                                  'สินค้าในคลังเหลือแค่ $stock ชิ้น',
+                                                  backgroundColor:
+                                                      Colors.red[800] ??
+                                                          Colors.red,
+                                                  duration: 3,
+                                                  gravity: Toast.center,
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                );
+                                              }
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (!canBuy) ...[
+                                      const SizedBox(height: 14),
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFF6E8),
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: AppColors.accentTint,
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'สินค้าหมดชั่วคราว',
+                                          style: TextStyle(
+                                            fontFamily: 'Kanit',
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.accent,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                16,
+                                0,
+                                16,
+                                14 + bottomInset,
+                              ),
+                              child: ShowLoadingWidget(
+                                loading: loadingAddCart,
+                                children: [
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 52,
+                                    child: ElevatedButton(
+                                      onPressed: canBuy
+                                          ? () async {
+                                              final currentQty =
+                                                  int.tryParse(qtyController.text) ??
+                                                      0;
+                                              if (currentQty <= 0 ||
+                                                  currentQty > stock) {
+                                                Toast.show(
+                                                  'กรุณาเลือกจำนวนสินค้าให้ถูกต้อง',
+                                                  backgroundColor:
+                                                      Colors.red[800] ??
+                                                          Colors.red,
+                                                  duration: 3,
+                                                  gravity: Toast.center,
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              setModalState(() {
+                                                loadingAddCart = true;
+                                              });
+
+                                              if (type == 'cart') {
+                                                await _addCart(
+                                                  [Map<String, dynamic>.from(model)],
+                                                  'cart',
+                                                );
+                                                if (sheetContext.mounted &&
+                                                    Navigator.of(sheetContext)
+                                                        .canPop()) {
+                                                  Navigator.of(sheetContext).pop();
+                                                }
+                                                if (mounted) {
+                                                  setState(() {
+                                                    loadingAddCart = false;
+                                                  });
+                                                }
+                                                return;
+                                              }
+
+                                              if (sheetContext.mounted &&
+                                                  Navigator.of(sheetContext)
+                                                      .canPop()) {
+                                                Navigator.of(sheetContext).pop();
+                                              }
+                                              if (mounted) {
+                                                setState(() {
+                                                  loadingAddCart = false;
+                                                });
+                                              }
+
+                                              await Future<void>.delayed(
+                                                const Duration(milliseconds: 120),
+                                              );
+                                              if (!pageContext.mounted) return;
+                                              await Navigator.push(
+                                                pageContext,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ConfirmOrderCentralPage(
+                                                    modelCode: [
+                                                      {
+                                                        ...Map<String, dynamic>.from(model),
+                                                        'qty': currentQty,
+                                                        'quantity': currentQty,
+                                                      },
+                                                    ],
+                                                    type: 'buy',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          : null,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: canBuy
+                                            ? AppColors.primary
+                                            : Colors.grey.shade400,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        canBuy
+                                            ? (type == 'cart'
+                                                ? 'เพิ่มเข้าตะกร้า'
+                                                : 'ยืนยันและสั่งซื้อ')
+                                            : 'สินค้าหมด',
+                                        style: const TextStyle(
+                                          fontFamily: 'Kanit',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800,
                                           color: Colors.white,
                                         ),
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                        25,
-                                        AdaptiveTextSize()
-                                            .getadaptiveTextSize(context, 50),
-                                        15,
-                                        80),
-                                    child: ListView(
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              height: AdaptiveTextSize()
-                                                  .getadaptiveTextSize(
-                                                      context, 130),
-                                              width: AdaptiveTextSize()
-                                                  .getadaptiveTextSize(
-                                                      context, 100),
-                                              child: model['image'] != null &&
-                                                      model['image']
-                                                          .toString()
-                                                          .isNotEmpty
-                                                  ? loadingImageNetwork(
-                                                      model['image'],
-                                                      fit: BoxFit.cover,
-                                                    )
-                                                  : Image.asset(
-                                                      'assets/images/kaset/no-img.png',
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                            ),
-                                            SizedBox(width: 20),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    model['name'] ?? '',
-                                                    style: TextStyle(
-                                                      fontFamily: 'Kanit',
-                                                      fontSize: 13,
-                                                      color: Colors.black,
-                                                    ),
-                                                    textScaleFactor: ScaleSize
-                                                        .textScaleFactor(
-                                                            context),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  Text(
-                                                    '${formatPrice(model?['price'])} บาท',
-                                                    style: TextStyle(
-                                                      fontSize: 23,
-                                                      fontFamily: 'Kanit',
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                    textScaleFactor: ScaleSize
-                                                        .textScaleFactor(
-                                                            context),
-                                                  ),
-                                                  Text(
-                                                    'คลัง : ' +
-                                                        (model['stock'] ?? 0)
-                                                            .toString() +
-                                                        ' ชิ้น',
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontFamily: 'Kanit',
-                                                      color: Colors.grey,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                    textScaleFactor: ScaleSize
-                                                        .textScaleFactor(
-                                                            context),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        SizedBox(height: 15),
-                                        if (model['description'] != null &&
-                                            model['description']
-                                                .toString()
-                                                .isNotEmpty) ...[
-                                          Text(
-                                            'รายละเอียดสินค้า',
-                                            style: TextStyle(
-                                              fontFamily: 'Kanit',
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textScaleFactor:
-                                                ScaleSize.textScaleFactor(
-                                                    context),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            model['description'],
-                                            style: TextStyle(
-                                              fontFamily: 'Kanit',
-                                              fontSize: 13,
-                                              color: Colors.grey[700],
-                                            ),
-                                            textScaleFactor:
-                                                ScaleSize.textScaleFactor(
-                                                    context),
-                                          ),
-                                          SizedBox(height: 15),
-                                        ],
-
-                                        // จำนวนสินค้า
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'จำนวน',
-                                              style: TextStyle(
-                                                fontFamily: 'Kanit',
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textScaleFactor:
-                                                  ScaleSize.textScaleFactor(
-                                                      context),
-                                            ),
-                                            Row(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () => setState(() {
-                                                    if (productQty > 1) {
-                                                      productQty--;
-                                                    }
-                                                    qtyController.text =
-                                                        productQty.toString();
-                                                  }),
-                                                  child: Container(
-                                                    height: AdaptiveTextSize()
-                                                        .getadaptiveTextSize(
-                                                            context, 30),
-                                                    width: AdaptiveTextSize()
-                                                        .getadaptiveTextSize(
-                                                            context, 30),
-                                                    alignment:
-                                                        Alignment.topCenter,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
-                                                      border: Border.all(
-                                                        width: 1,
-                                                        color: productQty == 1
-                                                            ? Color(0xFFFAF9F9)
-                                                            : Color(0xFFF7F7F7),
-                                                      ),
-                                                      color: productQty == 1
-                                                          ? Color(0xFFFAF9F9)
-                                                          : Color(0xFFF7F7F7),
-                                                    ),
-                                                    child: Text(
-                                                      '-',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Kanit',
-                                                        fontSize: 16,
-                                                        color: productQty == 1
-                                                            ? Colors.grey[400]
-                                                            : Color(0xFF707070),
-                                                      ),
-                                                      textScaleFactor: ScaleSize
-                                                          .textScaleFactor(
-                                                              context),
-                                                      textAlign:
-                                                          TextAlign.start,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(width: 15),
-                                                Container(
-                                                  width: AdaptiveTextSize()
-                                                      .getadaptiveTextSize(
-                                                          context, 50),
-                                                  height: AdaptiveTextSize()
-                                                      .getadaptiveTextSize(
-                                                          context, 30),
-                                                  alignment:
-                                                      Alignment.topCenter,
-                                                  child: TextFormField(
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    textInputAction:
-                                                        TextInputAction.next,
-                                                    controller: qtyController,
-                                                    style: TextStyle(
-                                                      fontSize: AdaptiveTextSize()
-                                                          .getadaptiveTextSize(
-                                                              context, 13),
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      color: Colors.black,
-                                                    ),
-                                                    cursorColor:
-                                                        Color(0xFF09665a),
-                                                    decoration: InputDecoration(
-                                                      fillColor: Colors.white,
-                                                      filled: true,
-                                                      border:
-                                                          OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        borderSide: BorderSide(
-                                                            color: Color(
-                                                                0xFF09665a)),
-                                                      ),
-                                                      focusedBorder:
-                                                          OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        borderSide: BorderSide(
-                                                            color: Color(
-                                                                0xFF09665a)),
-                                                      ),
-                                                      enabledBorder:
-                                                          OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        borderSide: BorderSide(
-                                                          color: Colors.black
-                                                              .withOpacity(0.2),
-                                                        ),
-                                                      ),
-                                                      errorStyle:
-                                                          const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        fontSize: 10.0,
-                                                      ),
-                                                      contentPadding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 15),
-                                                    ),
-                                                    onChanged: (value) {
-                                                      if (value.isNotEmpty) {
-                                                        int? qty =
-                                                            int.tryParse(value);
-                                                        if (qty != null &&
-                                                            qty > 0) {
-                                                          setState(() {
-                                                            productQty = qty;
-                                                          });
-                                                        }
-                                                      }
-                                                    },
-                                                    onSaved: (String? value) {},
-                                                  ),
-                                                ),
-                                                SizedBox(width: 15),
-                                                // ปุ่มเพิ่ม
-                                                InkWell(
-                                                  onTap: () => setState(() {
-                                                    if (productQty <
-                                                        (model['stock'] ?? 0)) {
-                                                      productQty++;
-                                                    } else {
-                                                      Toast.show(
-                                                        'สินค้าในคลังเหลือแค่ ' +
-                                                            (model['stock'] ??
-                                                                    0)
-                                                                .toString() +
-                                                            ' ชิ้น',
-                                                        backgroundColor:
-                                                            Colors.red[800] ??
-                                                                Colors.red,
-                                                        duration: 3,
-                                                        gravity: Toast.center,
-                                                        textStyle: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      );
-                                                    }
-                                                    qtyController.text =
-                                                        productQty.toString();
-                                                  }),
-                                                  child: Container(
-                                                    height: AdaptiveTextSize()
-                                                        .getadaptiveTextSize(
-                                                            context, 30),
-                                                    width: AdaptiveTextSize()
-                                                        .getadaptiveTextSize(
-                                                            context, 30),
-                                                    alignment:
-                                                        Alignment.topCenter,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
-                                                      border: Border.all(
-                                                        width: 1,
-                                                        color: (model['stock'] ??
-                                                                    0) ==
-                                                                productQty
-                                                            ? Color.fromARGB(
-                                                                255,
-                                                                250,
-                                                                249,
-                                                                249)
-                                                            : Color(0xFFF7F7F7),
-                                                      ),
-                                                      color: (model['stock'] ??
-                                                                  0) ==
-                                                              productQty
-                                                          ? Color.fromARGB(255,
-                                                              250, 249, 249)
-                                                          : Color(0xFFF7F7F7),
-                                                    ),
-                                                    child: Text(
-                                                      '+',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Kanit',
-                                                        fontSize: 16,
-                                                        color:
-                                                            (model['stock'] ??
-                                                                        0) ==
-                                                                    productQty
-                                                                ? Colors
-                                                                    .grey[400]
-                                                                : Color(
-                                                                    0xFF707070),
-                                                      ),
-                                                      textScaleFactor: ScaleSize
-                                                          .textScaleFactor(
-                                                              context),
-                                                      textAlign:
-                                                          TextAlign.start,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  // ปุ่มด้านล่าง
-                                  Positioned(
-                                    bottom: 0 +
-                                        MediaQuery.of(context).padding.bottom,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding:
-                                          EdgeInsets.fromLTRB(15, 0, 15, 15),
-                                      color: Colors.white,
-                                      child: Column(
-                                        children: [
-                                          InkWell(
-                                            onTap: () async {
-                                              int currentQty = int.tryParse(
-                                                      qtyController.text) ??
-                                                  0;
-                                              int stock = model['stock'] ?? 0;
-                                              if (stock <= 0) {
-                                                Toast.show(
-                                                  'สินค้าหมด',
-                                                  backgroundColor:
-                                                      Colors.red[800] ??
-                                                          Colors.red,
-                                                  duration: 3,
-                                                  gravity: Toast.center,
-                                                  textStyle: TextStyle(
-                                                      color: Colors.white),
-                                                );
-                                                return;
-                                              }
-                                              if (currentQty <= 0) {
-                                                Toast.show(
-                                                  'กรุณาใส่จำนวนสินค้าอย่างน้อย 1 ชิ้น',
-                                                  backgroundColor:
-                                                      Colors.red[800] ??
-                                                          Colors.red,
-                                                  duration: 3,
-                                                  gravity: Toast.center,
-                                                  textStyle: TextStyle(
-                                                      color: Colors.white),
-                                                );
-                                                return;
-                                              }
-                                              if (currentQty > stock) {
-                                                Toast.show(
-                                                  'สินค้าในคลังเหลือแค่ ' +
-                                                      stock.toString() +
-                                                      ' ชิ้น',
-                                                  backgroundColor:
-                                                      Colors.red[800] ??
-                                                          Colors.red,
-                                                  duration: 3,
-                                                  gravity: Toast.center,
-                                                  textStyle: TextStyle(
-                                                      color: Colors.white),
-                                                );
-                                                return;
-                                              }
-                                              setState(() {
-                                                loadingAddCart = true;
-                                              });
-
-                                              if (type == 'cart') {
-                                                // เพิ่มสินค้าลงตะกร้า
-                                                await _addCart([model], 'cart');
-                                                Navigator.pop(context);
-                                                print('-----------------');
-                                                print('เพิ่มสินค้าลงตะกร้า');
-                                                print(model);
-                                                print(model.runtimeType);
-                                                print('-----------------');
-                                              } else {
-                                                // ซื้อสินค้าทันที
-
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ConfirmOrderCentralPage(
-                                                      modelCode: [model],
-                                                      type: 'buy',
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            child: ShowLoadingWidget(
-                                              loading: loading,
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                                  color:
-                                                      (model['stock'] ?? 0) <= 0
-                                                          ? Colors.grey
-                                                          : Color(0xFF09665a),
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                    (model['stock'] ?? 0) <= 0
-                                                        ? 'สินค้าหมด'
-                                                        : type == 'cart'
-                                                            ? 'เพิ่มไปยังตะกร้า'
-                                                            : 'ซื้อสินค้า',
-                                                    style: TextStyle(
-                                                      fontFamily: 'Kanit',
-                                                      fontSize: 20,
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                    textScaleFactor: ScaleSize
-                                                        .textScaleFactor(
-                                                            context),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Container();
-                  } else {
-                    return Container();
-                  }
+                    ),
+                  );
                 },
               );
             },
@@ -1915,6 +1501,36 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
     );
   }
 
+  Widget _QtyButton({
+    required IconData icon,
+    required VoidCallback? onTap,
+    required bool enabled,
+  }) {
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          color: enabled ? AppColors.tintGreenSoft : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: enabled
+                ? AppColors.primary.withValues(alpha: 0.18)
+                : AppColors.border,
+          ),
+        ),
+        child: Icon(
+          icon,
+          color: enabled ? AppColors.primary : AppColors.border,
+          size: 20,
+        ),
+      ),
+    );
+  }
+
   _buildReview() {
     return FutureBuilder(
       future: _futureComment,
@@ -1937,7 +1553,7 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
       rating: rating,
       itemBuilder: (context, index) => Icon(
         Icons.star,
-        color: Color(0xFF929DFC),
+        color: AppColors.accent,
       ),
       itemSize: itemSize,
     );
@@ -1958,19 +1574,21 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
             // Text.rich(
             //   TextSpan(
             //     children: [
-            Text(
+            const Text(
               'รีวิว ',
               style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
+                fontSize: 17,
+                fontFamily: 'Kanit',
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
               ),
-              textScaleFactor: ScaleSize.textScaleFactor(context),
             ),
             Text(
               '( ${model.length} )',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
-                color: Color(0xFF707070),
+                fontFamily: 'Kanit',
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
               textScaleFactor: ScaleSize.textScaleFactor(context),
@@ -1988,13 +1606,20 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
             // ),
           ],
         ),
+        SizedBox(height: 6),
         _buildRatingBarIndicator(
             rating, AdaptiveTextSize().getadaptiveTextSize(context, 25)),
         SizedBox(height: 15),
         ...model
             .map<Widget>(
               (e) => Container(
-                margin: EdgeInsets.only(bottom: 15),
+                margin: EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9FBF9),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.border),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -2006,32 +1631,32 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                           child: loadingImageNetwork(
                             '${e['user']['data']['profile_picture_url']}',
                             height: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 20),
+                                .getadaptiveTextSize(context, 32),
                             width: AdaptiveTextSize()
-                                .getadaptiveTextSize(context, 20),
+                                .getadaptiveTextSize(context, 32),
                             fit: BoxFit.cover,
                           ),
                         ),
-                        SizedBox(width: 13),
+                        SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             '${e['user']['data']?['name']}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Kanit',
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF707070),
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
                             ),
                             textScaleFactor: ScaleSize.textScaleFactor(context),
                           ),
                         ),
                         Text(
                           dateUnixTimeThaiShort(e['created_at']),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontFamily: 'Kanit',
-                            fontSize: 13,
+                            fontSize: 12,
                             fontWeight: FontWeight.w400,
-                            color: Color(0xFF707070),
+                            color: AppColors.textSecondary,
                           ),
                           textScaleFactor: ScaleSize.textScaleFactor(context),
                         ),
@@ -2039,15 +1664,17 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                     ),
                     // ratingBar('${e['rating']}'),
                     // SizedBox(height: 13),
-                    SizedBox(height: 6),
+                    SizedBox(height: 8),
                     _buildRatingBarIndicator(e['rating'].toDouble(),
                         AdaptiveTextSize().getadaptiveTextSize(context, 15)),
-                    SizedBox(height: 6),
+                    SizedBox(height: 8),
                     Text(
                       '${e['comment']}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Kanit',
-                        fontSize: 15,
+                        fontSize: 14,
+                        color: AppColors.textPrimary,
+                        height: 1.4,
                       ),
                       textScaleFactor: ScaleSize.textScaleFactor(context),
                     ),
@@ -2094,12 +1721,15 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                   _currentImage = index;
                 });
               },
-              child: Container(
-                margin: EdgeInsets.only(right: 1),
-                child: Image.network(
-                  e['url'],
-                  width: sizeUrl,
-                  fit: BoxFit.fill,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  margin: EdgeInsets.only(right: 6),
+                  child: Image.network(
+                    e['url'],
+                    width: sizeUrl,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -2150,21 +1780,24 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
             },
         child: Container(
           // height: e['name'] == null ? 30 : 50,
-          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(7),
-            color: Color(0xFFF7F7F7),
+            borderRadius: BorderRadius.circular(14),
+            color: selectedInventory == e['id']
+                ? AppColors.tintGreenSoft
+                : const Color(0xFFF7F7F7),
             border: Border.all(
-              width: 1,
+              width: 1.2,
               color: selectedInventory == e['id']
-                  ? Color(0xFF1434F7)
-                  : Color(0xFFF7F7F7),
+                  ? AppColors.primary
+                  : AppColors.border,
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
                 child: e['url'] != null
                     ? loadingImageNetwork(
                         e['url'] ?? '',
@@ -2185,16 +1818,19 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
                         // color: Colors.white,
                       ),
               ),
-              SizedBox(width: 6),
+              SizedBox(width: 8),
               Flexible(
                 child: Text(
                   e?['name'] ?? e['sku'],
                   style: TextStyle(
                     fontFamily: 'Kanit',
                     fontSize: 13,
+                    fontWeight: selectedInventory == e['id']
+                        ? FontWeight.w600
+                        : FontWeight.w400,
                     color: selectedInventory == e['id']
-                        ? Color(0xFF1434F7)
-                        : Color(0xFF000000),
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
                   ),
                   textScaleFactor: ScaleSize.textScaleFactor(context),
                 ),
@@ -2246,26 +1882,11 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
   List<Map<String, dynamic>> cartItems = [];
 
   _addCart(List<Map<String, dynamic>> products, String type) async {
-    String? cartData = await storage.read(key: 'cartItems');
-    cartItems = cartData != null
-        ? List<Map<String, dynamic>>.from(jsonDecode(cartData))
-        : [];
-
     int qty = int.tryParse(qtyController.text) ?? 1;
 
     for (var product in products) {
-      var newItem = {...product, 'qty': qty};
-
-      int existingIndex =
-          cartItems.indexWhere((item) => item['id'] == newItem['id']);
-      if (existingIndex != -1) {
-        cartItems[existingIndex]['qty'] += qty;
-      } else {
-        cartItems.add(newItem);
-      }
+      await CartStore.addToCart(Map<String, dynamic>.from(product), qty: qty);
     }
-
-    await storage.write(key: 'cartItems', value: jsonEncode(cartItems));
     setState(() {});
 
     if (type == 'cart') {
@@ -2275,7 +1896,5 @@ class _ProductFormCentralPageState extends State<ProductFormCentralPage> {
           gravity: Toast.bottom,
           textStyle: TextStyle(color: Colors.white));
     }
-
-    Navigator.pop(context, 'success');
   }
 }

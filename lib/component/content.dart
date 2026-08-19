@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:kasetmall/component/link_url_out.dart';
+import 'package:kasetmall/shared/app_theme.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -361,7 +362,7 @@ class ContentState extends State<Content> {
           style: TextStyle(
             fontFamily: 'Kanit',
             fontSize: 14.0,
-            color: Colors.blue,
+            color: AppColors.primary,
             decoration: TextDecoration.underline,
           ),
         ),

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/menu.dart';
-import 'package:kasetmall/register_shop.dart';
 
 import 'package:kasetmall/widget/header.dart';
 import 'package:kasetmall/widget/input.dart';
@@ -19,6 +18,7 @@ class RegisterCentralPage extends StatefulWidget {
 
 class _RegisterCentralPageState extends State<RegisterCentralPage> {
   final storage = new FlutterSecureStorage();
+  static const String _agencyName = 'องค์การตลาดเพื่อเกษตรกร (อตก.)';
 
   final _formKey = GlobalKey<FormState>();
   final txtPassword = TextEditingController();
@@ -45,27 +45,9 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
     {'code': 70, 'title': 'ประชาชนทั่วไป'},
     {'code': 80, 'title': 'อื่นๆ'},
   ];
-  final _futureAgencyModel = [
-    {'code': 0, 'title': 'กรุณาเลือกหน่วยงาน'},
-    {'code': 10, 'title': 'กรมส่งเสริมการเกษตร'},
-    {'code': 20, 'title': 'กรมวิชาการเกษตร'},
-    {'code': 30, 'title': 'กรมปศุสัตว์'},
-    {'code': 40, 'title': 'กรมประมง'},
-    {'code': 50, 'title': 'กรมชลประทาน'},
-    {'code': 60, 'title': 'กรมหม่อนไหม'},
-    {'code': 70, 'title': 'กรมพัฒนาที่ดิน'},
-    {'code': 80, 'title': 'กรมป่าไม้'},
-    {'code': 90, 'title': 'กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช'},
-    {'code': 100, 'title': 'สำนักงานเศรษฐกิจการเกษตร (สศก.)'},
-    {'code': 110, 'title': 'องค์การตลาดเพื่อเกษตรกร (อตก.)'},
-    {'code': 120, 'title': 'สถาบันวิจัยและพัฒนาการเกษตร'},
-    {'code': 130, 'title': 'ศูนย์วิจัยและพัฒนาการเกษตรภูมิภาค'},
-    {'code': 140, 'title': 'อื่นๆ'},
-  ];
 
   late int selectedSexIndex = 0;
   late int selectOccupation = 0;
-  late int selectAgency = 0;
   bool showConfirmPassword = true;
   bool showPassword = true;
 
@@ -191,82 +173,75 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                 validator: (value) => ValidateRegister.phone(value),
               ),
               Container(
-                padding: EdgeInsets.only(top: 10.0, bottom: 15.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 15.0, bottom: 5),
-                        child: Text(
-                          'สังกัดหน่วยงาน',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xFF000000),
+                margin: const EdgeInsets.only(top: 10.0, bottom: 15.0),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF7FBF7),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE4E4E4)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDCEFDD),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.account_balance_outlined,
+                        color: Color(0xFF2E7D32),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'สังกัดหน่วยงาน',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Color(0xFF000000),
+                              fontFamily: 'Kanit',
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                          textAlign: TextAlign.left,
+                          const SizedBox(height: 4),
+                          Text(
+                            _agencyName,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6C61),
+                              fontFamily: 'Kanit',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFBE7C9),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Text(
+                        'อตก.',
+                        style: TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFC77A1F),
                         ),
                       ),
-                      DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          fillColor: Color(0xFFFFFFFF),
-                          filled: true,
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color(0xFF0B5C9E), width: 1.0),
-                            borderRadius: BorderRadius.circular(7.0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFE4E4E4),
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(7.0),
-                            gapPadding: 1,
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFE4E4E4),
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(7.0),
-                            gapPadding: 1,
-                          ),
-                          hintText: 'กรุณาใส่สังกัดหน่วยงาน',
-                          contentPadding: const EdgeInsets.all(10.0),
-                        ),
-                        validator: (value) =>
-                            ValidateRegister.occupation(value as int? ?? 0),
-                        hint: Text(
-                          'สังกัดหน่วยงาน',
-                          style: TextStyle(
-                            fontSize: 15.00,
-                            fontFamily: 'Kanit',
-                          ),
-                        ),
-                        value: selectAgency,
-                        onTap: () {
-                          FocusScope.of(context).unfocus();
-                          new TextEditingController().clear();
-                        },
-                        onChanged: (Object? newValue) {
-                          setState(() async {
-                            selectAgency = newValue as int;
-                          });
-                        },
-                        items: _futureAgencyModel.map((item) {
-                          return DropdownMenuItem(
-                            child: Text(
-                              item['title'].toString(),
-                              style: TextStyle(
-                                fontSize: 15.00,
-                                fontFamily: 'Kanit',
-                              ),
-                            ),
-                            value: item['code'],
-                          );
-                        }).toList(),
-                      )
-                    ]),
+                    ),
+                  ],
+                ),
               ),
               Container(
                 padding: EdgeInsets.only(top: 10.0, bottom: 15.0),
@@ -620,7 +595,7 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
           },
           child: CupertinoAlertDialog(
             title: new Text(
-              'ลงทะเบียนเรียบร้อยแล้ว\nท่านสนใจเข้าร่วมเป็นร้านค้ากับเราหรือไม่',
+              'ลงทะเบียนเรียบร้อยแล้ว',
               style: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Kanit',
@@ -628,32 +603,19 @@ class _RegisterCentralPageState extends State<RegisterCentralPage> {
                 fontWeight: FontWeight.normal,
               ),
             ),
-            content: Text(" "),
+            content: Text(
+              'ระบบจะพาคุณไปยังหน้าหลักเพื่อเริ่มใช้งาน',
+              style: TextStyle(
+                fontSize: 13,
+                fontFamily: 'Kanit',
+                color: Color(0xFF707070),
+              ),
+            ),
             actions: [
               CupertinoDialogAction(
                 isDefaultAction: true,
                 child: new Text(
-                  "ตกลง",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontFamily: 'Kanit',
-                    color: Color(0xFF09665a),
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => RegisterShopPage(),
-                    ),
-                  );
-                },
-              ),
-              CupertinoDialogAction(
-                isDefaultAction: false,
-                child: new Text(
-                  "ไม่ใช่ตอนนี้",
+                  "ไปหน้าหลัก",
                   style: TextStyle(
                     fontSize: 13,
                     fontFamily: 'Kanit',

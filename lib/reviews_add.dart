@@ -1,19 +1,17 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:io';
 import 'dart:math';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
-import 'package:kasetmall/component/toast_fail.dart';
-import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/app_bar.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 import 'package:kasetmall/to_rate.dart';
 import 'package:kasetmall/widget/image_picker.dart';
 import 'package:kasetmall/widget/loading_page.dart';
-import '../widget/header.dart';
-import 'package:http_parser/http_parser.dart';
 
 class ReviewsAddPage extends StatefulWidget {
   ReviewsAddPage({
@@ -36,18 +34,9 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
   Random random = new Random();
   bool loading = false;
   dynamic _rating;
-  String imagePDF = 'assets/images/pdf.png';
   bool loadingImage = false;
-  late XFile imageReviews;
   String image = '';
   List<dynamic> imageList = [];
-  late FormData mapData;
-  List<MultipartFile> futureMultipartFile = [];
-  dynamic futureMultipartFile0;
-  dynamic futureMultipartFile1;
-  dynamic futureMultipartFile2;
-  dynamic futureMultipartFile3;
-  dynamic futureMultipartFile4;
 
   @override
   void initState() {
@@ -65,39 +54,100 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
     setState(() {
       loadingImage = true;
     });
-    uploadImage(file).then((res) {
+    Future<void>.delayed(const Duration(milliseconds: 120)).then((_) {
       String fileName = file.path.split('/').last;
-      String fileType = fileName.split('.').last;
-      // var id = DateTime.now().millisecondsSinceEpoch;
       setState(() {
-        image = res;
+        image = file.path;
         loadingImage = false;
         imageList.add({
-          'value': image,
+          'value': file.path,
           'id': random.nextInt(100),
           'file': file,
           'fileName': fileName,
-          'fileType': fileType,
         });
         // image = server + res,
         // showLoadingImage = false,
       });
-    }).catchError((err) {
-      setState(() {
-        loadingImage = false;
-      });
-      return toastFail(context);
     });
+  }
+
+  Widget _buildProductImage(String? source) {
+    final value = (source ?? '').trim();
+    if (value.isEmpty) {
+      return Container(
+        color: AppColors.tintGreenSoft,
+        alignment: Alignment.center,
+        child: const Icon(
+          Icons.inventory_2_outlined,
+          color: AppColors.primary,
+          size: 30,
+        ),
+      );
+    }
+
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return Image.network(
+        value,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          color: AppColors.tintGreenSoft,
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.broken_image_outlined,
+            color: AppColors.primary,
+          ),
+        ),
+      );
+    }
+
+    if (value.startsWith('file://')) {
+      final file = File(Uri.parse(value).toFilePath());
+      if (file.existsSync()) {
+        return Image.file(file, fit: BoxFit.cover);
+      }
+    } else {
+      final file = File(value);
+      if (file.existsSync()) {
+        return Image.file(file, fit: BoxFit.cover);
+      }
+    }
+
+    return Image.asset(
+      value,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        color: AppColors.tintGreenSoft,
+        alignment: Alignment.center,
+        child: const Icon(
+          Icons.image_not_supported_outlined,
+          color: AppColors.primary,
+        ),
+      ),
+    );
+  }
+
+  String _productTitle() {
+    final raw = widget.modelProductData;
+    if (raw is Map) {
+      return (raw['title'] ?? raw['name'] ?? raw['productName'] ?? 'สินค้า')
+          .toString();
+    }
+    return 'สินค้า';
+  }
+
+  String _productImage() {
+    final raw = widget.modelMediaData;
+    if (raw is Map) {
+      return (raw['imageUrl'] ?? raw['image'] ?? raw['path'] ?? '').toString();
+    }
+    return '';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: headerCentral(
-        context,
-        title: 'เขียนรีวิว',
-      ),
-      backgroundColor: Colors.white,
+      appBar: const KasetAppBar(title: 'เขียนรีวิว'),
+      backgroundColor: AppColors.background,
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -108,7 +158,7 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
                 children: [
                   Expanded(
                     child: ListView(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
                       children: _buildList(),
                     ),
                   ),
@@ -239,34 +289,65 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
 
   _buildList() {
     return <Widget>[
-      SizedBox(
-        height: 80,
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF143D16).withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                widget.modelMediaData['imageUrl'],
-                height: 80,
-                width: 80,
-                fit: BoxFit.cover,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: 74,
+                height: 74,
+                color: AppColors.tintGreenSoft,
+                child: _buildProductImage(_productImage()),
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Text(
-                      widget.modelProductData['title'],
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 13,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.tintGreenSoft,
+                      borderRadius: BorderRadius.circular(999),
                     ),
+                    child: const Text(
+                      'รีวิวสินค้า',
+                      style: TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _productTitle(),
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -274,92 +355,131 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
           ],
         ),
       ),
-      Form(
-        key: _formKey,
+      const SizedBox(height: 14),
+      _sectionCard(
+        title: 'ความคิดเห็น',
+        child: Form(
+          key: _formKey,
+          child: _textData(
+            'ความคิดเห็น',
+            commentController,
+            maxLines: 6,
+          ),
+        ),
+      ),
+      const SizedBox(height: 14),
+      _sectionCard(
+        title: 'รูปภาพประกอบ',
+        subtitle: 'เพิ่มรูปได้สูงสุด 5 รูป',
+        child: Container(
+          height: 156,
+          padding: const EdgeInsets.all(10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.border),
+          ),
+          child:
+              imageList.isEmpty ? _imageUploadPicker() : _listViewImageList(),
+        ),
+      ),
+      const SizedBox(height: 14),
+      _sectionCard(
+        title: 'คะแนนสินค้า',
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _titleName('comment'),
-            _textData('comment', commentController, maxLines: 10),
-            SizedBox(height: 40),
-            Container(
-              height: 150,
-              padding: EdgeInsets.all(4),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(
-                  width: 1,
-                  color: Color(0xFFE4E4E4),
-                ),
-              ),
-              child: imageList.length == 0
-                  ? _imageUploadPicker()
-                  : _listViewImageList(),
-            ),
-            SizedBox(height: 40),
             _ratingBar(),
+            const SizedBox(height: 10),
+            const Text(
+              'แตะดาวเพื่อให้คะแนนประสบการณ์จริงของคุณ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 12.5,
+                color: AppColors.textSecondary,
+              ),
+            ),
           ],
         ),
       ),
-      SizedBox(height: 40),
-      Container(
-        // bottom: 50,
-        width: MediaQuery.of(context).size.width,
-        margin: EdgeInsets.symmetric(horizontal: 20),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Container(
-            height: 45,
-            child: Material(
-              elevation: 0,
-              borderRadius: BorderRadius.circular(25.0),
-              color: Color(0xFFDF0B24),
-              child: MaterialButton(
-                onPressed: () async {
-                  // final form = _formKey.currentState;
-                  // if (form!.validate()) {
-                  //   save();
-                  // } else {}
-                  _showDialog('ขอคุณสำหรับการรีวิวสินค้า').then((value) {
-                    Navigator.pop(context);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ToRateCentralPage(),
-                      ),
-                    );
-                  });
-                },
-                child: new Text(
-                  'บันทึก',
-                  style: new TextStyle(
-                    fontSize: 25.0,
-                    color: Colors.white,
-                    fontWeight: FontWeight.normal,
-                    fontFamily: 'Kanit',
-                  ),
-                ),
-              ),
+      const SizedBox(height: 18),
+      SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: ElevatedButton(
+          onPressed: loading ? null : () async => save(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            disabledBackgroundColor: AppColors.border,
+            disabledForegroundColor: AppColors.textSecondary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+          child: const Text(
+            'บันทึก',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Kanit',
             ),
           ),
         ),
       ),
-      SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
+      SizedBox(height: MediaQuery.of(context).padding.bottom + 12),
     ];
   }
 
-  _titleName(title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10.0, left: 10, right: 10, bottom: 5),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Kanit',
-          fontSize: 15,
-          // fontWeight: FontWeight.bold,
-        ),
+  Widget _sectionCard({
+    required String title,
+    String? subtitle,
+    required Widget child,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF143D16).withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontFamily: 'Kanit',
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 12.5,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          child,
+        ],
       ),
     );
   }
@@ -386,246 +506,69 @@ class _ReviewsAddPageState extends State<ReviewsAddPage> {
         keyboardType: textI,
         textInputAction: TextInputAction.next,
         controller: textC,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w300,
-          color: Colors.black,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: AppColors.textPrimary,
         ),
-        cursorColor: Color(0xFF0B24FB),
+        cursorColor: AppColors.primary,
         decoration: InputDecoration(
-          fillColor: Colors.white,
+          fillColor: AppColors.background,
           filled: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Color(0xFF0B24FB)),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Color(0xFF0B24FB)),
+            borderSide: const BorderSide(color: AppColors.primary),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
             borderSide: BorderSide(
-              color: Colors.black.withOpacity(0.2),
+              color: AppColors.border,
             ),
           ),
           errorStyle: const TextStyle(
             fontWeight: FontWeight.normal,
             fontSize: 10.0,
           ),
-          contentPadding: EdgeInsets.all(15),
-          // labelText: "กรุณากรอกหมายเลขบัตร",
-          hintText: title,
+          contentPadding: const EdgeInsets.all(15),
+          hintText: 'กรอก$title',
         ),
         onSaved: (String? value) {},
       ),
     );
   }
 
-  fromMapData(data) {
-    return MultipartFile.fromFileSync(
-      data['file'].path,
-      filename: data['fileName'],
-      contentType: MediaType('image', data['fileType']),
-    );
-    // futureMultipartFile.add(a);
-    // for (var i = 0; i >= imageListlength; i++) {
-    //   // MultipartFile.fromFile(
-    //   //   imageList[i]['file'].path,
-    //   //   filename: imageList[i]['fileName'],
-    //   //   contentType: MediaType('image', imageList[i]['fileType']),
-    //   // );
-    // }
-
-    // if (imageListlength != 0) {
-    //   if (imageListlength > 0) {
-    //     setState(() {
-    //       futureMultipartFile0 = MultipartFile.fromFile(
-    //         imageList[0]['file'].path,
-    //         filename: imageList[0]['fileName'],
-    //         contentType: MediaType('image', imageList[0]['fileType']),
-    //       );
-    //     });
-    //   }
-    //   if (imageListlength > 1) {
-    //     setState(() {
-    //       futureMultipartFile1 = MultipartFile.fromFile(
-    //         imageList[1]['file'].path,
-    //         filename: imageList[1]['fileName'],
-    //         contentType: MediaType('image', imageList[1]['fileType']),
-    //       );
-    //     });
-    //   }
-    //   if (imageListlength > 2) {
-    //     setState(() {
-    //       futureMultipartFile2 = MultipartFile.fromFile(
-    //         imageList[2]['file'].path,
-    //         filename: imageList[2]['fileName'],
-    //         contentType: MediaType('image', imageList[2]['fileType']),
-    //       );
-    //     });
-    //   }
-    //   if (imageListlength > 3) {
-    //     setState(() {
-    //       futureMultipartFile3 = MultipartFile.fromFile(
-    //         imageList[3]['file'].path,
-    //         filename: imageList[3]['fileName'],
-    //         contentType: MediaType('image', imageList[3]['fileType']),
-    //       );
-    //     });
-    //   }
-    //   if (imageListlength > 4) {
-    //     setState(() {
-    //       futureMultipartFile4 = MultipartFile.fromFile(
-    //         imageList[4]['file'].path,
-    //         filename: imageList[4]['fileName'],
-    //         contentType: MediaType('image', imageList[4]['fileType']),
-    //       );
-    //     });
-    //   }
-  }
-
   save() async {
-    mapData = FormData.fromMap({
-      // 'product_id': widget.modelProductData['id'],
-      'order_detail_id': widget.orderId,
-      'rating': _rating,
-      'comment': commentController.text,
-      // 'photos': [await futureMultipartFile0, await futureMultipartFile1],
-    });
-
-    var c = 0;
-    for (var i in imageList) {
-      mapData.files.addAll([
-        MapEntry(
-          'photos[$c]',
-          fromMapData(i),
-        ),
-      ]);
-      c++;
+    final now = DateTime.now().toIso8601String();
+    if ((widget.orderId ?? '').toString().isNotEmpty) {
+      await OrderStore.updateOrderStatus(
+        widget.orderId.toString(),
+        'reviewed',
+        reviewedAt: now,
+      );
+      await OrderStore.updateOrderReview(
+        widget.orderId.toString(),
+        rating: _rating,
+        comment: commentController.text.trim(),
+        images: imageList
+            .map((e) => (e['value'] ?? '').toString())
+            .where((e) => e.isNotEmpty)
+            .toList(),
+        reviewedAt: now,
+      );
     }
-
-    // futureMultipartFile.add(futureMultipartFile0);
-    // futureMultipartFile.add(futureMultipartFile1);
-
-    // mapData = FormData.fromMap({
-    //   'product_id': widget.modelProductData['id'],
-    //   'order_id': widget.orderId,
-    //   'rating': _rating,
-    //   'comment': commentController.text,
-    //   // 'photos': [await futureMultipartFile0, await futureMultipartFile1],
-    // });
-
-    // mapData.files.addAll([
-    //   MapEntry(
-    //     'photos[0]',
-    //     await futureMultipartFile0,
-    //   ),
-    // ]);
-
-    // mapData.files.addAll([
-    //   MapEntry(
-    //     'photos[1]',
-    //     await futureMultipartFile1,
-    //   ),
-    // ]);
-
-    // if (imageList.length == 1) {
-    //   mapData = FormData.fromMap({
-    //     'product_id': widget.modelProductData['id'],
-    //     'order_id': widget.orderId,
-    //     'rating': _rating,
-    //     'comment': commentController.text,
-    //     'photos[0]': await futureMultipartFile0,
-    //   });
-    // } else if (imageList.length == 2) {
-    //   mapData = FormData.fromMap({
-    //     'product_id': widget.modelProductData['id'],
-    //     'order_id': widget.orderId,
-    //     'rating': _rating,
-    //     'comment': commentController.text,
-    //     'photos[0]': await futureMultipartFile0,
-    //     'photos[1]': await futureMultipartFile1,
-    //   });
-    // } else if (imageList.length == 3) {
-    //   mapData = FormData.fromMap({
-    //     'product_id': widget.modelProductData['id'],
-    //     'order_id': widget.orderId,
-    //     'rating': _rating,
-    //     'comment': commentController.text,
-    //     'photos[0]': await futureMultipartFile0,
-    //     'photos[1]': await futureMultipartFile1,
-    //     'photos[2]': await futureMultipartFile2,
-    //   });
-    // } else if (imageList.length == 4) {
-    //   mapData = FormData.fromMap({
-    //     'product_id': widget.modelProductData['id'],
-    //     'order_id': widget.orderId,
-    //     'rating': _rating,
-    //     'comment': commentController.text,
-    //     'photos[0]': await futureMultipartFile0,
-    //     'photos[1]': await futureMultipartFile1,
-    //     'photos[2]': await futureMultipartFile2,
-    //     'photos[3]': await futureMultipartFile3,
-    //   });
-    // } else if (imageList.length == 5) {
-    //   mapData = FormData.fromMap({
-    //     'product_id': widget.modelProductData['id'],
-    //     'order_id': widget.orderId,
-    //     'rating': _rating,
-    //     'comment': commentController.text,
-    //     'photos[0]': await futureMultipartFile0,
-    //     'photos[1]': await futureMultipartFile1,
-    //     'photos[2]': await futureMultipartFile2,
-    //     'photos[3]': await futureMultipartFile3,
-    //     'photos[4]': await futureMultipartFile4,
-    //   });
-    // } else {
-    //   mapData = FormData.fromMap({
-    //     'product_id': widget.modelProductData['id'],
-    //     'order_id': widget.orderId,
-    //     'rating': _rating,
-    //     'comment': commentController.text,
-    //   });
-    // }
-
-    var result = await postFormData(server + 'reviews', mapData);
-    var message = '';
-    // var product_idErrors = '';
-    // var order_idErrors = '';
-    // var ratingErrors = '';
-    // var commentErrors = '';
-    // if (result['message'] != null) {
-    //   setState(() {
-    //     message = result['message'];
-    //     // product_idErrors = result['errors']['product_id'][0];
-    //     // order_idErrors = result['errors']['order_id'][0];
-    //     // ratingErrors = result['errors']['rating'][0];
-    //     // commentErrors = result['errors']['comment'][0];
-    //   });
-    // }
-    print('mapData >>>> ${result}');
-    if (result != null) {
-      if (message != '') {
-        _showDialog(
-          message,
-          // product_idErrors: product_idErrors,
-          // order_idErrors: order_idErrors,
-          // ratingErrors: ratingErrors,
-          // commentErrors: commentErrors,
-        );
-      } else {
-        _showDialog('Success').then((value) {
-          Navigator.pop(context);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ToRateCentralPage(),
-            ),
-          );
-        });
-      }
-    } else {}
+    _showDialog('Success').then((value) {
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ToRateCentralPage(),
+        ),
+      );
+    });
   }
 
   _showDialog(

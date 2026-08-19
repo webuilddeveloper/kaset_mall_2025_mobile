@@ -1,396 +1,310 @@
 import 'package:flutter/material.dart';
-import 'package:kasetmall/shared/api_provider.dart';
-import 'package:kasetmall/shared/extension.dart';
-import 'package:kasetmall/widget/header.dart';
-import 'package:kasetmall/widget/show_loading.dart';
-
-import 'order_details.dart';
+import 'package:intl/intl.dart';
+import 'package:kasetmall/component/loading_image_network.dart';
+import 'package:kasetmall/order_details.dart';
+import 'package:kasetmall/shared/app_bar.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 
 class ToShipCentralPage extends StatefulWidget {
-  const ToShipCentralPage({Key? key}) : super(key: key);
+  const ToShipCentralPage({Key? key, this.highlightOrderId}) : super(key: key);
+
+  final String? highlightOrderId;
 
   @override
   State<ToShipCentralPage> createState() => _ToShipCentralPageState();
 }
 
 class _ToShipCentralPageState extends State<ToShipCentralPage> {
-  bool loading = false;
+  final NumberFormat _moneyFormat = NumberFormat('#,###', 'th_TH');
+  late Future<List<Map<String, dynamic>>> _futureOrders;
 
-  List<dynamic> orderModel = [
-    {
-      "code": "1",
-      "title": "ปุ๋ยเคมี",
-      "price": 99000,
-      "qty": "2",
-      "discount": 0,
-      "priceTotal": 203000,
-      "shipping": 5000,
-      "imageUrl":
-          "https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255709298.png",
-      "purchaseDate": "10/10/2568 10:30:00",
-      "paidDate": "10/10/2568 10:35:00",
-      "receiptShipping": "receiptShipping.pdf",
-      "receipt": "receipt.pdf",
-      "taxId": "1004293962218",
-      "phone": "0999999999",
-      "name": "สมศักดิ์ ศักดิ์สม",
-      "shipped_at": "15/10/2568",
-      "address": {
-        "no": "19/1-2 ชั้น8 ห้อง8บี ซ.ยาสูบ1 ถ.วิภาวดีรังสิต",
-        "subDistrict": "จอมพล",
-        "district": "จตุจักร",
-        "province": "กรุงเทพมหานครฯ",
-        "postNo": "10900"
-      }
-    }
-  ];
+  int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
+  }
+
+  String _money(int value) => '${_moneyFormat.format(value)} บาท';
 
   @override
   void initState() {
-    _callRead();
     super.initState();
+    _futureOrders = OrderStore.getOrdersByStatus('preparing');
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  _callRead() {
-  }
-
-
-  updateStatus(item) async {
+  Future<void> _reload() async {
     setState(() {
-      loading = true;
+      _futureOrders = OrderStore.getOrdersByStatus('preparing');
     });
-    var status = item['status'];
-    if (item['status'] == 'W') status = 'P';
-    if (item['status'] == 'P') status = 'A';
-    await postDio('${server}m/cart/order/status/update', {
-      'code': item['orderNoReference'],
-      'status': status,
-    });
-    setState(() {
-    });
+  }
+
+  Widget _emptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 86,
+              height: 86,
+              decoration: BoxDecoration(
+                color: AppColors.tintGreenSoft,
+                borderRadius: BorderRadius.circular(26),
+              ),
+              child: const Icon(
+                Icons.inventory_2_outlined,
+                color: AppColors.primary,
+                size: 46,
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'ยังไม่มีรายการกำลังจัดเตรียม',
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'คำสั่งซื้อที่ชำระแล้วจะมาแสดงที่หน้านี้',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 13,
+                height: 1.45,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressDot(bool active) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: active ? AppColors.primary : AppColors.border,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(Map<String, dynamic> order) {
+    final items = (order['items'] as List<dynamic>? ?? const []);
+    final total = _toInt(order['grandTotal']);
+    final isHighlighted = order['id'].toString() == widget.highlightOrderId;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isHighlighted ? AppColors.tintGreenSoft : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isHighlighted ? AppColors.primary : AppColors.border,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF143D16).withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OrderDetailsPage(orderId: order['id'].toString()),
+            ),
+          ).then((_) => _reload());
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.tintGreen,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: const Text(
+                    'กำลังจัดเตรียม',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  order['orderNo']?.toString() ?? '-',
+                  style: const TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: 68,
+                    height: 68,
+                    color: AppColors.tintGreenSoft,
+                    child: loadingImageNetwork(
+                      items.isNotEmpty
+                          ? (items.first as Map)['image']?.toString() ?? ''
+                          : '',
+                      fit: BoxFit.cover,
+                      width: 68,
+                      height: 68,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        items.isNotEmpty
+                            ? (items.first as Map)['name']?.toString() ?? ''
+                            : 'คำสั่งซื้อ',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          height: 1.25,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${items.length} รายการ · ${_money(total)}',
+                        style: const TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 12.5,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                const Text(
+                  'สถานะ',
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                _buildProgressDot(true),
+                const SizedBox(width: 6),
+                _buildProgressDot(true),
+                const SizedBox(width: 6),
+                _buildProgressDot(false),
+                const SizedBox(width: 6),
+                _buildProgressDot(false),
+                const Spacer(),
+                Text(
+                  _money(total),
+                  style: const TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // backgroundColor: Colors.white,
-        appBar: headerCentral(context, title: 'กำลังจัดเตรียม'),
-        body: SafeArea(
-          child: ShowLoadingWidget(
-            loading: loading,
-            children: [
-              ListView.separated(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                padding: EdgeInsets.zero,
-                itemBuilder: (context, index) => orderModel.length > 0
-                    ? _buildListCategory(
-                        orderModel[index],
-                      )
-                    : SizedBox(),
-                separatorBuilder: (_, __) => SizedBox(height: 0),
-                itemCount: orderModel.length,
-              )
-              // FutureBuilder(
-              //   future: _futureModel,
-              //   builder: (context, snapshot) {
-              //     if (snapshot.hasData) {
-              //       loading = false;
-              //       if (snapshot.data.length > 0) {
-              //         return ListView.separated(
-              //           shrinkWrap: true,
-              //           physics: ClampingScrollPhysics(),
-              //           padding: EdgeInsets.zero,
-              //           itemBuilder: (context, index) => snapshot
-              //                       .data[index]['order_details']['data']
-              //                       .length >
-              //                   0
-              //               ? _buildListCategory(
-              //                   snapshot.data[index],
-              //                 )
-              //               : SizedBox(),
-              //           separatorBuilder: (_, __) => SizedBox(height: 0),
-              //           itemCount: snapshot.data.length,
-              //         );
-              //       } else {
-              //         return Center(
-              //           child: Text('ไม่มีรายการ'),
-              //         );
-              //       }
-              //     } else if (snapshot.hasError) {
-              //       if (snapshot.data == null) {
-              //         return Center(
-              //           child: Text('ไม่มีรายการ'),
-              //         );
-              //       } else {
-              //         return DataError();
-              //       }
-              //       // return DataError();
-              //     } else {
-              //       return Container();
-              //     }
-              //   },
-              // )
-            ],
-          ),
-        ));
-  }
+      backgroundColor: AppColors.background,
+      appBar: const KasetAppBar(title: 'กำลังจัดเตรียมสินค้า'),
+      body: SafeArea(
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _futureOrders,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
 
-  _buildListCategory(dynamic param) {
-    return Container(
-        color: Colors.white,
-        margin: EdgeInsets.only(
-            // bottom: 10.0,
-            top: 10),
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => OrderDetailsPage(
-                  model: param,
-                  statusText: 'กำลังจัดเตรียม',
-                  modePage: "10",
-                ),
+            final orders = snapshot.data ?? const <Map<String, dynamic>>[];
+            if (orders.isEmpty) {
+              return _emptyState();
+            }
+
+            return RefreshIndicator(
+              onRefresh: _reload,
+              color: AppColors.primary,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                children: [
+                  const Text(
+                    'คำสั่งซื้อที่ระบบกำลังจัดเตรียม',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'รายการที่ชำระแล้วจะถูกเลื่อนมาแสดงที่หน้านี้ทันที',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 12.5,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  for (final order in orders) _buildOrderCard(order),
+                ],
               ),
             );
           },
-          child: Column(
-            children: [
-              SizedBox(height: 5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    height: 25,
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFE3E6FE),
-                      borderRadius: BorderRadius.circular(
-                        12.5,
-                      ),
-                    ),
-                    child: Text(
-                      'กำลังจัดเตรียม',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF09665a),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // ListView.separated(
-              //   shrinkWrap: true,
-              //   physics: ClampingScrollPhysics(),
-              //   padding: EdgeInsets.zero,
-              //   itemBuilder: (context, index) => _buildListProductInOrder(
-              //       param['order_details']['data'][index]),
-              //   separatorBuilder: (_, __) => SizedBox(height: 10),
-              //   itemCount: param['order_details']['data'].length,
-              // ),
-
-              _buildListProductInOrder(param ?? ''),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Color(0xFFFBE3E6),
-                  borderRadius: BorderRadius.circular(
-                    12.5,
-                  ),
-                ),
-                child: Text(
-                  // 'พัสดุจะถูกส่งมอบให้บริษัทขนส่งภายในวันที่ ${dateThai(param['shipped_at']).toString()}',
-                  'พัสดุจะถูกส่งมอบให้บริษัทขนส่งภายในวันที่ ${param['shipped_at']}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFFDF0B24),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    // padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Text(
-                      // _calculatePrice(param['total']),
-                      'ยอดรวมส่วนนี้ ',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 5),
-                  Container(
-                    // padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Text(
-                      // _calculatePrice(param['total']),
-                      moneyFormat(param['priceTotal'].toString()) + ' บาท',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 10),
-            ],
-          ),
-        ));
-  }
-
-  _buildListProductInOrder(param) {
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.only(top: 10, bottom: 5),
-          child: Row(
-            children: [
-              // InkWell(
-              //   onTap: () {
-              //     // _getProductById(param['product']['data']['id']);
-              //     // Navigator.pop(context);
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (_) => OrderDetailsPage(
-              //           model: param,
-              //         ),
-              //       ),
-              //     );
-              //   },
-              //   child:
-              Stack(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      // _getProductById(param['code']);
-                      // Navigator.pop(context);
-                    },
-                    // loadingImageNetwork(
-                    //         param['imageUrl'],
-                    //         width: 90,
-                    //         height: 90,
-                    //         fit: BoxFit.cover,
-                    //       )
-                    child: param['imageUrl'] != null
-                        ? Image.network(
-                            param['imageUrl'],
-                            fit: BoxFit.cover,
-                            width: 90,
-                            height: 90,
-                          )
-                        : Image.asset(
-                            'assets/images/kaset/no-img.png',
-                            fit: BoxFit.cover,
-                            width: 90,
-                            height: 90,
-                          ),
-                  ),
-                  // param.length > 1
-                  //     ? Positioned(
-                  //         right: 10,
-                  //         // top: 0,
-                  //         bottom: 5,
-                  //         child: Container(
-                  //           padding: EdgeInsets.symmetric(horizontal: 6),
-                  //           alignment: Alignment.center,
-                  //           decoration: BoxDecoration(
-                  //               // shape: BoxShape.circle,
-                  //               color: Color(0XFFE3E6FE),
-                  //               borderRadius:
-                  //                   BorderRadius.all(Radius.circular(25))),
-                  //           child: Text(
-                  //             '${param.length > 99 ? '99+' : param.length.toString()} ชิ้น',
-                  //             style: TextStyle(
-                  //               fontFamily: 'Kanit',
-                  //               fontSize: 12,
-                  //               color: Color(0xFF09665a),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       )
-                  //     : SizedBox(),
-                ],
-              ),
-
-              // ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      // height: 80,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            param['title'],
-                            style: TextStyle(
-                              fontSize: 13,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            maxLines: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    SizedBox(
-                      height: 20,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '${moneyFormat(param['price'].toString())} บาท',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'จำนวน ' + param['qty'].toString(),
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
         ),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //   children: [
-
-        //   ],
-        // ),
-        SizedBox(height: 10),
-      ],
+      ),
     );
   }
-
-
 }

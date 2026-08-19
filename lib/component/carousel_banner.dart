@@ -7,8 +7,7 @@ import 'package:kasetmall/component/link_url_in.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/exercise_main.dart';
-
-import 'package:kasetmall/login.dart';
+import 'package:kasetmall/shared/login_guard.dart';
 
 class CarouselBanner extends StatefulWidget {
   CarouselBanner({Key? key, this.model, this.url, this.height = 70})
@@ -76,63 +75,59 @@ class _CarouselBanner extends State<CarouselBanner>
               children: [
                 // 🔹 Carousel ส่วนรูป
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     List<String> linkSplit =
                         snapshot.data[_current]['linkUrl'].split('/');
                     if (snapshot.data[_current]['isChkLogin']) {
-                      if (userProfileCode.isNotEmpty &&
-                          userProfileCode.length != 0) {
-                        if (snapshot.data[_current]['action'] == 'out') {
-                          if (linkSplit[0] == '') {
-                            if (linkSplit[1] == 'exercise') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ExerciseMain(
-                                    coverImg: snapshot.data[_current]
-                                        ['imageUrl'],
-                                  ),
+                      final allowed = await requireLogin(
+                        context,
+                        title: 'เข้าสู่ระบบ',
+                        description: 'ต้องเข้าสู่ระบบก่อนเพื่อดูเนื้อหานี้',
+                      );
+                      if (!allowed) return;
+                      await _getprofileCode();
+                      await _getUserData();
+                      if (snapshot.data[_current]['action'] == 'out') {
+                        if (linkSplit[0] == '') {
+                          if (linkSplit[1] == 'exercise') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ExerciseMain(
+                                  coverImg: snapshot.data[_current]['imageUrl'],
                                 ),
-                              );
+                              ),
+                            );
+                          }
+                        } else {
+                          if (snapshot.data[_current]['isPostHeader']) {
+                            if (profileCode != '') {
+                              var path = snapshot.data[_current]['linkUrl'];
+                              var code = snapshot.data[_current]['code'];
+                              var splitCheck = path.split('').reversed.join();
+                              if (splitCheck[0] != "/") {
+                                path = path + "/";
+                              }
+                              var codeReplae = "B" +
+                                  profileCode.replaceAll('-', '') +
+                                  code.replaceAll('-', '');
+                              launchInWebViewWithJavaScript('$path$codeReplae');
                             }
                           } else {
-                            if (snapshot.data[_current]['isPostHeader']) {
-                              if (profileCode != '') {
-                                var path = snapshot.data[_current]['linkUrl'];
-                                var code = snapshot.data[_current]['code'];
-                                var splitCheck = path.split('').reversed.join();
-                                if (splitCheck[0] != "/") {
-                                  path = path + "/";
-                                }
-                                var codeReplae = "B" +
-                                    profileCode.replaceAll('-', '') +
-                                    code.replaceAll('-', '');
-                                launchInWebViewWithJavaScript(
-                                    '$path$codeReplae');
-                              }
-                            } else {
-                              launchInWebViewWithJavaScript(
-                                  snapshot.data[_current]['linkUrl']);
-                            }
+                            launchInWebViewWithJavaScript(
+                                snapshot.data[_current]['linkUrl']);
                           }
-                        } else if (snapshot.data[_current]['action'] == 'in') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CarouselForm(
-                                code: snapshot.data[_current]['code'],
-                                model: snapshot.data[_current],
-                                url: 'm/Banner/' + widget.url!,
-                                urlGallery: 'm/Banner/' + widget.url!,
-                              ),
-                            ),
-                          );
                         }
-                      } else {
+                      } else if (snapshot.data[_current]['action'] == 'in') {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginCentralPage(),
+                            builder: (context) => CarouselForm(
+                              code: snapshot.data[_current]['code'],
+                              model: snapshot.data[_current],
+                              url: 'm/Banner/' + widget.url!,
+                              urlGallery: 'm/Banner/' + widget.url!,
+                            ),
                           ),
                         );
                       }

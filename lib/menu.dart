@@ -7,6 +7,9 @@ import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/home.dart';
 import 'package:kasetmall/notification/notification.dart';
 import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/login_guard.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 import 'package:kasetmall/user_information.dart';
 
 import 'cart.dart';
@@ -30,8 +33,11 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
   int _currentPage = 0;
   List<Widget> _widgetOptions = <Widget>[];
   dynamic profile = {'firstName': '', 'lastName': '', 'imageUrl': ''};
+  bool _isLoggedIn = false;
   late DateTime currentBackPressTime;
-  int notiCount = 3;
+  int notiCount = 0;
+  late final VoidCallback _authListener;
+  late final VoidCallback _notificationListener;
 
   @override
   void initState() {
@@ -40,11 +46,46 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     _widgetOptions = <Widget>[
       HomeCentralPage(changePage: _changePage),
       CartCentralPage(changePage: _changePage),
-      const NotificationCentralPage(),
-      UserInformationCentralPage(),
+      NotificationCentralPage(
+        onBack: () => _onItemTapped(0),
+      ),
+      UserInformationCentralPage(changePage: _changePage),
     ];
+    _authListener = () {
+      if (mounted) {
+        _loadAuthState();
+        _getProfile();
+      }
+    };
+    _notificationListener = () {
+      if (mounted) {
+        _loadNotificationCount();
+      }
+    };
+    MockStore.authVersion.addListener(_authListener);
+    NotificationStore.notificationVersion.addListener(_notificationListener);
+    _loadAuthState();
     _getProfile();
+    _loadNotificationCount();
     _setupInteractedMessage();
+  }
+
+  @override
+  void dispose() {
+    MockStore.authVersion.removeListener(_authListener);
+    NotificationStore.notificationVersion.removeListener(_notificationListener);
+    super.dispose();
+  }
+
+  Future<void> _loadAuthState() async {
+    final isLoggedIn = await MockStore.isLoggedIn();
+    if (!mounted) return;
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+      if (!_isLoggedIn && (_currentPage == 1 || _currentPage == 3)) {
+        _currentPage = 0;
+      }
+    });
   }
 
   Future<void> _setupInteractedMessage() async {
@@ -74,10 +115,34 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     });
   }
 
+  Future<void> _handleProtectedTap(int index) async {
+    if (!_isLoggedIn && (index == 1 || index == 2 || index == 3)) {
+      final titles = {
+        1: 'ตะกร้า',
+        2: 'แจ้งเตือน',
+        3: 'โปรไฟล์',
+      };
+      final allowed = await requireLogin(
+        context,
+        title: titles[index] ?? 'ฟีเจอร์นี้',
+        description: 'ต้องเข้าสู่ระบบก่อนเพื่อใช้งานฟีเจอร์นี้',
+      );
+      if (!allowed) return;
+      await _loadAuthState();
+      if (!mounted) return;
+      setState(() {
+        _currentPage = index;
+      });
+      return;
+    }
+    _onItemTapped(index);
+  }
+
   _getProfile() async {
-    final imageUrl = await storage.read(key: 'profileImageUrl');
-    final firstName = await storage.read(key: 'profileFirstName');
-    final lastName = await storage.read(key: 'profileLastName');
+    await MockStore.loadUserProfile();
+    final imageUrl = MockStore.userProfile['imageUrl']?.toString() ?? '';
+    final firstName = MockStore.userProfile['firstName']?.toString() ?? '';
+    final lastName = MockStore.userProfile['lastName']?.toString() ?? '';
 
     setState(() {
       profile = {
@@ -88,6 +153,23 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
     });
 
     await _insertToken();
+  }
+
+  Future<void> _loadNotificationCount() async {
+    final isLoggedIn = await MockStore.isLoggedIn();
+    if (!mounted) return;
+    if (!isLoggedIn) {
+      setState(() {
+        notiCount = 0;
+      });
+      return;
+    }
+
+    final unreadCount = await NotificationStore.unreadCount();
+    if (!mounted) return;
+    setState(() {
+      notiCount = unreadCount;
+    });
   }
 
   _insertToken() async {
@@ -152,30 +234,29 @@ class _MenuCentralPageState extends State<MenuCentralPage> {
                           icon: Icons.home_outlined,
                           activeIcon: Icons.home,
                           active: _currentPage == 0,
-                          onTap: () => _onItemTapped(0),
+                          onTap: () => _handleProtectedTap(0),
                         ),
                         _NavItem(
                           label: 'ตะกร้า',
                           icon: Icons.shopping_cart_outlined,
                           activeIcon: Icons.shopping_cart,
                           active: _currentPage == 1,
-                          onTap: () => _onItemTapped(1),
+                          onTap: () => _handleProtectedTap(1),
                         ),
                         _NavItem(
                           label: 'แจ้งเตือน',
                           icon: Icons.notifications_none_outlined,
                           activeIcon: Icons.notifications,
                           active: _currentPage == 2,
-                          onTap: () => _onItemTapped(2),
-                          badgeCount: notiCount,
+                          onTap: () => _handleProtectedTap(2),
+                          badgeCount: _isLoggedIn ? notiCount : 0,
                         ),
                         _NavItem(
                           label: 'โปรไฟล์',
                           icon: Icons.person_outline,
                           activeIcon: Icons.person,
                           active: _currentPage == 3,
-                          onTap: () => _onItemTapped(3),
-                          networkImage: (profile['imageUrl'] ?? '').toString(),
+                          onTap: () => _handleProtectedTap(3),
                         ),
                       ],
                     ),
@@ -214,7 +295,6 @@ class _NavItem extends StatelessWidget {
     required this.active,
     required this.onTap,
     this.badgeCount = 0,
-    this.networkImage = '',
   });
 
   final String label;
@@ -223,11 +303,10 @@ class _NavItem extends StatelessWidget {
   final bool active;
   final VoidCallback onTap;
   final int badgeCount;
-  final String networkImage;
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? const Color(0xFF13714C) : const Color(0xFF6C756F);
+    final color = active ? AppColors.primary : const Color(0xFF6C756F);
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -244,14 +323,7 @@ class _NavItem extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  if (networkImage.isNotEmpty)
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundColor: Colors.white,
-                      backgroundImage: NetworkImage(networkImage),
-                    )
-                  else
-                    Icon(active ? activeIcon : icon, color: color, size: 24),
+                  Icon(active ? activeIcon : icon, color: color, size: 24),
                   if (badgeCount > 0)
                     Positioned(
                       right: -6,

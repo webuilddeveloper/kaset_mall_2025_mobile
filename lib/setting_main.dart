@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/delete_user.dart';
 import 'package:kasetmall/delivery_address.dart';
-
+import 'package:kasetmall/shared/app_bar.dart';
+import 'package:kasetmall/shared/app_theme.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/user_profile_form.dart';
-import 'package:kasetmall/widget/header.dart';
 
 class SettingMain extends StatefulWidget {
   SettingMain({Key? key, this.code, this.title, this.callback})
@@ -98,425 +98,236 @@ class _SettingMain extends State<SettingMain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: headerCentral(context, title: 'ตั้งค่า'),
+      backgroundColor: AppColors.background,
+      appBar: KasetAppBar(
+        title: 'ตั้งค่า',
+        subtitle: 'จัดการบัญชีและความเป็นส่วนตัว',
+        actions: [
+          KasetAppBarAction(
+            icon: Icons.help_outline_rounded,
+            onTap: () {},
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            // Positioned(
-            //   bottom: 0,
-            //   left: 0,
-            //   right: 0,
-            //   child: Image.asset('assets/images/bg_setting.png'),
-            // ),
-            Container(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  profileFirstName != null
-                      ? Container(
-                          padding: EdgeInsets.only(bottom: 28),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: Text('บัญชีของฉัน',
-                                    style: TextStyle(
-                                      color: Color(0xFF000000),
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                    )),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: GestureDetector(
-                                  onTap: () => {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => UserProfileForm(),
-                                      ),
-                                    ),
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Text('ข้อมูลเกี่ยวกับบัญชี',
-                                            style: TextStyle(
-                                              color: Color(0xFF000000),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.normal,
-                                            )),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        color: Color(0xFF000000),
-                                        size: 17,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: GestureDetector(
-                                  onTap: () => {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            DeliveryAddressCentralPage(),
-                                      ),
-                                    ),
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Text('ที่อยู่ของฉัน',
-                                            style: TextStyle(
-                                              color: Color(0xFF000000),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.normal,
-                                            )),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        color: Color(0xFF000000),
-                                        size: 17,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: GestureDetector(
-                                  onTap: () => {},
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Text('ข้อมูลบัญชีธนาคาร / บัตร',
-                                            style: TextStyle(
-                                              color: Color(0xFF000000),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.normal,
-                                            )),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        color: Color(0xFF000000),
-                                        size: 17,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      : Container(),
-                  // Container(
-                  //   padding: EdgeInsets.only(bottom: 28),
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: [
-                  //       Container(
-                  //         margin: EdgeInsets.only(bottom: 5),
-                  //         child: Text('การตั้งค่า',
-                  //             style: TextStyle(
-                  //               color: Color(0xFF000000),
-                  //               fontSize: 20,
-                  //               fontWeight: FontWeight.w500,
-                  //             )),
-                  //       ),
-                  //       Container(
-                  //         margin: EdgeInsets.only(bottom: 5),
-                  //         child: GestureDetector(
-                  //           onTap: () => {
-                  //             // Navigator.push(
-                  //             //   context,
-                  //             //   MaterialPageRoute(
-                  //             //     builder: (_) => SettingMain(),
-                  //             //   ),
-                  //             // ),
-                  //           },
-                  //           child: Row(
-                  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //             children: [
-                  //               Container(
-                  //                 child: Text('ตั้งค่าการแจ้งเตือน',
-                  //                     style: TextStyle(
-                  //                       color: Color(0xFF000000),
-                  //                       fontSize: 18,
-                  //                       fontWeight: FontWeight.normal,
-                  //                     )),
-                  //               ),
-                  //               Icon(
-                  //                 Icons.arrow_forward_ios_rounded,
-                  //                 color: Color(0xFF000000),
-                  //                 size: 17,
-                  //               )
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       Container(
-                  //         margin: EdgeInsets.only(bottom: 5),
-                  //         child: GestureDetector(
-                  //           onTap: () => {
-                  //             // Navigator.push(
-                  //             //   context,
-                  //             //   MaterialPageRoute(
-                  //             //     builder: (_) => SettingMain(),
-                  //             //   ),
-                  //             // ),
-                  //           },
-                  //           child: Row(
-                  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //             children: [
-                  //               Container(
-                  //                 child: Text('ตั้งค่าภาษา',
-                  //                     style: TextStyle(
-                  //                       color: Color(0xFF000000),
-                  //                       fontSize: 18,
-                  //                       fontWeight: FontWeight.normal,
-                  //                     )),
-                  //               ),
-                  //               Icon(
-                  //                 Icons.arrow_forward_ios_rounded,
-                  //                 color: Color(0xFF000000),
-                  //                 size: 17,
-                  //               )
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       Container(
-                  //         margin: EdgeInsets.only(bottom: 5),
-                  //         child: GestureDetector(
-                  //           onTap: () => {
-                  //             // Navigator.push(
-                  //             //   context,
-                  //             //   MaterialPageRoute(
-                  //             //     builder: (_) => SettingMain(),
-                  //             //   ),
-                  //             // ),
-                  //           },
-                  //           child: Row(
-                  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //             children: [
-                  //               Container(
-                  //                 child: Text('ตั้งค่าความเป็นส่วนตัว',
-                  //                     style: TextStyle(
-                  //                       color: Color(0xFF000000),
-                  //                       fontSize: 18,
-                  //                       fontWeight: FontWeight.normal,
-                  //                     )),
-                  //               ),
-                  //               Icon(
-                  //                 Icons.arrow_forward_ios_rounded,
-                  //                 color: Color(0xFF000000),
-                  //                 size: 17,
-                  //               )
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                  Container(
-                    padding: EdgeInsets.only(bottom: 28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(bottom: 5),
-                          child: Text('ช่วยเหลือ',
-                              style: TextStyle(
-                                color: Color(0xFF000000),
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                              )),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          children: [
+            if (profileFirstName != null) ...[
+              _settingsSection(
+                title: 'บัญชีของฉัน',
+                children: [
+                  _settingsTile(
+                    icon: Icons.badge_outlined,
+                    title: 'ข้อมูลเกี่ยวกับบัญชี',
+                    subtitle: 'ชื่อ เบอร์โทร และข้อมูลส่วนตัว',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => UserProfileForm(),
                         ),
-                        // Container(
-                        //   margin: EdgeInsets.only(bottom: 5),
-                        //   child: GestureDetector(
-                        //     onTap: () => {
-                        //       Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //           builder: (_) => CommercialOrganizationPage(),
-                        //         ),
-                        //       ),
-                        //     },
-                        //     child: Row(
-                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //       children: [
-                        //         Container(
-                        //           child: Text('เกี่ยวกับ',
-                        //               style: TextStyle(
-                        //                 color: Color(0xFF000000),
-                        //                 fontSize: 18,
-                        //                 fontWeight: FontWeight.normal,
-                        //               )),
-                        //         ),
-                        //         Icon(
-                        //           Icons.arrow_forward_ios_rounded,
-                        //           color: Color(0xFF000000),
-                        //           size: 17,
-                        //         )
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        // Container(
-                        //   margin: EdgeInsets.only(bottom: 5),
-                        //   child: GestureDetector(
-                        //     onTap: () => {
-                        //       // Navigator.push(
-                        //       //   context,
-                        //       //   MaterialPageRoute(
-                        //       //     builder: (_) => SettingMain(),
-                        //       //   ),
-                        //       // ),
-                        //     },
-                        //     child: Row(
-                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //       children: [
-                        //         Container(
-                        //           child: Text('เกี่ยวกับ',
-                        //               style: TextStyle(
-                        //                 color: Color(0xFF000000),
-                        //                 fontSize: 18,
-                        //                 fontWeight: FontWeight.normal,
-                        //               )),
-                        //         ),
-                        //         Icon(
-                        //           Icons.arrow_forward_ios_rounded,
-                        //           color: Color(0xFF000000),
-                        //           size: 17,
-                        //         )
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-
-                        Container(
-                          margin: EdgeInsets.only(bottom: 5),
-                          child: GestureDetector(
-                            onTap: () => {
-                              // launchUrl(
-                              //   Uri.parse('https://policy.we-builds.com/ssp/'),
-                              // )
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (_) => SettingMain(),
-                              //   ),
-                              // ),
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  child: Text('นโยบายความเป็นส่วนตัว',
-                                      style: TextStyle(
-                                        color: Color(0xFF000000),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      )),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Color(0xFF000000),
-                                  size: 17,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          margin: EdgeInsets.only(bottom: 5),
-                          child: GestureDetector(
-                            onTap: () => {
-                              // launchUrl(
-                              //   Uri.parse(
-                              //       'https://suksapanmall.com/#/accout-deletion'),
-                              // )
-                              _dialogConfirm(),
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  child: Text('การยกเลิกการปิดบัญชี',
-                                      style: TextStyle(
-                                        color: Color(0xFF000000),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                      )),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Color(0xFF000000),
-                                  size: 17,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                  Container(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'v.$versionName',
-                    ),
+                  const Divider(height: 1),
+                  _settingsTile(
+                    icon: Icons.location_on_outlined,
+                    title: 'ที่อยู่ของฉัน',
+                    subtitle: 'จัดการที่อยู่จัดส่ง',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DeliveryAddressCentralPage(),
+                        ),
+                      );
+                    },
                   ),
-
-                  profileFirstName != null
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            MaterialButton(
-                              height: 33,
-                              // minWidth: 168,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: new BorderRadius.circular(25)),
-                              onPressed: () {
-                                logout(context);
-                                // launchInWebViewWithJavaScript(model['fileUrl']);
-                              },
-                              child: Text(
-                                "ออกจากระบบ",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color(0xFF09665a),
-                                  fontWeight: FontWeight.w400,
-                                  // letterSpacing: 0.1
-                                ),
-                              ),
-                              color: Color(0xFFE3E6FE),
-                            ),
-                          ],
-                        )
-                      : Container(),
                 ],
               ),
+              const SizedBox(height: 16),
+            ],
+            _settingsSection(
+              title: 'การใช้งานแอป',
+              children: [
+                _settingsTile(
+                  icon: Icons.notifications_none_rounded,
+                  title: 'การแจ้งเตือน',
+                  subtitle: 'จัดการการแจ้งเตือนและข้อความจากระบบ',
+                  onTap: () {},
+                ),
+                const Divider(height: 1),
+                _settingsTile(
+                  icon: Icons.language_rounded,
+                  title: 'ภาษา',
+                  subtitle: 'ภาษาไทย',
+                  onTap: () {},
+                ),
+                const Divider(height: 1),
+                _settingsTile(
+                  icon: Icons.privacy_tip_outlined,
+                  title: 'ความเป็นส่วนตัว',
+                  subtitle: 'นโยบายการใช้งานและข้อมูลส่วนบุคคล',
+                  onTap: () {},
+                ),
+              ],
             ),
+            const SizedBox(height: 16),
+            _settingsSection(
+              title: 'ช่วยเหลือ',
+              children: [
+                _settingsTile(
+                  icon: Icons.description_outlined,
+                  title: 'นโยบายความเป็นส่วนตัว',
+                  subtitle: 'อ่านรายละเอียดเงื่อนไขและสิทธิ์การใช้งาน',
+                  onTap: () {},
+                ),
+                const Divider(height: 1),
+                _settingsTile(
+                  icon: Icons.delete_outline_rounded,
+                  title: 'การยกเลิกการปิดบัญชี',
+                  subtitle: 'ส่งคำขอปิดบัญชีและลบข้อมูล',
+                  onTap: _dialogConfirm,
+                  accent: true,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              alignment: Alignment.centerRight,
+              child: Text(
+                'v.$versionName',
+                style: const TextStyle(
+                  fontFamily: 'Kanit',
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (profileFirstName != null)
+              SizedBox(
+                height: 46,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    logout(context);
+                  },
+                  icon: const Icon(Icons.logout_rounded),
+                  label: const Text(
+                    'ออกจากระบบ',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+              ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _settingsSection({
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _settingsTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool accent = false,
+  }) {
+    final iconColor = accent ? AppColors.accent : AppColors.primary;
+    final iconBg = accent ? AppColors.accentTint : AppColors.tintGreenSoft;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 20, color: iconColor),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 12.5,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.accent,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -552,26 +363,42 @@ class _SettingMain extends State<SettingMain> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
           'การยกเลิกบัญชี',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontFamily: 'Kanit',
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
         ),
-        content: Text(
+        content: const Text(
           'คุณต้องการยกเลิกบัญชีใช่หรือไม่',
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(
+            fontFamily: 'Kanit',
+            fontSize: 14,
+            color: AppColors.textSecondary,
+          ),
         ),
         actions: [
           TextButton(
-            child: Text(
+            child: const Text(
               'ย้อนกลับ',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                color: AppColors.textSecondary,
+              ),
             ),
             onPressed: () => Navigator.pop(context),
           ),
           TextButton(
-            child: Text(
+            child: const Text(
               'ยืนยัน',
-              style: TextStyle(color: Color(0xFF1CBC51)),
+              style: TextStyle(
+                fontFamily: 'Kanit',
+                color: AppColors.primary,
+              ),
             ),
             onPressed: () {
               Navigator.pop(context); // ปิด dialog

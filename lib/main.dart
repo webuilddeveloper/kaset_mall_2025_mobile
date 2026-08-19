@@ -11,6 +11,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kasetmall/dark_mode.dart';
+import 'package:kasetmall/shared/app_theme.dart';
 import 'package:kasetmall/version.dart';
 import 'package:provider/provider.dart';
 // import 'package:wereward/shared/notification_service.dart';
@@ -252,19 +253,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             supportedLocales: context.supportedLocales,
             locale: context.locale,
             navigatorKey: navigatorKey,
-            theme: ThemeData(
-              primaryColor: const Color(0xFF09665a),
-              primaryColorLight: const Color(0xFF528c6e),
-              primaryColorDark: const Color(0xFF9C0000),
-              colorScheme: ColorScheme.light(
-                primary: Color(0xFFEC008C),
-                secondary: Color(0xFFFC6767), // ใช้แทน accentColor
-                surfaceBright: Color(0xFFf7f7f7), // ใช้แทน backgroundColor
-              ),
-              scaffoldBackgroundColor:
-                  Color(0xFFf7f7f7), // ใช้แทน backgroundColor
-              fontFamily: 'Kanit',
-            ),
+            theme: AppTheme.light(),
+            darkTheme: AppTheme.dark(),
+            themeMode:
+                value.darkTheme ? ThemeMode.dark : ThemeMode.light,
             title: appName,
             home: VersionPage(),
             builder: (context, child) {

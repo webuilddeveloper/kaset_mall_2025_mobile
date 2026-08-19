@@ -1,10 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/cart.dart';
 import 'package:kasetmall/component/carousel_banner.dart';
@@ -19,8 +18,11 @@ import 'package:kasetmall/privilege_all.dart';
 import 'package:kasetmall/privilege_form.dart';
 import 'package:kasetmall/product_all.dart';
 import 'package:kasetmall/product_from.dart';
+import 'package:kasetmall/data/mock_kaset_data.dart';
 import 'package:kasetmall/shared/api_provider.dart';
+import 'package:kasetmall/shared/login_guard.dart';
 import 'package:kasetmall/shared/notification_service.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -45,6 +47,10 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   TextEditingController searchController = TextEditingController();
 
   dynamic profile = {'firstName': '', 'lastName': '', 'imageUrl': ''};
+  late final VoidCallback _authListener;
+  bool _isLoggedIn = false;
+  String _displayName = '';
+  String _profileImageUrl = '';
   RefreshController? _refreshController;
   ScrollController? _scrollController;
   int _limit = 30;
@@ -61,6 +67,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   String profileCode = "";
   // String verifyPhonePage = '';
   DateTime? currentBackPressTime;
+  late final VoidCallback _cartListener;
 
   String? emailProfile;
   int total_page = 0;
@@ -71,15 +78,37 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   void initState() {
     _scrollController = ScrollController(initialScrollOffset: 0.0);
     _refreshController = RefreshController();
+    _authListener = () {
+      if (mounted) {
+        _loadUserProfile();
+      }
+    };
+    _cartListener = () {
+      if (mounted) {
+        _getCountItemInCart();
+      }
+    };
+    MockStore.authVersion.addListener(_authListener);
+    MockStore.cartVersion.addListener(_cartListener);
     _getCategory();
     _callRead();
     // _getUserData();
     _getCountItemInCart();
+    _loadUserProfile();
     // _callReadVideoShort();
     _callReadAll();
     _onLoading();
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    MockStore.authVersion.removeListener(_authListener);
+    MockStore.cartVersion.removeListener(_cartListener);
+    _scrollController?.dispose();
+    _refreshController?.dispose();
+    super.dispose();
   }
 
   Future<bool> sendPushMessage({
@@ -117,32 +146,47 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   // }
 
   _getCountItemInCart() async {
-    String? value = await storage.read(key: 'cartItems');
+    final items = await CartStore.getCart();
+    if (!mounted) return;
+    setState(() {
+      amountItemInCart = items.length;
+    });
+  }
 
-    if (value != null) {
-      List<dynamic> items = jsonDecode(value);
+  Future<void> _loadUserProfile() async {
+    final isLoggedIn = await MockStore.isLoggedIn();
+    final data = await MockStore.loadUserProfile();
+    final firstName = data['firstName']?.toString() ?? '';
+    final lastName = data['lastName']?.toString() ?? '';
+    if (!mounted) return;
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+      _displayName = '$firstName $lastName'.trim();
+      _profileImageUrl = data['imageUrl']?.toString() ?? '';
+    });
+  }
 
-      setState(() {
-        amountItemInCart = items.length;
-      });
-    } else {
-      setState(() {
-        amountItemInCart = 0;
-      });
+  ImageProvider _profileImageProvider(String path) {
+    if (path.isEmpty) {
+      return const AssetImage('assets/images/kaset/logo_kaset.png');
     }
+    if (path.startsWith('assets/')) {
+      return AssetImage(path);
+    }
+    if (path.startsWith('http')) {
+      return NetworkImage(path);
+    }
+    final file = File(path);
+    if (file.existsSync()) {
+      return FileImage(file);
+    }
+    return const AssetImage('assets/images/kaset/logo_kaset.png');
   }
 
   _getCategory() async {
     setState(() {
       _futureCategory = Future.value(mockCategories);
     });
-  }
-
-  @override
-  void dispose() {
-    _scrollController?.dispose();
-    _refreshController?.dispose();
-    super.dispose();
   }
 
   // business logic.
@@ -281,42 +325,92 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   height: 42,
                   width: 42,
                   alignment: Alignment.center,
-                  child: Image.asset(
-                    'assets/images/kaset/logo_kaset.png',
-                    width: 45,
-                    height: 45,
-                    // color: const Color(0xFF2E7D32),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFE1EBE0)),
                   ),
+                  child: _isLoggedIn
+                      ? ClipOval(
+                          child: Image(
+                            image: _profileImageProvider(_profileImageUrl),
+                            width: 42,
+                            height: 42,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Image.asset(
+                              'assets/images/kaset/user.png',
+                              width: 26,
+                              height: 26,
+                            ),
+                          ),
+                        )
+                      : Image.asset(
+                          'assets/images/kaset/logo_kaset.png',
+                          width: 28,
+                          height: 28,
+                        ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'เกษตร Mall',
-                    style: TextStyle(
-                      color: Color(0xFF1B5E20),
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    textScaleFactor: ScaleSize.textScaleFactor(context),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'เกษตร Mall',
+                        style: const TextStyle(
+                          color: Color(0xFF1B5E20),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textScaleFactor: ScaleSize.textScaleFactor(context),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _isLoggedIn
+                            ? (_displayName.isNotEmpty
+                                ? _displayName
+                                : 'บัญชีของคุณ')
+                            : 'เข้าสู่ระบบเพื่อเริ่มใช้งาน',
+                        style: const TextStyle(
+                          color: Color(0xFF6E6C61),
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textScaleFactor: ScaleSize.textScaleFactor(context),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 8),
-                _buildAppBarAction(
-                  icon: Icons.shopping_cart_outlined,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CartCentralPage(),
-                      ),
-                    ).then((value) => _getCountItemInCart());
-                  },
-                  badge: amountItemInCart > 0
-                      ? amountItemInCart > 99
-                          ? '99+'
-                          : amountItemInCart.toString()
-                      : null,
-                ),
+                if (_isLoggedIn)
+                  _buildAppBarAction(
+                    icon: Icons.shopping_cart_outlined,
+                    onTap: () async {
+                      final allowed = await requireLogin(
+                        context,
+                        title: 'ตะกร้า',
+                        description: 'ต้องเข้าสู่ระบบก่อนเพื่อดูตะกร้าสินค้า',
+                      );
+                      if (!allowed) return;
+                      if (widget.changePage != null) {
+                        widget.changePage!(1);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CartCentralPage(),
+                          ),
+                        ).then((value) => _getCountItemInCart());
+                      }
+                    },
+                    badge: amountItemInCart > 0
+                        ? amountItemInCart > 99
+                            ? '99+'
+                            : amountItemInCart.toString()
+                        : null,
+                  ),
               ],
             ),
           ),
@@ -392,18 +486,11 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   const SizedBox(height: 2),
                   _buildCategory(),
                   const SizedBox(height: 6),
-                  _buildCouponRow(),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {},
-                    child: _buildTitle(
-                      code: 'privilege',
-                      title: 'สิทธิประโยชน์',
-                      showAll: true,
-                    ),
-                  ),
-                  _buildForYou(),
+                  _buildCouponTodaySection(),
+
                   const SizedBox(height: 8),
+                  _buildForYou(),
+                  const SizedBox(height: 10),
                   _buildBestSellerSection(),
                   // _buildTitle(
                   //   code: 'product',
@@ -412,7 +499,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   // ),
                   // SizedBox(height: 5),
                   // _buildTrending(),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 85),
                 ],
               ),
             ),
@@ -539,13 +626,21 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                             NewsAllPage(title: title, mode: showAll),
                       ),
                     );
-                  } else if (code == 'privilege') {
+                  } else if (code == 'coupon') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => PrivilegeAllPage(
-                          title: title,
-                          mode: showAll,
+                          title: 'คูปอง',
+                        ),
+                      ),
+                    );
+                  } else if (code == 'benefit') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrivilegeAllPage(
+                          title: 'สิทธิประโยชน์',
                         ),
                       ),
                     );
@@ -567,7 +662,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   ? Row(
                       children: [
                         Text(
-                          'ดูทั้งหมด   ',
+                          'ดูทั้งหมด',
                           style:
                               TextStyle(fontSize: 13, color: Color(0xFFfd3131)),
                           textAlign: TextAlign.center,
@@ -914,6 +1009,12 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
       color: Colors.white,
       child: Column(
         children: [
+          _buildTitle(
+            title: 'สิทธิประโยชน์',
+            code: 'benefit',
+            showAll: true,
+          ),
+          const SizedBox(height: 2),
           SizedBox(
             height: 220,
             child: FutureBuilder<dynamic>(
@@ -1050,96 +1151,106 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     );
   }
 
-  Widget _buildCouponRow() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: GestureDetector(
-        onTap: () {},
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Color(0xFFFBFDFB), Color(0xFFF2F8F2)],
+  Widget _buildCouponTodaySection() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: CouponStore.getAllCoupons(),
+      builder: (context, snapshot) {
+        final hasCoupons = (snapshot.data ?? const []).isNotEmpty;
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 86,
+            child: Center(
+              child: CircularProgressIndicator(color: Color(0xFF2E7D32)),
             ),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE1EBE0)),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF143D16).withOpacity(0.04),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                height: 48,
-                width: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFBE7C9),
-                  borderRadius: BorderRadius.circular(14),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PrivilegeAllPage(title: 'คูปอง'),
                 ),
-                child: const Icon(
-                  Icons.local_offer_rounded,
-                  color: Color(0xFFC77A1F),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'คูปองลด 15% วันนี้',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1C1C1A),
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      'กดรับไว้ก่อน ใช้ได้กับสินค้าที่ร่วมรายการ',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        color: Color(0xFF6E6C61),
-                        height: 1.15,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Color(0xFFC77A1F),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: const Text(
-                  'กดรับ',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFE1EBE0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF143D16).withOpacity(0.05),
+                    blurRadius: 12,
+                    offset: const Offset(0, 5),
                   ),
-                ),
+                ],
               ),
-            ],
+              child: Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFBE7C9),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.local_offer_rounded,
+                      color: Color(0xFFC77A1F),
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'คูปองวันนี้',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1C1C1A),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          hasCoupons
+                              ? 'กดรับคูปองไว้ใช้กับสินค้าที่ร่วมรายการ'
+                              : 'ยังไม่มีคูปองให้แสดง',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11.8,
+                            color: Color(0xFF6E6C61),
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: Color(0xFFE8992B),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -1230,42 +1341,23 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                 top: Radius.circular(18),
               ),
               child: SizedBox(
-                height: 104,
-                width: double.infinity,
+              height: 104,
+              width: double.infinity,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
                     if (hasImage)
-                      loadingImageNetwork(image, fit: BoxFit.cover)
+                      AdaptiveProductImage(
+                        url: image,
+                        fit: BoxFit.contain,
+                        blurThreshold: 0.45,
+                        padding: const EdgeInsets.all(10),
+                      )
                     else
                       Image.asset(
                         'assets/images/kaset/no-img.png',
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                       ),
-                    BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                      child: Container(
-                        color: Colors.white.withOpacity(0.14),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: Container(
-                          color: Colors.white.withOpacity(0.08),
-                          child: Center(
-                            child: hasImage
-                                ? loadingImageNetwork(image,
-                                    fit: BoxFit.contain)
-                                : Image.asset(
-                                    'assets/images/kaset/no-img.png',
-                                    fit: BoxFit.contain,
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ),
                     Positioned(
                       left: 10,
                       top: 10,
@@ -1724,461 +1816,4 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   //     ),
   //   );
   // }
-
-  final List<Map<String, dynamic>> mockCategories = [
-    {
-      'id': '1',
-      'name': 'พรรณพืช',
-      'img': "assets/images/kaset/category_basket.png"
-    },
-    {
-      'id': '2',
-      'name': 'เครื่องมือ',
-      'img': "assets/images/kaset/category_tools.png"
-    },
-    {
-      'id': '3',
-      'name': 'อาหารสัตว์',
-      'img': "assets/images/kaset/category_feed.png"
-    },
-    {
-      'id': '4',
-      'name': 'เคมีภัณฑ์',
-      'img': "assets/images/kaset/category_fertilizer.png"
-    },
-  ];
-  final List<Map<String, dynamic>> mockProductList = [
-    // พรรณพืช
-    {
-      'id': 1,
-      'name': 'เมล็ดพันธุ์ข้าวหอมมะลิ 105',
-      'type': '1',
-      'price': 120.0,
-      'description':
-          'เมล็ดพันธุ์ข้าวหอมมะลิคุณภาพดี ให้ผลผลิตสูง เหมาะกับการปลูกในทุกภาคของประเทศไทย',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_251458731.png',
-      'stock': 10,
-    },
-    {
-      'id': 6,
-      'name': 'เมล็ดพันธุ์ผักบุ้งจีน',
-      'type': '1',
-      'price': 35.0,
-      'description':
-          'เมล็ดพันธุ์ผักบุ้งจีน ปลูกง่าย โตเร็ว เหมาะสำหรับปลูกในฤดูฝน',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_251522694.png',
-      'stock': 50,
-    },
-    {
-      'id': 7,
-      'name': 'เมล็ดพันธุ์ถั่วฝักยาว',
-      'type': '1',
-      'price': 40.0,
-      'description': 'เมล็ดถั่วฝักยาวพันธุ์ดี ให้ผลผลิตสูง ทนโรคและแมลง',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_251548725.png',
-      'stock': 30,
-    },
-    {
-      'id': 8,
-      'name': 'เมล็ดพันธุ์มะเขือเทศ',
-      'type': '1',
-      'price': 50.0,
-      'description': 'มะเขือเทศพันธุ์คุณภาพ ให้ผลผลิตลูกใหญ่ สีแดงสด',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_251619462.png',
-      'stock': 25,
-    },
-    {
-      'id': 9,
-      'name': 'เมล็ดพันธุ์ข้าวโพดหวาน',
-      'type': '1',
-      'price': 60.0,
-      'description': 'ข้าวโพดหวานพันธุ์ดี รสหวาน ปลูกง่าย ผลผลิตสูง',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_251637998.png',
-      'stock': 40,
-    },
-
-    // เครื่องมือ
-    {
-      'id': 2,
-      'name': 'เครื่องพ่นยาแบตเตอรี่ 20 ลิตร',
-      'type': '2',
-      'price': 890.0,
-      'description':
-          'เครื่องพ่นยาคุณภาพสูง ทำงานด้วยระบบไฟฟ้าแบตเตอรี่ ใช้งานต่อเนื่องได้ยาวนาน เหมาะกับการฉีดพ่นปุ๋ยหรือยาฆ่าแมลง',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254704897.png',
-      'stock': 10,
-    },
-    {
-      'id': 10,
-      'name': 'กรรไกรตัดแต่งกิ่ง',
-      'type': '2',
-      'price': 150.0,
-      'description': 'กรรไกรคุณภาพสูง ตัดแต่งกิ่งไม้และพืชสวนได้สะดวก',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255345172.png',
-      'stock': 20,
-    },
-    // {
-    //   'id': 11,
-    //   'name': 'จอบขุดดิน',
-    //   'type': '2',
-    //   'price': 200.0,
-    //   'description': 'จอบขุดดินคุณภาพ แข็งแรง ใช้งานได้นาน',
-    //   'image':
-    //       'https://www.sprayerthai.com/wp-content/uploads/2021/07/shovel.jpg',
-    //   'stock': 15,
-    // },
-    // {
-    //   'id': 12,
-    //   'name': 'สายยางรดน้ำ 20 ม.',
-    //   'type': '2',
-    //   'price': 350.0,
-    //   'description': 'สายยางคุณภาพสูง ยาว 20 เมตร เหมาะสำหรับรดน้ำสวน',
-    //   'image':
-    //       'https://www.sprayerthai.com/wp-content/uploads/2021/07/hose.jpg',
-    //   'stock': 30,
-    // },
-    {
-      'id': 13,
-      'name': 'เครื่องตัดหญ้าไฟฟ้า',
-      'type': '2',
-      'price': 2500.0,
-      'description': 'เครื่องตัดหญ้าไฟฟ้า ประสิทธิภาพสูง ใช้งานง่าย',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255345172.png',
-      'stock': 5,
-    },
-
-    // อาหารสัตว์
-    {
-      'id': 3,
-      'name': 'อาหารไก่เนื้อเบอร์ 910',
-      'type': '3',
-      'price': 250.0,
-      'description':
-          'อาหารชนิดเม็ด สำหรับไก่เล็กถึงอายุ 3 สัปดาห์ มีโปรตีนคุณภาพสูง เหมาะสำหรับฟาร์มไก่เนื้อ',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_253341284.png',
-      'stock': 10,
-    },
-    {
-      'id': 14,
-      'name': 'อาหารหมูลูกพันธุ์ 101',
-      'type': '3',
-      'price': 300.0,
-      'description': 'อาหารหมูลูกพันธุ์ สำหรับลูกหมูอายุ 0-8 สัปดาห์ โปรตีนสูง',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_253126489.png',
-      'stock': 20,
-    },
-    {
-      'id': 15,
-      'name': 'อาหารปลานิล',
-      'type': '3',
-      'price': 220.0,
-      'description': 'อาหารปลานิลเม็ดคุณภาพดี ช่วยเร่งการเจริญเติบโตของปลา',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254041307.png',
-      'stock': 25,
-    },
-    {
-      'id': 16,
-      'name': 'อาหารวัวกระทิง',
-      'type': '3',
-      'price': 400.0,
-      'description': 'อาหารวัวชนิดเม็ด เสริมโปรตีนและแร่ธาตุสำหรับวัวเนื้อ',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_253600030.png',
-      'stock': 15,
-    },
-    {
-      'id': 17,
-      'name': 'อาหารไก่ไข่เบอร์ 926',
-      'type': '3',
-      'price': 280.0,
-      'description': 'อาหารไก่ไข่ เสริมโปรตีนและแคลเซียม ให้ไข่มีคุณภาพ',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_253540696.jpg',
-      'stock': 20,
-    },
-
-    // เคมีภัณฑ์
-    {
-      'id': 4,
-      'name': 'ปุ๋ยเคมีสูตร 15-15-15',
-      'type': '4',
-      'price': 450.0,
-      'description':
-          'ปุ๋ยเคมีสูตรมาตรฐาน เหมาะสำหรับพืชสวนและพืชไร่ ให้ธาตุอาหารครบถ้วนสำหรับการเจริญเติบโต',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254613292.jpg',
-      'stock': 10,
-    },
-    {
-      'id': 5,
-      'name': 'ยาฆ่าแมลงตราช้างแดง',
-      'type': '4',
-      'price': 195.0,
-      'description':
-          'ยาฆ่าแมลงประสิทธิภาพสูง ปลอดภัยเมื่อใช้ตามคำแนะนำ เหมาะสำหรับพืชสวน พืชไร่ และไม้ดอก',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254638003.png',
-      'stock': 0,
-    },
-    {
-      'id': 18,
-      'name': 'ปุ๋ยยูเรียเม็ด',
-      'type': '4',
-      'price': 220.0,
-      'description': 'ปุ๋ยยูเรียเสริมไนโตรเจน สำหรับพืชผลผลิตสูง',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254711304.png',
-      'stock': 30,
-    },
-    {
-      'id': 19,
-      'name': 'ยาฆ่าแมลงกำจัดเพลี้ย',
-      'type': '4',
-      'price': 180.0,
-      'description': 'ยาฆ่าแมลงสูตรเข้มข้น กำจัดเพลี้ยและแมลงศัตรูพืชได้ดี',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254735649.png',
-      'stock': 20,
-    },
-    {
-      'id': 20,
-      'name': 'ปุ๋ยสูตรฟอสฟอรัสสูง',
-      'type': '4',
-      'price': 350.0,
-      'description': 'ปุ๋ยฟอสฟอรัสสูง เพิ่มการเจริญเติบโตของรากพืช',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254801234.png',
-      'stock': 25,
-    },
-    {
-      'id': 21,
-      'name': 'สารปรับสภาพดิน',
-      'type': '4',
-      'price': 300.0,
-      'description':
-          'สารปรับสภาพดิน ช่วยให้ดินร่วนซุย เพิ่มประสิทธิภาพการใช้ปุ๋ย',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254834628.png',
-      'stock': 15,
-    },
-
-    // ========= 🚜 สินค้าใหม่ที่เด่น ๆ =========
-    {
-      'id': 22,
-      'name': 'โดรนพ่นยาเกษตร DJI Agras T40',
-      'type': '2', // จัดเป็นอุปกรณ์เครื่องมือ
-      'price': 580000.0,
-      'description':
-          'โดรนพ่นยา/ปุ๋ย รุ่นล่าสุด DJI Agras T40 ความจุถัง 40 ลิตร พ่นได้รวดเร็ว ประหยัดแรงงาน เหมาะกับไร่ข้าวโพด นาข้าว และพืชเศรษฐกิจ',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252119760.png',
-      'stock': 2,
-    },
-    {
-      'id': 23,
-      'name': 'รถไถเดินตาม Kubota รุ่น RT140',
-      'type': '2',
-      'price': 120000.0,
-      'description':
-          'รถไถเดินตามขนาดกลาง ใช้งานง่าย เหมาะกับเกษตรกรรายย่อย สามารถติดตั้งอุปกรณ์เสริมได้หลายชนิด',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_255759883.png',
-      'stock': 3,
-    },
-    {
-      'id': 24,
-      'name': 'รถแทรกเตอร์ Kubota MU5501',
-      'type': '2',
-      'price': 750000.0,
-      'description':
-          'แทรกเตอร์ขนาดใหญ่ 55 แรงม้า เหมาะสำหรับการเพาะปลูกขนาดกลางถึงใหญ่ รองรับงานไถ พรวน ยกร่อง และลากพ่วง',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_250611616.png',
-      'stock': 5,
-    },
-    {
-      'id': 25,
-      'name': 'ปุ๋ยอินทรีย์ชีวภาพ Premium',
-      'type': '4',
-      'price': 500.0,
-      'description':
-          'ปุ๋ยอินทรีย์ผสมจุลินทรีย์ธรรมชาติ เพิ่มความสมบูรณ์ของดิน กระตุ้นการเจริญเติบโตของพืชแบบยั่งยืน',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/rotation/rotation_254921133.png',
-      'stock': 50,
-    },
-    {
-      'id': 26,
-      'name': 'ระบบ Smart Sensor เกษตร IoT',
-      'type': '2',
-      'price': 25000.0,
-      'description':
-          'เซ็นเซอร์ IoT ตรวจวัดความชื้นในดิน อุณหภูมิ และค่า pH ส่งข้อมูลผ่านแอปมือถือ ช่วยเกษตรกรวิเคราะห์และจัดการแปลงเพาะปลูก',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_250621859.png',
-      'stock': 10,
-    },
-    {
-      'id': 27,
-      'name': 'เครื่องเก็บเกี่ยวข้าว Combine Harvester',
-      'type': '2',
-      'price': 950000.0,
-      'description':
-          'เครื่องเก็บเกี่ยวข้าวอัตโนมัติ ทำงานได้รวดเร็ว ลดแรงงาน ประหยัดเวลา เหมาะกับไร่นาขนาดใหญ่',
-      'image': 'https://www.agriculture.com/images/harvester.png',
-      'stock': 2,
-    },
-    {
-      'id': 28,
-      'name': 'ระบบน้ำหยดอัตโนมัติ Smart Drip',
-      'type': '2',
-      'price': 18000.0,
-      'description':
-          'ระบบน้ำหยดควบคุมด้วยมือถือ ตั้งเวลาอัตโนมัติ ประหยัดน้ำ เหมาะสำหรับสวนผลไม้และแปลงผัก',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_251239328.png',
-      'stock': 8,
-    },
-    {
-      'id': 29,
-      'name': 'โรงเรือนอัจฉริยะ Smart Greenhouse',
-      'type': '2',
-      'price': 350000.0,
-      'description':
-          'โรงเรือนสำเร็จรูปพร้อมระบบควบคุมอุณหภูมิ ความชื้น และการให้น้ำอัตโนมัติ ผ่านแอปมือถือ',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253545227.png',
-      'stock': 1,
-    },
-    {
-      'id': 30,
-      'name': 'โดรนสำรวจพื้นที่การเกษตร Mavic Agro',
-      'type': '2',
-      'price': 250000.0,
-      'description':
-          'โดรนสำรวจไร่นา พร้อมกล้องความละเอียดสูงและเซ็นเซอร์ NDVI สำหรับวิเคราะห์สุขภาพพืช',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252540513.png',
-      'stock': 3,
-    },
-    // {
-    //   'id': 31,
-    //   'name': 'ปุ๋ยชีวภาพเสริมจุลินทรีย์',
-    //   'type': '4',
-    //   'price': 380.0,
-    //   'description':
-    //       'ปุ๋ยชีวภาพพิเศษเสริมจุลินทรีย์ละลายฟอสเฟต เพิ่มธาตุอาหารให้ดินและลดการใช้สารเคมี',
-    //   'image': 'https://www.organicfertilizer.com/images/biofert.png',
-    //   'stock': 40,
-    // },
-    {
-      'id': 32,
-      'name': 'รถไถเล็กอเนกประสงค์ Mini Tractor',
-      'type': '2',
-      'price': 185000.0,
-      'description':
-          'รถไถเล็กสำหรับสวนผลไม้ ใช้งานคล่องตัว ประหยัดน้ำมัน เหมาะกับพื้นที่ขนาดเล็กถึงกลาง',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_250611616.png',
-      'stock': 6,
-    },
-    {
-      'id': 33,
-      'name': 'เครื่องเพาะกล้าอัตโนมัติ',
-      'type': '2',
-      'price': 45000.0,
-      'description':
-          'เครื่องเพาะกล้ารุ่นใหม่ สามารถหยอดเมล็ด รดน้ำ และควบคุมสภาพแวดล้อมได้อัตโนมัติ',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253640982.png',
-      'stock': 4,
-    },
-    // {
-    //   'id': 34,
-    //   'name': 'สารชีวภัณฑ์กำจัดหนอนกอข้าว',
-    //   'type': '4',
-    //   'price': 250.0,
-    //   'description':
-    //       'สารชีวภัณฑ์จากแบคทีเรีย Bacillus thuringiensis (BT) ใช้กำจัดหนอนศัตรูพืชโดยไม่กระทบสิ่งแวดล้อม',
-    //   'image': 'https://www.bioagro.com/images/bt-bio.png',
-    //   'stock': 25,
-    // },
-    {
-      'id': 35,
-      'name': 'เครื่องคัดแยกเมล็ดพันธุ์อัตโนมัติ',
-      'type': '2',
-      'price': 65000.0,
-      'description':
-          'เครื่องคัดแยกเมล็ดพันธุ์ตามขนาดและน้ำหนัก ลดแรงงาน เพิ่มคุณภาพเมล็ดพันธุ์',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_254142264.png',
-      'stock': 7,
-    },
-    {
-      'id': 36,
-      'name': 'เครื่องอบข้าวโพดพลังงานแสงอาทิตย์',
-      'type': '2',
-      'price': 98000.0,
-      'description':
-          'เครื่องอบเมล็ดข้าวโพดด้วยพลังงานแสงอาทิตย์ ลดต้นทุนค่าไฟฟ้าและเป็นมิตรต่อสิ่งแวดล้อม',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253640982.png',
-      'stock': 3,
-    },
-    {
-      'id': 37,
-      'name': 'เครื่องบรรจุเมล็ดพืชอัตโนมัติ',
-      'type': '2',
-      'price': 120000.0,
-      'description':
-          'เครื่องบรรจุเมล็ดหรือธัญพืชลงถุงแบบอัตโนมัติ ปรับขนาดบรรจุได้ ประหยัดแรงงานและเวลา',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_253229765.png',
-      'stock': 4,
-    },
-    {
-      'id': 38,
-      'name': 'ระบบพลังงานแสงอาทิตย์สำหรับเกษตร',
-      'type': '2',
-      'price': 150000.0,
-      'description':
-          'แผงโซลาร์เซ็ตพร้อมระบบแบตเตอรี่ สำหรับปั๊มน้ำและระบบชลประทานในไร่นา',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252146409.png',
-      'stock': 5,
-    },
-    {
-      'id': 39,
-      'name': 'เครื่องย่อยเศษพืช',
-      'type': '2',
-      'price': 32000.0,
-      'description':
-          'เครื่องย่อยเศษพืชหลังการเก็บเกี่ยว เปลี่ยนเป็นปุ๋ยหมักหรือนำกลับใช้ในไร่นา',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_252653005.png',
-      'stock': 10,
-    },
-    {
-      'id': 40,
-      'name': 'หุ่นยนต์เก็บผลไม้ Smart Picker',
-      'type': '2',
-      'price': 480000.0,
-      'description':
-          'หุ่นยนต์เก็บผลไม้ เช่น มะม่วง ทุเรียน มะเขือเทศ ลดแรงงานและความเสียหายของผลผลิต',
-      'image':
-          'https://khubdeedlt.we-builds.com/khubdeedlt-document/images/aboutUs/aboutUs_251733990.png',
-      'stock': 2,
-    },
-  ];
 }

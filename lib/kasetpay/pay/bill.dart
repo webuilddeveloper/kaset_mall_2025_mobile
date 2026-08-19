@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kasetmall/shared/app_theme.dart';
 
 class BillPage extends StatefulWidget {
   const BillPage({super.key});
@@ -296,17 +297,17 @@ class _BillPageState extends State<BillPage> {
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: AppColors.tintGreenSoft,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Colors.blue.withOpacity(0.3),
+                  color: AppColors.primary.withOpacity(0.25),
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: Colors.blue[700],
+                    color: AppColors.primary,
                     size: 20,
                   ),
                   SizedBox(width: 8),
@@ -315,7 +316,7 @@ class _BillPageState extends State<BillPage> {
                       'QR Code นี้ใช้งานได้ภายใน 15 นาที',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.blue[700],
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
