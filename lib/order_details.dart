@@ -5,7 +5,6 @@ import 'package:kasetmall/payment_status.dart';
 import 'package:kasetmall/shared/app_bar.dart';
 import 'package:kasetmall/shared/app_theme.dart';
 import 'package:kasetmall/shared/mock_store.dart';
-import 'package:kasetmall/to_rate.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   const OrderDetailsPage({
@@ -156,6 +155,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         return 'กำลังจัดส่ง';
       case 'completed':
         return 'สำเร็จ';
+      case 'received':
+        return 'รับสินค้าแล้ว';
       case 'reviewed':
         return 'รีวิวแล้ว';
       default:
@@ -172,6 +173,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       case 'shipping':
         return AppColors.infoBlue;
       case 'completed':
+      case 'received':
       case 'reviewed':
         return AppColors.primaryDark;
       default:
@@ -188,6 +190,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       case 'shipping':
         return Icons.local_shipping_rounded;
       case 'completed':
+      case 'received':
       case 'reviewed':
         return Icons.verified_rounded;
       default:
@@ -201,6 +204,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       {'title': 'กำลังจัดเตรียม', 'key': 'preparing'},
       {'title': 'กำลังจัดส่ง', 'key': 'shipping'},
       {'title': 'สำเร็จ', 'key': 'completed'},
+      {'title': 'รับสินค้าแล้ว', 'key': 'received'},
     ];
     final currentIndex = stages.indexWhere((item) => item['key'] == status);
     return stages.asMap().entries.map((entry) {
@@ -361,7 +365,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   }
 
   Widget _buildCompactStatusAction(String status) {
-    if (status == 'reviewed' || status == 'completed') {
+    if (status == 'reviewed' || status == 'completed' || status == 'received') {
       return const SizedBox.shrink();
     }
 
@@ -744,15 +748,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         width: double.infinity,
         height: 50,
         child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ToRateCentralPage(
-                  highlightOrderId: order['id'].toString(),
-                ),
-              ),
-            ).then((_) => _loadOrder());
+          onPressed: () async {
+            await OrderStore.updateOrderStatus(
+              order['id'].toString(),
+              'received',
+            );
+            await _loadOrder();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,

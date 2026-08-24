@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kasetmall/dark_mode.dart';
 import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/mock_store.dart';
 import 'package:kasetmall/version.dart';
 import 'package:provider/provider.dart';
 // import 'package:wereward/shared/notification_service.dart';
@@ -41,6 +42,7 @@ void main() async {
   NotificationService.initialize();
   NotificationService.requestPermission();
   NotificationService.subscribeToAllTopic('suksapan-mall');
+  await DemoDataStore.ensureFreshDemoData();
 
   //16557962-88 SUKSAPAN Online
   //16564548-34 SUKSAPAN Online

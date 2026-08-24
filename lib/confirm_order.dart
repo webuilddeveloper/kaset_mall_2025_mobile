@@ -848,6 +848,7 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
 
   Widget _buildCouponSection() {
     final selectedCoupon = _selectedCoupon;
+    final hasSavedCoupon = _savedCoupons.isNotEmpty;
 
     return _sectionCard(
       child: Column(
@@ -855,14 +856,14 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
         children: [
           _sectionHeader(
             'คูปองของฉัน',
-            actionText: 'ดูรายการ',
+            actionText: hasSavedCoupon ? 'ดูรายการ' : 'ไปเก็บคูปอง',
             onTap: _openCouponPicker,
           ),
           const SizedBox(height: 6),
           Text(
-            _savedCoupons.isEmpty
-                ? 'ยังไม่มีคูปองที่เก็บไว้'
-                : 'แตะเพื่อเลือกคูปองที่เก็บไว้ใช้กับคำสั่งซื้อนี้',
+            hasSavedCoupon
+                ? 'แตะการ์ดด้านล่างเพื่อเลือกคูปองที่เก็บไว้ใช้กับคำสั่งซื้อนี้'
+                : 'ยังไม่มีคูปองที่เก็บไว้ กดปุ่มด้านล่างเพื่อไปดูและเก็บคูปอง',
             style: const TextStyle(
               fontFamily: 'Kanit',
               fontSize: 12.5,
@@ -871,87 +872,117 @@ class _ConfirmOrderCentralPageState extends State<ConfirmOrderCentralPage> {
             ),
           ),
           const SizedBox(height: 12),
-          GestureDetector(
-            onTap: _savedCoupons.isEmpty ? null : _openCouponPicker,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: selectedCoupon == null
-                    ? AppColors.tintGreenSoft
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: AppColors.tintGreenSoft,
-                      borderRadius: BorderRadius.circular(14),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _openCouponPicker,
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: selectedCoupon == null
+                      ? AppColors.tintGreenSoft
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: selectedCoupon == null
+                            ? Colors.white
+                            : AppColors.tintGreenSoft,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: const Icon(
+                        Icons.local_offer_outlined,
+                        color: AppColors.primary,
+                        size: 23,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.local_offer_outlined,
-                      color: AppColors.primary,
-                      size: 22,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            selectedCoupon != null
+                                ? selectedCoupon['name']?.toString() ??
+                                    'คูปองที่เลือก'
+                                : hasSavedCoupon
+                                    ? 'แตะเพื่อเลือกคูปอง'
+                                    : 'ไปเก็บคูปองก่อน',
+                            style: const TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            selectedCoupon != null
+                                ? 'ใช้กับคำสั่งซื้อนี้ได้'
+                                : hasSavedCoupon
+                                    ? 'คูปองที่เก็บไว้จะแสดงรายการให้เลือก'
+                                    : 'กดเพื่อไปดูรายการคูปอง',
+                            style: const TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 12.5,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          selectedCoupon != null
-                              ? selectedCoupon['name']?.toString() ??
-                                  'คูปองที่เลือก'
-                              : 'กดเพื่อเลือกคูปอง',
-                          style: const TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                        if (selectedCoupon != null)
+                          Text(
+                            '- ${_money(_discount)}',
+                            style: const TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: const Text(
+                              'เลือก',
+                              style: TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _savedCoupons.isEmpty
-                              ? 'เก็บคูปองจากหน้า Home ก่อน'
-                              : 'แตะเพื่อเลือกรายการคูปอง',
-                          style: const TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 12.5,
-                            color: AppColors.textSecondary,
-                          ),
+                        const SizedBox(height: 6),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          color: AppColors.primary,
+                          size: 22,
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (selectedCoupon != null)
-                        Text(
-                          '- ${_money(_discount)}',
-                          style: const TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      const SizedBox(height: 4),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        color: AppColors.primary,
-                        size: 22,
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

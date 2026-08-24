@@ -30,7 +30,7 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
   String _money(int value) => '${_moneyFormat.format(value)} บาท';
 
   Future<List<Map<String, dynamic>>> _loadOrders() async {
-    final pending = await OrderStore.getOrdersByStatus('completed');
+    final pending = await OrderStore.getOrdersByStatus('received');
     final reviewed = await OrderStore.getOrdersByStatus('reviewed');
     final all = [...pending, ...reviewed];
     all.sort((a, b) {
@@ -86,7 +86,7 @@ class _ToRateCentralPageState extends State<ToRateCentralPage> {
             ),
             const SizedBox(height: 6),
             const Text(
-              'เมื่อคำสั่งซื้อเสร็จสิ้นและยังไม่ได้รีวิว จะมาแสดงที่หน้านี้',
+              'เมื่อกดรับสินค้าแล้วและยังไม่ได้รีวิว จะมาแสดงที่หน้านี้',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Kanit',

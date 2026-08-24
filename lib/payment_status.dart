@@ -308,20 +308,6 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage> {
     return _sectionCard(
       child: Column(
         children: [
-          Container(
-            width: 82,
-            height: 82,
-            decoration: BoxDecoration(
-              color: AppColors.tintGreenSoft,
-              borderRadius: BorderRadius.circular(28),
-            ),
-            child: const Icon(
-              Icons.verified_rounded,
-              color: AppColors.primary,
-              size: 46,
-            ),
-          ),
-          const SizedBox(height: 14),
           const Text(
             'ชำระเงินเสร็จสิ้น',
             style: TextStyle(
@@ -361,11 +347,6 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage> {
     final subtotal = _toInt(order['subtotal']);
     final shippingFee = _toInt(order['shippingFee']);
     final discount = _toInt(order['discount']);
-    final totalSeconds = 30;
-    final progress = _remainingSeconds / totalSeconds;
-    final deadlineText = _remainingSeconds > 0
-        ? 'หมดเวลาใน ${_remainingSeconds}s'
-        : 'กำลังยืนยันการชำระเงิน';
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -373,20 +354,6 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage> {
         _sectionCard(
           child: Column(
             children: [
-              Container(
-                width: 58,
-                height: 58,
-                decoration: BoxDecoration(
-                  color: AppColors.tintGreenSoft,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: const Icon(
-                  Icons.qr_code_2_rounded,
-                  color: AppColors.primary,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 12),
               const Text(
                 'ชำระเงินด้วย QR Code',
                 style: TextStyle(
@@ -409,53 +376,20 @@ class _PaymentStatusCentralPageState extends State<PaymentStatusCentralPage> {
               ),
               const SizedBox(height: 14),
               SizedBox(
-                width: 150,
-                height: 150,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 150,
-                      height: 150,
-                      child: CircularProgressIndicator(
-                        value: progress.clamp(0.0, 1.0),
-                        strokeWidth: 7,
-                        color: AppColors.primary,
-                        backgroundColor: AppColors.border,
-                      ),
+                width: 260,
+                height: 260,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.tintGreenSoft,
+                    borderRadius: BorderRadius.circular(34),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.qr_code_rounded,
+                      color: AppColors.primaryDark,
+                      size: 150,
                     ),
-                    Container(
-                      width: 118,
-                      height: 118,
-                      decoration: BoxDecoration(
-                        color: AppColors.tintGreenSoft,
-                        borderRadius: BorderRadius.circular(26),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: const Icon(
-                        Icons.qr_code_rounded,
-                        color: AppColors.primaryDark,
-                        size: 72,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.accentTint,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  deadlineText,
-                  style: const TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.accentHover,
                   ),
                 ),
               ),

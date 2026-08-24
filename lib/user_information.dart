@@ -41,7 +41,7 @@ class _UserInformationCentralPageState
   bool _loading = true;
   bool _isLoggedIn = false;
   bool _isShop = false;
-  int _selectedOrderIndex = 0;
+  final List<int> _orderCounts = [0, 0, 0, 0];
 
   String _displayName = '';
   String _phone = '';
@@ -50,7 +50,7 @@ class _UserInformationCentralPageState
   final List<_OrderActionData> _orderRows = const [
     _OrderActionData(
       title: 'ที่ต้องชำระ',
-      icon: Icons.payments_outlined,
+      icon: Icons.receipt_long_outlined,
     ),
     _OrderActionData(
       title: 'จัดเตรียมสินค้า',
@@ -62,7 +62,7 @@ class _UserInformationCentralPageState
     ),
     _OrderActionData(
       title: 'รอรีวิว',
-      icon: Icons.rate_review_outlined,
+      icon: Icons.star_outline_rounded,
     ),
   ];
 
@@ -124,6 +124,13 @@ class _UserInformationCentralPageState
     final phone = profile['phone']?.toString() ?? '';
     final profileImageUrl = profile['imageUrl']?.toString() ?? '';
     final isShop = (await storage.read(key: 'isShop') ?? 'false') == 'true';
+    final orderCounts = await Future.wait<int>([
+      OrderStore.getOrdersByStatus('pendingPayment')
+          .then((items) => items.length),
+      OrderStore.getOrdersByStatus('preparing').then((items) => items.length),
+      OrderStore.getOrdersByStatus('shipping').then((items) => items.length),
+      OrderStore.getOrdersByStatus('received').then((items) => items.length),
+    ]);
 
     if (!mounted) return;
     setState(() {
@@ -132,6 +139,9 @@ class _UserInformationCentralPageState
       _phone = phone;
       _profileImageUrl = profileImageUrl;
       _isShop = isShop;
+      for (var i = 0; i < _orderCounts.length && i < orderCounts.length; i++) {
+        _orderCounts[i] = orderCounts[i];
+      }
       _loading = false;
     });
   }
@@ -188,10 +198,6 @@ class _UserInformationCentralPageState
   }
 
   void _openOrderStatus(int index) {
-    setState(() {
-      _selectedOrderIndex = index;
-    });
-
     Widget page;
     switch (index) {
       case 0:
@@ -450,22 +456,20 @@ class _UserInformationCentralPageState
   Widget _buildOrderSection() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const gap = 6.0;
-        final buttonWidth =
-            (constraints.maxWidth - (gap * (_orderRows.length - 1))) /
-                _orderRows.length;
+        const gap = 2.0;
 
         return SizedBox(
-          height: 82,
+          height: 80,
+          // color: Colors.red,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (var i = 0; i < _orderRows.length; i++) ...[
-                SizedBox(
-                  width: buttonWidth,
+                Expanded(
                   child: _OrderActionButton(
                     title: _orderRows[i].title,
                     icon: _orderRows[i].icon,
-                    selected: i == _selectedOrderIndex,
+                    badge: _orderCounts[i],
                     onTap: () => _openOrderStatus(i),
                   ),
                 ),
@@ -728,60 +732,86 @@ class _OrderActionButton extends StatelessWidget {
   const _OrderActionButton({
     required this.title,
     required this.icon,
-    required this.selected,
+    required this.badge,
     required this.onTap,
   });
 
   final String title;
   final IconData icon;
-  final bool selected;
+  final int badge;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor =
-        selected ? AppColors.primary : const Color(0xFFF3F8F3);
-    final textColor = selected ? Colors.white : Colors.black;
-    final iconColor = selected ? Colors.white : AppColors.primary;
-
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: selected ? AppColors.primary : AppColors.border,
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 18,
-                color: iconColor,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'Kanit',
-                  fontSize: 10.5,
-                  height: 1.05,
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topRight,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: AppColors.tintGreenSoft,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 35,
+                    color: AppColors.primary,
+                  ),
                 ),
+                if (badge > 0)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 3,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        badge > 99 ? '99+' : '$badge',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'Kanit',
+                          fontSize: 8,
+                          height: 1.0,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontFamily: 'Kanit',
+                fontSize: 9.6,
+                height: 0.98,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

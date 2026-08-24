@@ -32,12 +32,12 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
   @override
   void initState() {
     super.initState();
-    _futureOrders = OrderStore.getOrdersByStatus('shipping');
+    _futureOrders = OrderStore.getOrdersByStatus('completed');
   }
 
   Future<void> _reload() async {
     setState(() {
-      _futureOrders = OrderStore.getOrdersByStatus('shipping');
+      _futureOrders = OrderStore.getOrdersByStatus('completed');
     });
   }
 
@@ -63,7 +63,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
             ),
             const SizedBox(height: 14),
             const Text(
-              'ยังไม่มีรายการกำลังจัดส่ง',
+              'ยังไม่มีรายการที่ต้องได้รับ',
               style: TextStyle(
                 fontFamily: 'Kanit',
                 fontSize: 17,
@@ -73,7 +73,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
             ),
             const SizedBox(height: 6),
             const Text(
-              'เมื่อมีคำสั่งซื้อที่ถูกส่งออกจากร้านแล้ว ระบบจะแสดงที่หน้านี้',
+              'เมื่อคำสั่งซื้อเข้าสู่สถานะสำเร็จ ระบบจะแสดงที่หน้านี้จนกว่าจะกดรับสินค้า',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Kanit',
@@ -139,16 +139,16 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.infoBlueSoft,
+                    color: AppColors.tintGreenSoft,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: const Text(
-                    'กำลังจัดส่ง',
+                    'รอรับสินค้า',
                     style: TextStyle(
                       fontFamily: 'Kanit',
                       fontSize: 11.5,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.infoBlue,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
@@ -234,7 +234,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                 const SizedBox(width: 6),
                 _buildProgressDot(true),
                 const SizedBox(width: 6),
-                _buildProgressDot(false),
+                _buildProgressDot(true),
                 const Spacer(),
                 Text(
                   _money(total),
@@ -280,7 +280,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 children: [
                   const Text(
-                    'รายการที่อยู่ระหว่างการจัดส่ง',
+                    'รายการที่พร้อมรับสินค้า',
                     style: TextStyle(
                       fontFamily: 'Kanit',
                       fontSize: 16.5,
@@ -290,7 +290,7 @@ class _ToReceiveCentralPageState extends State<ToReceiveCentralPage> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    'ตรวจสอบสถานะพัสดุและเปิดดูรายละเอียดได้จากการ์ดแต่ละรายการ',
+                    'ตรวจสอบรายการที่ส่งถึงแล้ว และกดรับสินค้าเพื่อไปต่อที่หน้ารอรีวิว',
                     style: TextStyle(
                       fontFamily: 'Kanit',
                       fontSize: 12.5,

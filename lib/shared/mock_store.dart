@@ -143,6 +143,10 @@ class CouponStore {
     final savedIds = await _readSavedIds();
     return savedIds.contains(id);
   }
+
+  static Future<void> clearSavedCoupons() async {
+    await _writeSavedIds(<String>[]);
+  }
 }
 
 class OrderItemNormalizer {
@@ -382,6 +386,10 @@ class AddressStore {
     }
     await _writeAddresses(items);
   }
+
+  static Future<void> resetAddresses() async {
+    await _writeAddresses(List<Map<String, dynamic>>.from(_defaultAddresses));
+  }
 }
 
 class ProfileStore {
@@ -620,6 +628,10 @@ class FavoriteStore {
     }
     await _writeFavorites(ids);
   }
+
+  static Future<void> clearFavorites() async {
+    await _writeFavorites(<String>[]);
+  }
 }
 
 class NotificationStore {
@@ -724,6 +736,11 @@ class NotificationStore {
   static Future<int> unreadCount() async {
     final items = await _readNotifications();
     return items.where((item) => item['read'] != true).length;
+  }
+
+  static Future<void> clearNotifications() async {
+    await _writeNotifications(<Map<String, dynamic>>[]);
+    notificationVersion.value++;
   }
 }
 
@@ -1200,6 +1217,10 @@ class OrderStore {
     await _writeOrders(
         _defaultOrders.map((item) => Map<String, dynamic>.from(item)).toList());
   }
+
+  static Future<void> clearOrders() async {
+    await _writeOrders(<Map<String, dynamic>>[]);
+  }
 }
 
 class BenefitStore {
@@ -1223,5 +1244,26 @@ class BenefitStore {
         'canRedeem': coupon['canRedeem'] ?? true,
       };
     }).toList(growable: false);
+  }
+}
+
+class DemoDataStore {
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+  static const String _demoDataVersionKey = 'mock_demo_data_version_v1';
+  static const String _demoDataVersion = '2026-08-20-clear-v1';
+
+  static Future<void> ensureFreshDemoData() async {
+    final storedVersion = await _storage.read(key: _demoDataVersionKey);
+    if (storedVersion == _demoDataVersion) {
+      return;
+    }
+
+    await CouponStore.clearSavedCoupons();
+    await CartStore.clearCart();
+    await FavoriteStore.clearFavorites();
+    await NotificationStore.clearNotifications();
+    await OrderStore.clearOrders();
+
+    await _storage.write(key: _demoDataVersionKey, value: _demoDataVersion);
   }
 }
