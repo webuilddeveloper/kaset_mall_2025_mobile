@@ -19,10 +19,13 @@ import 'package:kasetmall/privilege_form.dart';
 import 'package:kasetmall/product_all.dart';
 import 'package:kasetmall/product_from.dart';
 import 'package:kasetmall/data/mock_kaset_data.dart';
+import 'package:kasetmall/services/local_notification_service.dart';
 import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/login_guard.dart';
 import 'package:kasetmall/shared/notification_service.dart';
+import 'package:kasetmall/shared/checkin_campaign_notification.dart';
 import 'package:kasetmall/shared/mock_store.dart';
+import 'package:lottie/lottie.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -31,6 +34,10 @@ class HomeCentralPage extends StatefulWidget {
   HomeCentralPage({Key? key, this.changePage}) : super(key: key);
   late _HomeCentralPageState homeCentralPageState;
   Function? changePage;
+
+  static void resetDailyCampaignPromptSession() {
+    _HomeCentralPageState.resetDailyCampaignPromptSession();
+  }
 
   @override
   State<HomeCentralPage> createState() {
@@ -42,6 +49,12 @@ class HomeCentralPage extends StatefulWidget {
 }
 
 class _HomeCentralPageState extends State<HomeCentralPage> {
+  static bool _hasShownDailyCampaignPromptThisSession = false;
+
+  static void resetDailyCampaignPromptSession() {
+    _hasShownDailyCampaignPromptThisSession = false;
+  }
+
   final storage = new FlutterSecureStorage();
 
   TextEditingController searchController = TextEditingController();
@@ -68,6 +81,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   // String verifyPhonePage = '';
   DateTime? currentBackPressTime;
   late final VoidCallback _cartListener;
+  late final VoidCallback _dailyCheckInNotificationListener;
 
   String? emailProfile;
   int total_page = 0;
@@ -88,8 +102,15 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         _getCountItemInCart();
       }
     };
+    _dailyCheckInNotificationListener = () {
+      if (mounted) {
+        _consumePendingDailyCheckInAction();
+      }
+    };
     MockStore.authVersion.addListener(_authListener);
     MockStore.cartVersion.addListener(_cartListener);
+    LocalNotificationService.dailyCheckInActionVersion
+        .addListener(_dailyCheckInNotificationListener);
     _getCategory();
     _callRead();
     // _getUserData();
@@ -98,6 +119,10 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     // _callReadVideoShort();
     _callReadAll();
     _onLoading();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeShowDailyCampaignPrompt();
+      _consumePendingDailyCheckInAction();
+    });
 
     super.initState();
   }
@@ -106,6 +131,8 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   void dispose() {
     MockStore.authVersion.removeListener(_authListener);
     MockStore.cartVersion.removeListener(_cartListener);
+    LocalNotificationService.dailyCheckInActionVersion
+        .removeListener(_dailyCheckInNotificationListener);
     _scrollController?.dispose();
     _refreshController?.dispose();
     super.dispose();
@@ -291,6 +318,49 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   }
 
   _callReadKnowledge() {}
+
+  Future<void> _maybeShowDailyCampaignPrompt() async {
+    if (_hasShownDailyCampaignPromptThisSession || !mounted) return;
+    await _openDailyCampaignPrompt(markSessionAsShown: true);
+  }
+
+  Future<void> _consumePendingDailyCheckInAction() async {
+    if (!LocalNotificationService.consumePendingDailyCheckInAction() ||
+        !mounted) {
+      return;
+    }
+    await _openDailyCampaignPrompt(markSessionAsShown: true);
+  }
+
+  Future<void> _openDailyCampaignPrompt({
+    required bool markSessionAsShown,
+  }) async {
+    final state = await DailyCheckInStore.getState();
+    if (!mounted) return;
+
+    if (markSessionAsShown) {
+      _hasShownDailyCampaignPromptThisSession = true;
+    }
+
+    final action = await CheckInCampaignNotification.show(
+      context: context,
+      campaignState: state,
+    );
+
+    if (!mounted || action != 'open_coupon') return;
+
+    final checkedInToday = state['checkedInToday'] == true;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PrivilegeAllPage(
+          title: 'คูปอง',
+          savedOnly: checkedInToday,
+          initialCampaignExpanded: !checkedInToday,
+        ),
+      ),
+    );
+  }
 
   _readCoupons() async {
     var ConponsMe = await get(server + 'users/me/coupons');
@@ -1195,18 +1265,12 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
               child: Row(
                 children: [
                   Container(
+                      child: Lottie.asset(
+                    'assets/lotties/Discount Coupon.json',
                     width: 52,
                     height: 52,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFBE7C9),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(
-                      Icons.local_offer_rounded,
-                      color: Color(0xFFC77A1F),
-                      size: 28,
-                    ),
-                  ),
+                    fit: BoxFit.contain,
+                  )),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -1341,8 +1405,8 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                 top: Radius.circular(18),
               ),
               child: SizedBox(
-              height: 104,
-              width: double.infinity,
+                height: 104,
+                width: double.infinity,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [

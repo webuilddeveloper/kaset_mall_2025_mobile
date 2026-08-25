@@ -8,6 +8,7 @@ class AppDialog {
     required String description,
     String primaryText = 'ตกลง',
     String secondaryText = 'ยกเลิก',
+    bool showSecondary = true,
     IconData icon = Icons.info_outline_rounded,
     Color? primaryColor,
     VoidCallback? onPrimaryPressed,
@@ -115,31 +116,33 @@ class AppDialog {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 44,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.pop(dialogContext, false);
-                            onSecondaryPressed?.call();
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.border),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                      if (showSecondary) ...[
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 44,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.pop(dialogContext, false);
+                              onSecondaryPressed?.call();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.border),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            secondaryText,
-                            style: const TextStyle(
-                              fontFamily: 'Kanit',
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+                            child: Text(
+                              secondaryText,
+                              style: const TextStyle(
+                                fontFamily: 'Kanit',
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),

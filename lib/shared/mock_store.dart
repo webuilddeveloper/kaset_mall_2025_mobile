@@ -7,6 +7,8 @@ import 'package:kasetmall/data/mock_kaset_data.dart';
 class CouponStore {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
   static const String _savedKey = 'mock_saved_coupons_v1';
+  // Bump the demo namespace so old check-in rewards do not appear in a new test run.
+  static const String _dynamicKey = 'mock_dynamic_coupons_v2';
 
   static final List<Map<String, dynamic>> _coupons = [
     {
@@ -103,6 +105,26 @@ class CouponStore {
     await _storage.write(key: _savedKey, value: jsonEncode(ids));
   }
 
+  static Future<List<Map<String, dynamic>>> _readDynamicCoupons() async {
+    final raw = await _storage.read(key: _dynamicKey);
+    if (raw == null || raw.isEmpty) {
+      return <Map<String, dynamic>>[];
+    }
+    final decoded = jsonDecode(raw);
+    if (decoded is List) {
+      return decoded
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .toList();
+    }
+    return <Map<String, dynamic>>[];
+  }
+
+  static Future<void> _writeDynamicCoupons(
+    List<Map<String, dynamic>> items,
+  ) async {
+    await _storage.write(key: _dynamicKey, value: jsonEncode(items));
+  }
+
   static Map<String, dynamic> _withSavedState(
     Map<String, dynamic> coupon,
     bool isSaved,
@@ -115,7 +137,12 @@ class CouponStore {
 
   static Future<List<Map<String, dynamic>>> getAllCoupons() async {
     final savedIds = await _readSavedIds();
-    return _coupons
+    final dynamicCoupons = await _readDynamicCoupons();
+    final merged = <Map<String, dynamic>>[
+      ...dynamicCoupons,
+      ..._coupons,
+    ];
+    return merged
         .map((coupon) =>
             _withSavedState(coupon, savedIds.contains(coupon['id'])))
         .toList();
@@ -146,6 +173,298 @@ class CouponStore {
 
   static Future<void> clearSavedCoupons() async {
     await _writeSavedIds(<String>[]);
+  }
+
+  static Future<void> addCoupon(
+    Map<String, dynamic> coupon, {
+    bool saveToMyCoupons = false,
+  }) async {
+    final dynamicCoupons = await _readDynamicCoupons();
+    final couponId = coupon['id']?.toString() ?? '';
+    if (couponId.isEmpty) return;
+
+    final index = dynamicCoupons.indexWhere(
+      (item) => item['id']?.toString() == couponId,
+    );
+    final normalized = Map<String, dynamic>.from(coupon);
+
+    if (index >= 0) {
+      dynamicCoupons[index] = {
+        ...dynamicCoupons[index],
+        ...normalized,
+      };
+    } else {
+      dynamicCoupons.insert(0, normalized);
+    }
+
+    await _writeDynamicCoupons(dynamicCoupons);
+
+    if (saveToMyCoupons) {
+      await saveCoupon(couponId);
+    }
+  }
+
+  static Future<void> clearDynamicCoupons() async {
+    await _storage.delete(key: _dynamicKey);
+  }
+}
+
+class DailyCheckInStore {
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+  // Versioned keys reset the previous local demo campaign once.
+  static const String _lastCheckInDateKey = 'daily_check_in_last_date_v2';
+  static const String _currentDayKey = 'daily_check_in_current_day_v2';
+  static const String _claimedDaysKey = 'daily_check_in_claimed_days_v2';
+  static const String _cycleKey = 'daily_check_in_cycle_v2';
+
+  static const List<Map<String, dynamic>> _rewardTemplates = [
+    {
+      'day': 1,
+      'name': 'คูปองเช็กอินวันที่ 1',
+      'discount': '฿10',
+      'discountType': 'amount',
+      'discountValue': 10,
+      'minimumOrderTotal': 100,
+      'eligibleKeywords': <String>[],
+      'tag': 'เช็กอินรายวัน',
+      'subtitle': 'ส่วนลด 10 บาท สำหรับคำสั่งซื้อถัดไป',
+      'description': 'เช็กอินต่อเนื่องรับคูปองส่วนลด 10 บาท',
+      'condition': 'ใช้ได้กับคำสั่งซื้อขั้นต่ำ 100 บาท',
+    },
+    {
+      'day': 2,
+      'name': 'คูปองเช็กอินวันที่ 2',
+      'discount': '฿10',
+      'discountType': 'amount',
+      'discountValue': 10,
+      'minimumOrderTotal': 100,
+      'eligibleKeywords': <String>[],
+      'tag': 'เช็กอินรายวัน',
+      'subtitle': 'ส่วนลด 10 บาท สำหรับคำสั่งซื้อถัดไป',
+      'description': 'เช็กอินต่อเนื่องรับคูปองส่วนลด 10 บาท',
+      'condition': 'ใช้ได้กับคำสั่งซื้อขั้นต่ำ 100 บาท',
+    },
+    {
+      'day': 3,
+      'name': 'คูปองส่งฟรี',
+      'discount': 'ส่งฟรี',
+      'discountType': 'shipping',
+      'discountValue': 30,
+      'minimumOrderTotal': 0,
+      'eligibleKeywords': <String>[],
+      'tag': 'เช็กอินรายวัน',
+      'subtitle': 'ส่งฟรีสำหรับคำสั่งซื้อถัดไป',
+      'description': 'เช็กอินต่อเนื่องครบวันที่ 3 รับสิทธิ์ส่งฟรี',
+      'condition': 'ใช้ได้กับคำสั่งซื้อที่ร่วมรายการ',
+    },
+    {
+      'day': 4,
+      'name': 'คูปองเช็กอินวันที่ 4',
+      'discount': '฿20',
+      'discountType': 'amount',
+      'discountValue': 20,
+      'minimumOrderTotal': 200,
+      'eligibleKeywords': <String>[],
+      'tag': 'เช็กอินรายวัน',
+      'subtitle': 'ส่วนลด 20 บาท สำหรับคำสั่งซื้อถัดไป',
+      'description': 'เช็กอินต่อเนื่องรับคูปองส่วนลด 20 บาท',
+      'condition': 'ใช้ได้กับคำสั่งซื้อขั้นต่ำ 200 บาท',
+    },
+    {
+      'day': 5,
+      'name': 'คูปองเช็กอินวันที่ 5',
+      'discount': '฿20',
+      'discountType': 'amount',
+      'discountValue': 20,
+      'minimumOrderTotal': 200,
+      'eligibleKeywords': <String>[],
+      'tag': 'เช็กอินรายวัน',
+      'subtitle': 'ส่วนลด 20 บาท สำหรับคำสั่งซื้อถัดไป',
+      'description': 'เช็กอินต่อเนื่องรับคูปองส่วนลด 20 บาท',
+      'condition': 'ใช้ได้กับคำสั่งซื้อขั้นต่ำ 200 บาท',
+    },
+    {
+      'day': 6,
+      'name': 'คูปองเช็กอินวันที่ 6',
+      'discount': '฿30',
+      'discountType': 'amount',
+      'discountValue': 30,
+      'minimumOrderTotal': 300,
+      'eligibleKeywords': <String>[],
+      'tag': 'เช็กอินรายวัน',
+      'subtitle': 'ส่วนลด 30 บาท สำหรับคำสั่งซื้อถัดไป',
+      'description': 'เช็กอินต่อเนื่องรับคูปองส่วนลด 30 บาท',
+      'condition': 'ใช้ได้กับคำสั่งซื้อขั้นต่ำ 300 บาท',
+    },
+    {
+      'day': 7,
+      'name': 'คูปองเช็กอินครบ 7 วัน',
+      'discount': '฿50',
+      'discountType': 'amount',
+      'discountValue': 50,
+      'minimumOrderTotal': 500,
+      'eligibleKeywords': <String>[],
+      'tag': 'เช็กอินครบสัปดาห์',
+      'subtitle': 'ส่วนลด 50 บาท สำหรับคำสั่งซื้อถัดไป',
+      'description': 'เช็กอินครบ 7 วัน รับคูปองส่วนลด 50 บาท',
+      'condition': 'ใช้ได้กับคำสั่งซื้อขั้นต่ำ 500 บาท',
+    },
+  ];
+
+  static String _dateKey(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
+
+  static Future<int> _readInt(String key, int fallback) async {
+    final raw = await _storage.read(key: key);
+    return int.tryParse(raw ?? '') ?? fallback;
+  }
+
+  static Future<List<int>> _readClaimedDays() async {
+    final raw = await _storage.read(key: _claimedDaysKey);
+    if (raw == null || raw.isEmpty) {
+      return <int>[];
+    }
+    final decoded = jsonDecode(raw);
+    if (decoded is List) {
+      return decoded
+          .map((item) => int.tryParse(item.toString()) ?? 0)
+          .where((day) => day > 0)
+          .toList();
+    }
+    return <int>[];
+  }
+
+  static Future<void> _writeClaimedDays(List<int> items) async {
+    await _storage.write(key: _claimedDaysKey, value: jsonEncode(items));
+  }
+
+  static Future<void> _resetForNextCycle({required int nextCycle}) async {
+    await _storage.write(key: _currentDayKey, value: '1');
+    await _writeClaimedDays(<int>[]);
+    await _storage.write(key: _cycleKey, value: nextCycle.toString());
+  }
+
+  static Map<String, dynamic> _rewardTemplateForDay(int day) {
+    return Map<String, dynamic>.from(
+      _rewardTemplates.firstWhere(
+        (item) => item['day'] == day,
+        orElse: () => _rewardTemplates.first,
+      ),
+    );
+  }
+
+  static Future<Map<String, dynamic>> getState() async {
+    final today = DateTime.now();
+    final todayKey = _dateKey(today);
+    final lastCheckInDate = await _storage.read(key: _lastCheckInDateKey) ?? '';
+    var currentDay = await _readInt(_currentDayKey, 1);
+    var currentCycle = await _readInt(_cycleKey, 1);
+    var claimedDays = await _readClaimedDays();
+
+    final checkedInToday = lastCheckInDate == todayKey;
+
+    if (currentDay > 7 && !checkedInToday) {
+      currentCycle += 1;
+      await _resetForNextCycle(nextCycle: currentCycle);
+      currentDay = 1;
+      claimedDays = <int>[];
+    }
+
+    final days = List<Map<String, dynamic>>.generate(7, (index) {
+      final day = index + 1;
+      final reward = _rewardTemplateForDay(day);
+      String status = 'locked';
+      if (claimedDays.contains(day)) {
+        status = 'claimed';
+      } else if (!checkedInToday && day == currentDay && currentDay <= 7) {
+        status = 'today';
+      }
+
+      return {
+        'day': day,
+        'status': status,
+        'reward': reward,
+      };
+    });
+
+    return {
+      'currentDay': currentDay.clamp(1, 7),
+      'currentCycle': currentCycle,
+      'claimedDays': claimedDays,
+      'checkedInToday': checkedInToday,
+      'lastCheckInDate': lastCheckInDate,
+      'days': days,
+      'buttonEnabled': !checkedInToday,
+      'isCycleCompleted': currentDay > 7 && checkedInToday,
+      'todayReward': currentDay <= 7 ? _rewardTemplateForDay(currentDay) : null,
+    };
+  }
+
+  static Future<Map<String, dynamic>> claimToday() async {
+    final state = await getState();
+    if (state['checkedInToday'] == true) {
+      return {
+        'success': false,
+        'reason': 'already_claimed',
+        'state': state,
+      };
+    }
+
+    final day = state['currentDay'] as int? ?? 1;
+    final cycle = state['currentCycle'] as int? ?? 1;
+    final reward = _rewardTemplateForDay(day);
+    final todayKey = _dateKey(DateTime.now());
+    final claimedDays = List<int>.from(state['claimedDays'] as List<dynamic>);
+    if (!claimedDays.contains(day)) {
+      claimedDays.add(day);
+    }
+    claimedDays.sort();
+
+    final couponId = 'daily-checkin-c$cycle-d$day';
+    final rewardCoupon = {
+      'id': couponId,
+      'name': reward['name'],
+      'title': reward['name'],
+      'subtitle': reward['subtitle'],
+      'discount': reward['discount'],
+      'discountType': reward['discountType'],
+      'discountValue': reward['discountValue'],
+      'minimumOrderTotal': reward['minimumOrderTotal'],
+      'eligibleKeywords': reward['eligibleKeywords'],
+      'expiry': 'ใช้งานได้ภายใน 7 วัน',
+      'period': 'รับจากกิจกรรมเช็กอินรายวัน',
+      'image': 'assets/images/kaset/logo_kaset.png',
+      'tag': reward['tag'],
+      'description': reward['description'],
+      'condition': reward['condition'],
+      'canSave': false,
+      'canRedeem': true,
+      'source': 'daily_checkin',
+      'claimedAt': todayKey,
+    };
+
+    await CouponStore.addCoupon(rewardCoupon, saveToMyCoupons: true);
+    await _storage.write(key: _lastCheckInDateKey, value: todayKey);
+    await _writeClaimedDays(claimedDays);
+    await _storage.write(key: _currentDayKey, value: '${day + 1}');
+
+    final updatedState = await getState();
+    return {
+      'success': true,
+      'day': day,
+      'reward': rewardCoupon,
+      'state': updatedState,
+    };
+  }
+
+  static Future<void> resetCampaign() async {
+    await _storage.delete(key: _lastCheckInDateKey);
+    await _storage.write(key: _currentDayKey, value: '1');
+    await _writeClaimedDays(<int>[]);
+    await _storage.write(key: _cycleKey, value: '1');
   }
 }
 

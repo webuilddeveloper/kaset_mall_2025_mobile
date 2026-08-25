@@ -35,7 +35,7 @@ class NotificationService {
 
   // กำหนดการตั้งค่าเริ่มต้นสำหรับ iOS และ Android
   static const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/launcher_icon');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
   static const DarwinInitializationSettings initializationSettingsIOS =
       DarwinInitializationSettings(

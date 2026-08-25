@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -11,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kasetmall/dark_mode.dart';
+import 'package:kasetmall/services/local_notification_service.dart';
 import 'package:kasetmall/shared/app_theme.dart';
 import 'package:kasetmall/shared/mock_store.dart';
 import 'package:kasetmall/version.dart';
@@ -39,9 +39,7 @@ void main() async {
   // initializeDateFormatting();
   await Firebase.initializeApp(options: firebaseOption);
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  NotificationService.initialize();
-  NotificationService.requestPermission();
-  NotificationService.subscribeToAllTopic('suksapan-mall');
+  await NotificationService.initialize();
   await DemoDataStore.ensureFreshDemoData();
 
   //16557962-88 SUKSAPAN Online
@@ -107,64 +105,57 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     SchedulerBinding.SchedulerBinding.instance.addPostFrameCallback((_) {
       print('addPostFrameCallback');
+      _showDeferredCampaignNotification();
     });
 
     _setupFirebaseMessaging();
+    _setupLocalNotifications();
 
-    FirebaseMessaging.instance.getToken().then((token) {
- 
-    });
+    FirebaseMessaging.instance.getToken().then((token) {});
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {});
 
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-   
-    });
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {});
   }
 
   void _setupFirebaseMessaging() async {
-    if (Platform.isIOS) {
-      NotificationSettings settings =
-          await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-
-      print('🔔 Permission granted: ${settings.authorizationStatus}');
-
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        print("✅ APNs Token: $apnsToken");
-
-        String? fcmToken = await FirebaseMessaging.instance.getToken();
-        print("✅ FCM Token: $fcmToken");
-      } else {
-        print("❌ Notification permission not granted");
-      }
+    try {
+      NotificationService.setupFirebaseMessaging();
+    } catch (e) {
+      print('Notification setup failed: $e');
     }
+  }
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showNotification(message);
-    });
+  void _setupLocalNotifications() async {
+    try {
+      await LocalNotificationService.initialize();
+      await LocalNotificationService.requestPermission();
+      await LocalNotificationService.syncDailyCheckInNotification();
+    } catch (e) {
+      print('Local notification setup failed: $e');
+    }
+  }
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Notification opened!');
+  void _refreshLocalNotifications() async {
+    try {
+      await LocalNotificationService.syncDailyCheckInNotification();
+    } catch (e) {
+      print('Local notification refresh failed: $e');
+    }
+  }
+
+  void _showDeferredCampaignNotification() {
+    Future.delayed(const Duration(milliseconds: 1400), () async {
+      if (!mounted) return;
+      try {
+        await LocalNotificationService.showImmediateCampaignReminderOnce();
+      } catch (e) {
+        print('Immediate campaign notification failed: $e');
+      }
     });
   }
 
   void _initUriLinks() async {}
-
-  Future<void> _showNotification(RemoteMessage message) async {
-    // await flutterLocalNotificationsPlugin.show(
-    //   0, // ID ของการแจ้งเตือน
-    //   message.notification?.title,
-    //   message.notification?.body,
-    //   platformChannelSpecifics,
-    // );
-  }
 
   _getUser() async {
     var code = await storage.read(key: 'profileCode10') ?? '';
@@ -196,6 +187,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
     if (state == AppLifecycleState.resumed) {
       _start();
+      _refreshLocalNotifications();
     }
     // if (state == AppLifecycleState.detached) {
     //   _stop();
@@ -257,8 +249,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             navigatorKey: navigatorKey,
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
-            themeMode:
-                value.darkTheme ? ThemeMode.dark : ThemeMode.light,
+            themeMode: value.darkTheme ? ThemeMode.dark : ThemeMode.light,
             title: appName,
             home: VersionPage(),
             builder: (context, child) {
