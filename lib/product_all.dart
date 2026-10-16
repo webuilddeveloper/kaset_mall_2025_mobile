@@ -49,24 +49,28 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
   bool changOrderKey = false;
   String orderBy = '';
   String filterType = '';
+  String _selectedSubcategory = 'ทั้งหมด';
   int page = 1;
   int total_page = 0;
   bool loadProduct = true;
   String? emailProfile;
 
   String _categoryTitle() {
-    switch (widget.typeelect) {
-      case '1':
-        return 'สินค้าเกษตร';
-      case '2':
-        return 'ปุ๋ยและเคมีภัณฑ์';
-      case '3':
-        return 'เครื่องมือการเกษตร';
-      case '4':
-        return 'อาหารสัตว์';
-      default:
-        return widget.title ?? 'สินค้า';
+    if (widget.typeelect == '0') {
+      return widget.title ?? 'สินค้า';
     }
+    return mockCategoryTitle(widget.typeelect);
+  }
+
+  List<String> _subcategories() {
+    if (widget.typeelect == '0') {
+      return const <String>[];
+    }
+    return mockSubcategoriesForType(widget.typeelect);
+  }
+
+  Color _categoryAccentColor() {
+    return const Color(0xFF2E7D32);
   }
 
   @override
@@ -87,7 +91,6 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
     super.dispose();
   }
 
-
   _callRead() async {
     // dashboard/readTop20
     // postProductData(
@@ -106,6 +109,7 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
       // emailProfile = dataValue['email'].toString() ?? "";
       // _futureModel = getData(server + 'products?per_page=' + _limit.toString());
       _filterSelected = widget.typeelect;
+      _selectedSubcategory = 'ทั้งหมด';
       if (_filterSelected == '0') {
         setState(() {
           _listModelMore = [...mockProductList];
@@ -157,6 +161,12 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
             .toList();
       } else {
         filteredList = [...mockProductList];
+      }
+
+      if (_selectedSubcategory != 'ทั้งหมด') {
+        filteredList = filteredList
+            .where((item) => item['subcategory'] == _selectedSubcategory)
+            .toList();
       }
 
       // กรองตามราคา (ถ้ามี)
@@ -964,53 +974,109 @@ class _ProductAllCentralPageState extends State<ProductAllCentralPage> {
           widget.mode ? (() => _refreshController?.loadComplete()) : _onLoading,
       child: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-        child: FutureBuilder(
-          future: _futureModel,
-          builder: (context, snapshot) {
-            if (_listModelMore.length > 0) {
-              if (changeToListView) {
-                return _buildListView(_listModelMore);
-              } else
-                return
-                    // Container();
-                    _buildGridView(_listModelMore);
-            } else {
-              return loadProduct == true
-                  ? GridView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 300,
-                        childAspectRatio: 9 / 14,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15,
-                      ),
-                      itemCount: 6,
-                      itemBuilder: (context, index) => Column(
-                        children: [
-                          SizedBox(height: 10),
-                          LoadingTween(
-                            height: 165,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_subcategories().isNotEmpty) _buildSubcategorySection(),
+            FutureBuilder(
+              future: _futureModel,
+              builder: (context, snapshot) {
+                if (_listModelMore.length > 0) {
+                  if (changeToListView) {
+                    return _buildListView(_listModelMore);
+                  } else {
+                    return _buildGridView(_listModelMore);
+                  }
+                } else {
+                  return loadProduct == true
+                      ? GridView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 300,
+                            childAspectRatio: 9 / 14,
+                            crossAxisSpacing: 15,
+                            mainAxisSpacing: 15,
                           ),
-                          SizedBox(height: 5),
-                          LoadingTween(
-                            height: 40,
+                          itemCount: 6,
+                          itemBuilder: (context, index) => Column(
+                            children: [
+                              SizedBox(height: 10),
+                              LoadingTween(
+                                height: 165,
+                              ),
+                              SizedBox(height: 5),
+                              LoadingTween(
+                                height: 40,
+                              ),
+                              SizedBox(height: 5),
+                              LoadingTween(
+                                height: 17,
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 5),
-                          LoadingTween(
-                            height: 17,
+                        )
+                      : Container(
+                          height: 165,
+                          child: Center(
+                            child: Text('ไม่พบสินค้า'),
                           ),
-                        ],
-                      ),
-                    )
-                  : Container(
-                      height: 165,
-                      child: Center(
-                        child: Text('ไม่พบสินค้า'),
-                      ),
-                    );
-            }
+                        );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubcategorySection() {
+    final accentColor = _categoryAccentColor();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+      child: SizedBox(
+        height: 38,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: _subcategories().length,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final item = _subcategories()[index];
+            final isSelected = item == _selectedSubcategory;
+            return InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () {
+                setState(() {
+                  _selectedSubcategory = item;
+                });
+                _applyFilter();
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? accentColor : const Color(0xFFEEF7EE),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: isSelected ? accentColor : const Color(0xFFD6E8D7),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF1C1C1A),
+                    ),
+                  ),
+                ),
+              ),
+            );
           },
         ),
       ),

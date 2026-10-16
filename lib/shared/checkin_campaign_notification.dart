@@ -672,10 +672,11 @@ class _CheckInCampaignNotificationCardState
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.card_giftcard_rounded,
-                color: Colors.white,
-                size: 12,
+              _rewardIconBubble(
+                backgroundColor: Colors.white.withValues(alpha: 0.18),
+                icon: Icons.local_offer_rounded,
+                iconColor: Colors.white,
+                size: 11,
               ),
               const SizedBox(height: 2),
               FittedBox(
@@ -738,18 +739,11 @@ class _CheckInCampaignNotificationCardState
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 18,
-            height: 18,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.check_rounded,
-              color: Colors.white,
-              size: 12,
-            ),
+          _rewardIconBubble(
+            backgroundColor: const Color(0xFFE4F2E7),
+            icon: Icons.check_rounded,
+            iconColor: AppColors.primary,
+            size: 11,
           ),
           const SizedBox(height: 2),
           FittedBox(
@@ -788,19 +782,12 @@ class _CheckInCampaignNotificationCardState
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFCFDFC),
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFE3E8E2)),
-            ),
-            child: Icon(
-              isLocked ? Icons.card_giftcard_rounded : Icons.redeem_rounded,
-              color: const Color(0xFFA6ACA2),
-              size: 10.5,
-            ),
+          _rewardIconBubble(
+            backgroundColor: const Color(0xFFFCFDFC),
+            borderColor: const Color(0xFFE3E8E2),
+            icon: Icons.local_offer_rounded,
+            iconColor: const Color(0xFFA6ACA2),
+            size: 10.5,
           ),
           const SizedBox(height: 2),
           FittedBox(
@@ -848,18 +835,11 @@ class _CheckInCampaignNotificationCardState
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 18,
-            height: 18,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.workspace_premium_rounded,
-              color: Color(0xFFE0703C),
-              size: 12,
-            ),
+          _rewardIconBubble(
+            backgroundColor: Colors.white,
+            icon: Icons.workspace_premium_rounded,
+            iconColor: const Color(0xFFE0703C),
+            size: 12,
           ),
           const SizedBox(height: 2),
           FittedBox(
@@ -880,7 +860,10 @@ class _CheckInCampaignNotificationCardState
           ),
         ],
       ),
-      footer: _buildFooterLabel('โบนัสใหญ่', const Color(0xFFE0703C)),
+      footer: _buildFooterLabel(
+        _specialRewardFooterLabel(reward),
+        const Color(0xFFE0703C),
+      ),
     );
   }
 
@@ -913,6 +896,25 @@ class _CheckInCampaignNotificationCardState
         color: color,
         height: 1.0,
       ),
+    );
+  }
+
+  Widget _rewardIconBubble({
+    required Color backgroundColor,
+    required IconData icon,
+    required Color iconColor,
+    required double size,
+    Color? borderColor,
+  }) {
+    return Container(
+      width: 18,
+      height: 18,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        shape: BoxShape.circle,
+        border: borderColor == null ? null : Border.all(color: borderColor),
+      ),
+      child: Icon(icon, color: iconColor, size: size),
     );
   }
 
@@ -1097,5 +1099,11 @@ class _CheckInCampaignNotificationCardState
   String _specialRewardValueLabel(Map<String, dynamic> reward) {
     if (reward.isEmpty) return '';
     return _isShippingReward(reward) ? 'ส่งฟรี' : _displayRewardValue(reward);
+  }
+
+  String _specialRewardFooterLabel(Map<String, dynamic> reward) {
+    if (reward.isEmpty) return 'รางวัลใหญ่';
+    if (_isShippingReward(reward)) return 'สิทธิ์พิเศษ';
+    return 'ส่วนลดใหญ่';
   }
 }

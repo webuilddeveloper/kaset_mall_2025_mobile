@@ -25,6 +25,13 @@ class CheckInDayItem extends StatelessWidget {
     final isToday = status == 'today';
     final isSpecial = status == 'special';
     final isSpecialToday = status == 'special_today';
+    final iconColor = isSpecial || isSpecialToday
+        ? const Color(0xFFE0703C)
+        : isClaimed
+            ? AppColors.primary
+            : isToday
+                ? AppColors.primaryDark
+                : const Color(0xFF9AA39D);
 
     return Container(
       width: width,
@@ -68,28 +75,27 @@ class CheckInDayItem extends StatelessWidget {
           ),
           const Spacer(),
           if (isClaimed)
-            Container(
-              width: 48,
-              height: 48,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
+            _RewardIconShell(
+              foregroundColor: AppColors.primary,
+              backgroundColor: const Color(0xFFE8F4EA),
               child: const Icon(
                 Icons.check_rounded,
-                color: Colors.white,
-                size: 30,
+                color: AppColors.primary,
+                size: 24,
               ),
             )
           else if (isSpecial || isSpecialToday)
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 20,
-                  color: Color(0xFFE0703C),
+                _RewardIconShell(
+                  foregroundColor: const Color(0xFFE0703C),
+                  backgroundColor: const Color(0xFFFFEFE4),
+                  child: const Icon(
+                    Icons.workspace_premium_rounded,
+                    size: 18,
+                    color: Color(0xFFE0703C),
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -108,19 +114,37 @@ class CheckInDayItem extends StatelessWidget {
               ],
             )
           else
-            Text(
-              rewardText,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Kanit',
-                fontSize: rewardText.length <= 4 ? 18 : 15,
-                fontWeight: FontWeight.w700,
-                color:
-                    isToday ? AppColors.primaryDark : const Color(0xFF868E88),
-                height: 1.1,
-              ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _RewardIconShell(
+                  foregroundColor: iconColor,
+                  backgroundColor: isToday
+                      ? const Color(0xFFE5F2E7)
+                      : const Color(0xFFF6F8F6),
+                  child: Icon(
+                    Icons.local_offer_rounded,
+                    size: 18,
+                    color: iconColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  rewardText,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: rewardText.length <= 4 ? 18 : 15,
+                    fontWeight: FontWeight.w700,
+                    color: isToday
+                        ? AppColors.primaryDark
+                        : const Color(0xFF868E88),
+                    height: 1.1,
+                  ),
+                ),
+              ],
             ),
           const Spacer(),
           if (footerText != null && footerText!.isNotEmpty)
@@ -145,6 +169,35 @@ class CheckInDayItem extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _RewardIconShell extends StatelessWidget {
+  const _RewardIconShell({
+    required this.child,
+    required this.backgroundColor,
+    required this.foregroundColor,
+  });
+
+  final Widget child;
+  final Color backgroundColor;
+  final Color foregroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: foregroundColor.withValues(alpha: 0.14),
+        ),
+      ),
+      child: child,
     );
   }
 }

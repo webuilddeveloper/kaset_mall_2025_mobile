@@ -202,14 +202,15 @@ class _CarouselBanner extends State<CarouselBanner>
                               width: double.infinity,
                             ),
                             BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+                              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
                               child: Container(
                                 color: Colors.white.withValues(alpha: 0.28),
                               ),
                             ),
                             Center(
                               child: Padding(
-                                padding: const EdgeInsets.all(6),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 0),
                                 child: loadingImageNetwork(
                                   document['imageUrl'],
                                   fit: BoxFit.contain,

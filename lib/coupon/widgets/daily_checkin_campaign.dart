@@ -382,7 +382,7 @@ class _DailyCheckInCampaignState extends State<DailyCheckInCampaign> {
     required String status,
     required int day,
   }) {
-    if (day == 8) return 'โบนัสใหญ่';
+    if (day == 8) return 'ส่วนลดใหญ่';
     if (status == 'claimed') return 'รับแล้ว';
     if (status == 'today') return 'รับวันนี้';
     return _isShippingReward(reward) ? 'สิทธิ์วันนี้' : 'รอรับ';

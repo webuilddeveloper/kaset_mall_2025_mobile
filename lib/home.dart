@@ -12,6 +12,7 @@ import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/component/toast_fail.dart';
 import 'package:kasetmall/event_calendar_form.dart';
 import 'package:kasetmall/event_calendar_main.dart';
+import 'package:kasetmall/farmer_campaign_page.dart';
 import 'package:kasetmall/news_all.dart';
 import 'package:kasetmall/news_form.dart';
 import 'package:kasetmall/privilege_all.dart';
@@ -24,6 +25,8 @@ import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/login_guard.dart';
 import 'package:kasetmall/shared/notification_service.dart';
 import 'package:kasetmall/shared/checkin_campaign_notification.dart';
+import 'package:kasetmall/shared/app_theme.dart';
+import 'package:kasetmall/shared/farmer_campaign_store.dart';
 import 'package:kasetmall/shared/mock_store.dart';
 import 'package:lottie/lottie.dart';
 
@@ -82,6 +85,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
   DateTime? currentBackPressTime;
   late final VoidCallback _cartListener;
   late final VoidCallback _dailyCheckInNotificationListener;
+  late final VoidCallback _farmerCampaignListener;
 
   String? emailProfile;
   int total_page = 0;
@@ -107,10 +111,14 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         _consumePendingDailyCheckInAction();
       }
     };
+    _farmerCampaignListener = () {
+      if (mounted) setState(() {});
+    };
     MockStore.authVersion.addListener(_authListener);
     MockStore.cartVersion.addListener(_cartListener);
     LocalNotificationService.dailyCheckInActionVersion
         .addListener(_dailyCheckInNotificationListener);
+    FarmerCampaignStore.version.addListener(_farmerCampaignListener);
     _getCategory();
     _callRead();
     // _getUserData();
@@ -133,6 +141,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     MockStore.cartVersion.removeListener(_cartListener);
     LocalNotificationService.dailyCheckInActionVersion
         .removeListener(_dailyCheckInNotificationListener);
+    FarmerCampaignStore.version.removeListener(_farmerCampaignListener);
     _scrollController?.dispose();
     _refreshController?.dispose();
     super.dispose();
@@ -557,6 +566,8 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   _buildCategory(),
                   const SizedBox(height: 6),
                   _buildCouponTodaySection(),
+                  const SizedBox(height: 10),
+                  _buildFarmerCampaignCard(),
 
                   const SizedBox(height: 8),
                   _buildForYou(),
@@ -771,20 +782,27 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
         final categories = snapshot.data as List<dynamic>;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+          ),
           child: GridView.builder(
             padding: EdgeInsets.zero,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             itemCount: categories.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              mainAxisExtent: 100,
-            ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                mainAxisExtent: MediaQuery.of(context).size.height * 0.135),
             itemBuilder: (context, i) {
               final item = categories[i];
+              final iconBgColor = Color(
+                (item['iconBgColor'] as int?) ?? 0xFFEEF7EE,
+              );
+              final borderColor = Color(
+                (item['borderColor'] as int?) ?? 0xFFE5EEE4,
+              );
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -802,7 +820,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0xFFE5EEE4)),
+                    border: Border.all(color: borderColor),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFF143D16).withOpacity(0.04),
@@ -826,7 +844,7 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
                                 height: 65,
                                 width: 65,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEEF7EE),
+                                  color: iconBgColor,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 alignment: Alignment.center,
@@ -1318,10 +1336,154 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
     );
   }
 
+  Widget _buildFarmerCampaignCard() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: FarmerCampaignStore.getState(),
+      builder: (context, snapshot) {
+        final completed = snapshot.data?['completed'] == true;
+        final reward = Map<String, dynamic>.from(
+          (snapshot.data?['reward'] as Map?) ??
+              FarmerCampaignStore.campaign['reward'] as Map,
+        );
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () async {
+                final changed = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const FarmerCampaignPage(),
+                  ),
+                );
+                if (changed == true && mounted) setState(() {});
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(15, 14, 14, 14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: completed
+                        ? const [Color(0xFFF3F8F3), Color(0xFFEEF7EE)]
+                        : const [Color(0xFFFFFCF5), Color(0xFFF5FAF3)],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryDark.withOpacity(0.05),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 54,
+                      height: 54,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: completed
+                            ? AppColors.tintGreen
+                            : AppColors.accentTint,
+                        borderRadius: BorderRadius.circular(17),
+                      ),
+                      // child: completed
+                      //     ? const Icon(
+                      //         Icons.verified_rounded,
+                      //         size: 28,
+                      //         color: AppColors.primary,
+                      //       )
+                      //     : const Text(
+                      //         '🌱',
+                      //         style: TextStyle(fontSize: 27),
+                      //       ),
+                      child: LottieBuilder.asset(
+                          'assets/lotties/Agriculture based on data.json'),
+                    ),
+                    const SizedBox(width: 13),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Container(
+                          //   padding: const EdgeInsets.symmetric(
+                          //     horizontal: 9,
+                          //     vertical: 3,
+                          //   ),
+                          //   decoration: BoxDecoration(
+                          //     color: completed
+                          //         ? AppColors.tintGreen
+                          //         : AppColors.accentTint,
+                          //     borderRadius: BorderRadius.circular(999),
+                          //   ),
+                          //   child: Text(
+                          //     completed ? 'อัปเดตแล้ว' : 'แคมเปญสำหรับเกษตรกร',
+                          //     style: TextStyle(
+                          //       fontSize: 10.5,
+                          //       fontWeight: FontWeight.w700,
+                          //       color: completed
+                          //           ? AppColors.primaryDark
+                          //           : AppColors.accentHover,
+                          //     ),
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 6),
+                          Text(
+                            completed
+                                ? 'ได้รับปุ๋ยฟรี ${reward['quantity']}'
+                                : FarmerCampaignStore.campaign['title']
+                                    .toString(),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                              height: 1.25,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            completed
+                                ? 'คำนวณจากพื้นที่ ${reward['areaRai'] ?? 0} ไร่'
+                                : FarmerCampaignStore.campaign['description']
+                                    .toString(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11.8,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildBestSellerSection() {
-    final items = _futureProductHot.isNotEmpty
-        ? _futureProductHot.take(6).toList()
-        : mockProductList.take(6).toList();
+    final items = mockBestSellerProducts(limit: 6);
 
     return Container(
       color: Colors.white,
@@ -1524,15 +1686,13 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
             if (type == '0') {
               onRefresh();
             } else if (type == '1') {
-              onRefresh(); // พรรณพืช
+              onRefresh(); // เทคโนโลยีการเกษตร
             } else if (type == '2') {
-              onRefresh(); // เคมีภัณฑ์
-            } else if (type == '2') {
-              onRefresh(); // เคมีภัณฑ์
+              onRefresh(); // ปุ๋ยและเคมีภัณฑ์
             } else if (type == '3') {
-              onRefresh(); // อาหารสัตว์
+              onRefresh(); // เครื่องมือการเกษตร
             } else if (type == '4') {
-              onRefresh(); // เครื่องมือ
+              onRefresh(); // วัตถุดิบและอาหารสัตว์
             }
           });
         },
@@ -1546,12 +1706,12 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
             type == '0'
                 ? 'ทั้งหมด'
                 : type == '1'
-                    ? 'พรรณพืช'
+                    ? 'เทคโนโลยี'
                     : type == '2'
-                        ? 'เครื่องมือ'
+                        ? 'ปุ๋ยและเคมี'
                         : type == '3'
-                            ? 'อาหารสัตว์'
-                            : 'เคมีภัณฑ์',
+                            ? 'เครื่องมือ'
+                            : 'วัตถุดิบ/อาหารสัตว์',
             style: TextStyle(
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

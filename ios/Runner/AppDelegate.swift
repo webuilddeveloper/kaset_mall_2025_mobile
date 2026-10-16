@@ -1,22 +1,18 @@
 import Flutter
 import UIKit
 
-import Firebase
-import flutter_local_notifications
-
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterPluginRegistrant {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-
-    if #available(iOS 10.0, *) {
-      UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
-    }
-
-    // GMSServices.provideAPIKey("AIzaSyDPcNbGx51w5cVYGIW1QURDHwmLeMwDD4c") //DDPM
-    GeneratedPluginRegistrant.register(with: self)
+    // Flutter 3.35 registers storyboard-created engines through this callback.
+    pluginRegistrant = self
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  func register(with registry: FlutterPluginRegistry) {
+    GeneratedPluginRegistrant.register(with: registry)
   }
 }

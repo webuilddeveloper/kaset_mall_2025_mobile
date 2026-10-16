@@ -75,6 +75,7 @@ class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
   }
 
   Future<void> _resetCouponTestData() async {
+    print('Resetting...');
     await CouponStore.clearSavedCoupons();
     await CouponStore.clearDynamicCoupons();
     await DailyCheckInStore.resetCampaign();
@@ -619,7 +620,7 @@ class _PrivilegeAllPageState extends State<PrivilegeAllPage> {
                                 foregroundColor: AppColors.textSecondary,
                               ),
                               child: const Text(
-                                'Reset',
+                                'Reset ',
                                 style: TextStyle(
                                   fontFamily: 'Kanit',
                                   fontSize: 11.5,

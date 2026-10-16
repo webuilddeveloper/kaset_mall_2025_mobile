@@ -101,7 +101,6 @@ class _SettingMain extends State<SettingMain> {
       backgroundColor: AppColors.background,
       appBar: KasetAppBar(
         title: 'ตั้งค่า',
-        subtitle: 'จัดการบัญชีและความเป็นส่วนตัว',
         actions: [
           KasetAppBarAction(
             icon: Icons.help_outline_rounded,

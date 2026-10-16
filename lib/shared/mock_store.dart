@@ -311,6 +311,20 @@ class DailyCheckInStore {
     },
   ];
 
+  static const Map<String, dynamic> _dayEightRewardTemplate = {
+    'day': 8,
+    'name': 'คูปองรางวัลใหญ่วันที่ 8',
+    'discount': '฿80',
+    'discountType': 'amount',
+    'discountValue': 80,
+    'minimumOrderTotal': 800,
+    'eligibleKeywords': <String>[],
+    'tag': 'รางวัลใหญ่',
+    'subtitle': 'ส่วนลด 80 บาท สำหรับคำสั่งซื้อถัดไป',
+    'description': 'เช็กอินครบ 8 วัน รับคูปองส่วนลด 80 บาท',
+    'condition': 'ใช้ได้กับคำสั่งซื้อขั้นต่ำ 800 บาท',
+  };
+
   static String _dateKey(DateTime date) {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
@@ -400,6 +414,7 @@ class DailyCheckInStore {
       'buttonEnabled': !checkedInToday,
       'isCycleCompleted': currentDay > 7 && checkedInToday,
       'todayReward': currentDay <= 7 ? _rewardTemplateForDay(currentDay) : null,
+      'dayEightReward': Map<String, dynamic>.from(_dayEightRewardTemplate),
     };
   }
 
