@@ -33,6 +33,17 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+
+    // Flutter can add Kotlin to Java-only plugins; keep both bytecode targets aligned.
+    project.pluginManager.withPlugin('org.jetbrains.kotlin.android') {
+        project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            compilerOptions.jvmTarget.set(project.provider {
+                org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(
+                    project.extensions.getByName('android').compileOptions.targetCompatibility.toString()
+                )
+            })
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(':app')
