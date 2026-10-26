@@ -26,7 +26,7 @@ const versionNumber = 12;
 // const server = 'https://0a02-125-24-6-114.au.ngrok.io/';
 // const server = 'https://ssp.we-builds.com/ssp-api/';
 // const server = 'https://private-anon-a0406381df-sspmall.apiary-mock.com/';
-const server = 'https://api.suksapanmall.com/';
+const server = 'https://gateway.we-builds.com/kaset-mall-api/';
 // const server_we_build = 'http://122.155.223.63/td-we-mart-api/';
 const server_we_build = 'https://gateway.we-builds.com/kaset-mall-api/';
 

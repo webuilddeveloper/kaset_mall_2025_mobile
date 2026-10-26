@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kasetmall/policy.dart';
 import 'package:kasetmall/register.dart';
+import 'package:kasetmall/shared/app_bar.dart';
 import 'package:kasetmall/shared/app_theme.dart';
 import 'package:kasetmall/widget/text_field.dart';
 
@@ -78,6 +79,10 @@ class _LoginCentralPageState extends State<LoginCentralPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
+      appBar: const KasetAppBar(
+        title: 'เข้าสู่ระบบ',
+        backgroundColor: Colors.transparent,
+      ),
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => FocusScope.of(context).unfocus(),

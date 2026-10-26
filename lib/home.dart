@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:kasetmall/ai_chat_page.dart';
 import 'package:kasetmall/cart.dart';
 import 'package:kasetmall/component/carousel_banner.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
@@ -587,6 +588,27 @@ class _HomeCentralPageState extends State<HomeCentralPage> {
           )
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80),
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => AiChatPage(
+                  initialIsDark: Theme.of(context).brightness == Brightness.dark,
+                ),
+              ),
+            );
+          },
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 3,
+          tooltip: 'ผู้ช่วยเกษตร Kaset Mall',
+          child: const Icon(Icons.eco_rounded),
+        ),
+      ),
+
     );
   }
 

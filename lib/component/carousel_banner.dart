@@ -2,11 +2,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'dart:ui';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:kasetmall/banner_detail_page.dart';
 import 'package:kasetmall/component/carousel_form.dart';
 import 'package:kasetmall/component/link_url_in.dart';
 import 'package:kasetmall/component/loading_image_network.dart';
 import 'package:kasetmall/component/material/loading_tween.dart';
 import 'package:kasetmall/exercise_main.dart';
+import 'package:kasetmall/shared/api_provider.dart';
 import 'package:kasetmall/shared/login_guard.dart';
 
 class CarouselBanner extends StatefulWidget {
@@ -62,6 +64,86 @@ class _CarouselBanner extends State<CarouselBanner>
     });
   }
 
+  Future<List<String>> _readGallery(dynamic code) async {
+    try {
+      final result = await postObjectData(bannerGalleryApi, {'code': code});
+      if (result['status'] != 'S') return [];
+      return (result['objectData'] as List)
+          .map((e) => (e['imageUrl'] ?? '').toString())
+          .where((url) => url.isNotEmpty)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> _onTapBanner(Map<String, dynamic> item) async {
+    if (item['isChkLogin'] == true) {
+      final allowed = await requireLogin(
+        context,
+        title: 'เข้าสู่ระบบ',
+        description: 'ต้องเข้าสู่ระบบก่อนเพื่อดูเนื้อหานี้',
+      );
+      if (!allowed || !mounted) return;
+      await _getprofileCode();
+      await _getUserData();
+    }
+
+    final action = item['action'];
+    final linkUrl = (item['linkUrl'] ?? '').toString();
+
+    if (action == 'out' && linkUrl.isNotEmpty) {
+      final linkSplit = linkUrl.split('/');
+      if (linkSplit[0] == '') {
+        if (linkSplit.length > 1 && linkSplit[1] == 'exercise') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExerciseMain(coverImg: item['imageUrl']),
+            ),
+          );
+        }
+      } else if (item['isPostHeader'] == true) {
+        if (profileCode != '') {
+          var path = linkUrl;
+          if (!path.endsWith('/')) path = path + '/';
+          final codeReplace = 'B' +
+              profileCode.replaceAll('-', '') +
+              item['code'].toString().replaceAll('-', '');
+          launchInWebViewWithJavaScript('$path$codeReplace');
+        }
+      } else {
+        launchInWebViewWithJavaScript(linkUrl);
+      }
+    } else if (action == 'in') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CarouselForm(
+            code: item['code'],
+            model: item,
+            url: 'm/Banner/' + (widget.url ?? ''),
+            urlGallery: 'm/Banner/' + (widget.url ?? ''),
+          ),
+        ),
+      );
+    } else {
+      final gallery = await _readGallery(item['code']);
+      if (!mounted) return;
+      final hasDescription =
+          (item['description'] ?? '').toString().trim().isNotEmpty;
+      if (hasDescription || gallery.isNotEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                BannerDetailPage(model: item, gallery: gallery),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -75,107 +157,7 @@ class _CarouselBanner extends State<CarouselBanner>
               children: [
                 // 🔹 Carousel ส่วนรูป
                 InkWell(
-                  onTap: () async {
-                    List<String> linkSplit =
-                        snapshot.data[_current]['linkUrl'].split('/');
-                    if (snapshot.data[_current]['isChkLogin']) {
-                      final allowed = await requireLogin(
-                        context,
-                        title: 'เข้าสู่ระบบ',
-                        description: 'ต้องเข้าสู่ระบบก่อนเพื่อดูเนื้อหานี้',
-                      );
-                      if (!allowed) return;
-                      await _getprofileCode();
-                      await _getUserData();
-                      if (snapshot.data[_current]['action'] == 'out') {
-                        if (linkSplit[0] == '') {
-                          if (linkSplit[1] == 'exercise') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ExerciseMain(
-                                  coverImg: snapshot.data[_current]['imageUrl'],
-                                ),
-                              ),
-                            );
-                          }
-                        } else {
-                          if (snapshot.data[_current]['isPostHeader']) {
-                            if (profileCode != '') {
-                              var path = snapshot.data[_current]['linkUrl'];
-                              var code = snapshot.data[_current]['code'];
-                              var splitCheck = path.split('').reversed.join();
-                              if (splitCheck[0] != "/") {
-                                path = path + "/";
-                              }
-                              var codeReplae = "B" +
-                                  profileCode.replaceAll('-', '') +
-                                  code.replaceAll('-', '');
-                              launchInWebViewWithJavaScript('$path$codeReplae');
-                            }
-                          } else {
-                            launchInWebViewWithJavaScript(
-                                snapshot.data[_current]['linkUrl']);
-                          }
-                        }
-                      } else if (snapshot.data[_current]['action'] == 'in') {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CarouselForm(
-                              code: snapshot.data[_current]['code'],
-                              model: snapshot.data[_current],
-                              url: 'm/Banner/' + widget.url!,
-                              urlGallery: 'm/Banner/' + widget.url!,
-                            ),
-                          ),
-                        );
-                      }
-                    } else {
-                      if (snapshot.data[_current]['action'] == 'out') {
-                        if (linkSplit[0] == '') {
-                          if (linkSplit[1] == 'exercise') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ExerciseMain(),
-                              ),
-                            );
-                          }
-                        } else {
-                          if (snapshot.data[_current]['isPostHeader']) {
-                            if (profileCode != '') {
-                              var path = snapshot.data[_current]['linkUrl'];
-                              var code = snapshot.data[_current]['code'];
-                              var splitCheck = path.split('').reversed.join();
-                              if (splitCheck[0] != "/") {
-                                path = path + "/";
-                              }
-                              var codeReplae = "B" +
-                                  profileCode.replaceAll('-', '') +
-                                  code.replaceAll('-', '');
-                              launchInWebViewWithJavaScript('$path$codeReplae');
-                            }
-                          } else {
-                            launchInWebViewWithJavaScript(
-                                snapshot.data[_current]['linkUrl']);
-                          }
-                        }
-                      } else if (snapshot.data[_current]['action'] == 'in') {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CarouselForm(
-                              code: snapshot.data[_current]['code'],
-                              model: snapshot.data[_current],
-                              url: 'm/Banner/' + widget.url!,
-                              urlGallery: 'm/Banner/' + widget.url!,
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  },
+                  onTap: () => _onTapBanner(snapshot.data[_current]),
                   child: CarouselSlider(
                     options: CarouselOptions(
                       height: widget.height,
